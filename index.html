@@ -1,0 +1,1070 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="ALL Pedidos"/>
+<meta name="theme-color" content="#FF4D00"/>
+<title>ALL — Pedidos v1.0</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5}
+body{font-family:system-ui,-apple-system,sans-serif}
+
+/* ── VISTAS ── */
+.vista{display:none;width:100%;height:100vh;flex-direction:column;overflow:hidden}
+.vista.activa{display:flex}
+
+/* ── SPLASH ── */
+#v-splash{background:#FF4D00;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.splash-logo{width:80px;height:80px;border-radius:24px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center}
+.splash-title{font-size:28px;font-weight:800;color:#fff;letter-spacing:-1px}
+.splash-sub{font-size:13px;color:rgba(255,255,255,0.7)}
+
+/* ── AUTH ── */
+#v-auth{background:#1A1A1A;overflow-y:auto}
+.auth-hero{padding:48px 24px 28px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.auth-logo{font-size:36px;font-weight:800;color:#fff;letter-spacing:-2px}
+.auth-logo span{color:#FF4D00}
+.auth-sub{font-size:12px;color:rgba(255,255,255,0.4);text-align:center}
+.auth-body{flex:1;background:#fff;border-radius:28px 28px 0 0;padding:28px 20px;overflow-y:auto}
+.auth-tabs{display:flex;gap:0;margin-bottom:24px;background:#f5f5f5;border-radius:12px;padding:4px}
+.auth-tab{flex:1;padding:10px;text-align:center;font-size:14px;font-weight:600;border-radius:10px;cursor:pointer;color:#888;transition:.2s}
+.auth-tab.active{background:#fff;color:#1A1A1A;box-shadow:0 1px 4px rgba(0,0,0,0.1)}
+.field-label{font-size:12px;font-weight:600;color:#1A1A1A;margin-bottom:8px}
+.input{width:100%;padding:14px;font-size:15px;border-radius:12px;border:1.5px solid #eee;background:#fafafa;color:#1A1A1A;margin-bottom:14px;outline:none}
+.input:focus{border-color:#FF4D00}
+.btn-main{width:100%;padding:16px;background:#FF4D00;color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer}
+.btn-sec{width:100%;padding:14px;background:#f5f5f5;color:#1A1A1A;border:none;border-radius:14px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
+.pass-wrap{position:relative;margin-bottom:14px}
+.pass-wrap .input{margin-bottom:0;padding-right:48px}
+.pass-ojo{position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px}
+.msg-err{font-size:12px;padding:10px;background:#FFF0F0;border-radius:8px;color:#E24B4A;margin-bottom:12px;display:none}
+.msg-ok{font-size:12px;padding:10px;background:#E8F5E9;border-radius:8px;color:#2D6A2D;margin-bottom:12px;display:none}
+
+/* ── HOME ── */
+#v-home{background:#f5f5f5}
+.topbar-home{background:#FF4D00;padding:48px 16px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.topbar-home-title{font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.5px;flex:1}
+.topbar-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0}
+.home-scroll{flex:1;overflow-y:auto;padding:14px}
+.home-section{font-size:11px;font-weight:700;color:#888;letter-spacing:1px;text-transform:uppercase;margin:14px 0 10px}
+.resto-card{background:#fff;border-radius:18px;margin-bottom:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);cursor:pointer;transition:.15s}
+.resto-card:active{transform:scale(0.98)}
+.resto-card-img{width:100%;height:130px;background:#FFF4EF;display:flex;align-items:center;justify-content:center;font-size:48px;position:relative;overflow:hidden}
+.resto-card-img img{width:100%;height:100%;object-fit:cover}
+.resto-card-badge{position:absolute;top:10px;right:10px;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px}
+.badge-abierto{background:#E8F5E9;color:#2D6A2D}
+.badge-cerrado{background:rgba(0,0,0,0.5);color:#fff}
+.badge-tipo{position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.5);color:#fff;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px}
+.resto-card-body{padding:14px}
+.resto-card-nombre{font-size:16px;font-weight:700;color:#1A1A1A}
+.resto-card-cat{font-size:12px;color:#888;margin-top:3px}
+.resto-card-info{display:flex;gap:12px;margin-top:8px}
+.resto-card-info span{font-size:11px;color:#888;display:flex;align-items:center;gap:3px}
+
+/* ── MENÚ RESTAURANTE ── */
+#v-menu{background:#f5f5f5}
+.menu-topbar{background:#fff;padding:48px 16px 0;border-bottom:1px solid #eee;flex-shrink:0}
+.menu-topbar-row{display:flex;align-items:center;gap:10px;padding-bottom:14px}
+.back-btn{font-size:24px;color:#1A1A1A;cursor:pointer;background:none;border:none;padding:0}
+.menu-resto-nombre{font-size:16px;font-weight:700;color:#1A1A1A;flex:1}
+.carrito-btn{position:relative;background:#FF4D00;border:none;border-radius:20px;padding:8px 16px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px}
+.carrito-count{background:#fff;color:#FF4D00;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.cat-tabs{display:flex;gap:8px;overflow-x:auto;padding:0 16px 12px;scrollbar-width:none}
+.cat-tabs::-webkit-scrollbar{display:none}
+.cat-tab{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;border:none;background:#f5f5f5;color:#888;flex-shrink:0}
+.cat-tab.active{background:#FF4D00;color:#fff}
+.menu-scroll{flex:1;overflow-y:auto;padding:14px}
+.menu-cat-title{font-size:11px;font-weight:700;color:#FF4D00;letter-spacing:1px;text-transform:uppercase;margin:16px 0 8px}
+.prod-item{background:#fff;border-radius:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,0.05);cursor:pointer;transition:.15s}
+.prod-item:active{transform:scale(0.98)}
+.prod-item-img{width:70px;height:70px;border-radius:10px;background:#FFF4EF;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;overflow:hidden}
+.prod-item-img img{width:100%;height:100%;object-fit:cover}
+.prod-item-info{flex:1}
+.prod-item-nombre{font-size:14px;font-weight:700;color:#1A1A1A}
+.prod-item-desc{font-size:11px;color:#888;margin-top:3px;line-height:1.4}
+.prod-item-precio{font-size:15px;font-weight:700;color:#FF4D00;margin-top:6px}
+.prod-item-precio-orig{font-size:12px;color:#aaa;text-decoration:line-through;margin-left:4px}
+.prod-item-add{width:32px;height:32px;border-radius:50%;background:#FF4D00;color:#fff;border:none;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;line-height:1}
+.prod-item-nodisponible{opacity:0.4;pointer-events:none}
+.prod-qty{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.qty-btn{width:28px;height:28px;border-radius:50%;border:1.5px solid #FF4D00;background:#fff;color:#FF4D00;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.qty-num{font-size:14px;font-weight:700;color:#1A1A1A;min-width:20px;text-align:center}
+
+/* ── CARRITO ── */
+#v-carrito{background:#f5f5f5}
+.carrito-topbar{background:#fff;padding:48px 16px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.carrito-topbar-title{font-size:18px;font-weight:700;color:#1A1A1A;flex:1}
+.carrito-scroll{flex:1;overflow-y:auto;padding:14px}
+.carrito-item{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.carrito-item-info{flex:1}
+.carrito-item-nombre{font-size:14px;font-weight:700;color:#1A1A1A}
+.carrito-item-precio{font-size:13px;color:#FF4D00;margin-top:3px}
+.carrito-footer{background:#fff;padding:16px 20px;border-top:1px solid #eee;flex-shrink:0}
+.carrito-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.carrito-total-label{font-size:14px;color:#888}
+.carrito-total-val{font-size:22px;font-weight:800;color:#1A1A1A}
+
+/* ── CHECKOUT ── */
+#v-checkout{background:#f5f5f5}
+.checkout-topbar{background:#fff;padding:48px 16px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.checkout-scroll{flex:1;overflow-y:auto;padding:14px}
+.checkout-section{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px}
+.checkout-section-title{font-size:13px;font-weight:700;color:#1A1A1A;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.dir-row{display:flex;align-items:center;gap:10px;background:#FFF4EF;border-radius:12px;padding:12px}
+.dir-icon{font-size:20px;flex-shrink:0}
+.dir-text{flex:1;font-size:13px;color:#1A1A1A;font-weight:600}
+.dir-change{font-size:12px;color:#FF4D00;font-weight:600;cursor:pointer;white-space:nowrap}
+.pago-opt{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;border:2px solid #eee;margin-bottom:8px;cursor:pointer;transition:.15s}
+.pago-opt.selected{border-color:#FF4D00;background:#FFF4EF}
+.pago-opt-icon{font-size:22px;width:40px;text-align:center}
+.pago-opt-info{flex:1}
+.pago-opt-label{font-size:14px;font-weight:600;color:#1A1A1A}
+.pago-opt-sub{font-size:11px;color:#888;margin-top:2px}
+.pago-check{width:20px;height:20px;border-radius:50%;border:2px solid #eee;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.pago-opt.selected .pago-check{background:#FF4D00;border-color:#FF4D00;color:#fff;font-size:12px}
+.ticket-upload{margin-top:12px;padding:14px;background:#f5f5f5;border-radius:12px;border:1.5px dashed #ddd;text-align:center;cursor:pointer;display:none}
+.ticket-preview{width:100%;border-radius:10px;margin-top:8px;display:none}
+.resumen-item{display:flex;justify-content:space-between;font-size:13px;color:#555;padding:4px 0}
+.resumen-total{display:flex;justify-content:space-between;font-size:16px;font-weight:700;color:#1A1A1A;padding-top:10px;margin-top:6px;border-top:1px solid #eee}
+.notas-input{width:100%;padding:12px;font-size:13px;border-radius:10px;border:1.5px solid #eee;background:#fafafa;color:#1A1A1A;outline:none;resize:none;height:70px}
+.checkout-footer{background:#fff;padding:16px 20px;border-top:1px solid #eee;flex-shrink:0}
+
+/* ── SEGUIMIENTO ── */
+#v-seguimiento{background:#f5f5f5}
+.seg-topbar{background:#fff;padding:48px 16px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.seg-scroll{flex:1;overflow-y:auto;padding:14px}
+.seg-estado-card{background:#FF4D00;border-radius:18px;padding:20px;margin-bottom:14px;text-align:center}
+.seg-estado-icon{font-size:48px;margin-bottom:8px}
+.seg-estado-label{font-size:20px;font-weight:800;color:#fff}
+.seg-estado-sub{font-size:13px;color:rgba(255,255,255,0.8);margin-top:4px}
+.seg-steps{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px}
+.seg-step{display:flex;align-items:center;gap:12px;padding:8px 0}
+.seg-step-dot{width:28px;height:28px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;transition:.3s}
+.seg-step-dot.done{background:#2D6A2D;color:#fff}
+.seg-step-dot.active{background:#FF4D00;color:#fff}
+.seg-step-line{width:2px;height:24px;background:#eee;margin-left:13px}
+.seg-step-line.done{background:#2D6A2D}
+.seg-step-label{font-size:13px;font-weight:600;color:#888}
+.seg-step-label.done{color:#2D6A2D}
+.seg-step-label.active{color:#1A1A1A;font-weight:700}
+.seg-info-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px}
+.seg-info-title{font-size:12px;font-weight:700;color:#888;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}
+.seg-info-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0}
+.seg-info-label{color:#888}
+.seg-info-val{font-weight:600;color:#1A1A1A}
+.btn-reclamo{width:100%;padding:14px;background:#FFF0F0;color:#E24B4A;border:1.5px solid #FFD0D0;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px}
+
+/* ── MIS PEDIDOS ── */
+#v-mispedidos{background:#f5f5f5}
+.mispedidos-topbar{background:#fff;padding:48px 16px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.pedido-hist-card{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer}
+.pedido-hist-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.pedido-hist-num{font-size:12px;font-weight:700;color:#FF4D00}
+.pedido-hist-fecha{font-size:11px;color:#888}
+.pedido-hist-resto{font-size:14px;font-weight:700;color:#1A1A1A;margin-bottom:4px}
+.pedido-hist-items{font-size:12px;color:#888}
+.pedido-hist-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid #f5f5f5}
+.pedido-hist-total{font-size:15px;font-weight:700;color:#1A1A1A}
+.tag{font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px}
+.tag-nuevo{background:#FFF0E5;color:#FF4D00}
+.tag-preparando{background:#FFF9E5;color:#B8860B}
+.tag-camino{background:#E3F2FD;color:#1565C0}
+.tag-entregado{background:#E8F5E9;color:#2D6A2D}
+.tag-cancelado{background:#f5f5f5;color:#aaa}
+
+/* ── PERFIL ── */
+#v-perfil{background:#f5f5f5}
+.perfil-topbar{background:#FF4D00;padding:48px 16px 24px;display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0}
+.perfil-avatar{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff}
+.perfil-nombre{font-size:18px;font-weight:700;color:#fff}
+.perfil-email{font-size:12px;color:rgba(255,255,255,0.7)}
+.perfil-scroll{flex:1;overflow-y:auto;padding:14px}
+.perfil-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:10px}
+.perfil-card-title{font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.perfil-campo{margin-bottom:14px}
+
+/* ── RECLAMO ── */
+#v-reclamo{background:#f5f5f5}
+.reclamo-topbar{background:#fff;padding:48px 16px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.reclamo-scroll{flex:1;overflow-y:auto;padding:14px}
+
+/* ── NAVBAR ── */
+.navbar{display:flex;background:#fff;border-top:1px solid #eee;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 8px;cursor:pointer;border:none;background:none;transition:.15s}
+.nav-item-icon{font-size:22px;line-height:1}
+.nav-item-label{font-size:10px;font-weight:600;color:#aaa;margin-top:3px}
+.nav-item.active .nav-item-label{color:#FF4D00}
+
+/* ── DIR MODAL ── */
+#modal-dir{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:flex-end;z-index:200;display:none}
+#modal-dir.open{display:flex}
+.modal-dir-body{background:#fff;border-radius:24px 24px 0 0;padding:24px 20px;width:100%}
+.modal-dir-title{font-size:18px;font-weight:700;color:#1A1A1A;margin-bottom:16px}
+
+/* ── ALERTA DIR ── */
+#alerta-dir{position:fixed;top:60px;left:12px;right:12px;background:#1A1A1A;color:#fff;border-radius:14px;padding:14px 16px;z-index:300;display:none;font-size:13px}
+#alerta-dir.show{display:flex;align-items:center;gap:10px}
+.alerta-dir-text{flex:1}
+.alerta-dir-btns{display:flex;gap:8px;margin-top:10px}
+.alerta-btn{padding:8px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.alerta-btn-naranja{background:#FF4D00;color:#fff}
+.alerta-btn-gris{background:rgba(255,255,255,0.2);color:#fff}
+
+.hidden{display:none!important}
+.loading-text{text-align:center;padding:32px;color:#aaa;font-size:13px}
+.version{font-size:10px;color:#ccc;text-align:center;padding:12px}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="v-splash" class="vista activa">
+  <div class="splash-logo">
+    <svg width="48" height="48" viewBox="0 0 60 60">
+      <circle cx="30" cy="30" r="26" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="140 24" stroke-dashoffset="-4" stroke-linecap="round"/>
+      <circle cx="50" cy="13" r="4" fill="#FFD166"/>
+      <text x="30" y="38" text-anchor="middle" font-family="system-ui" font-weight="700" font-size="20" letter-spacing="-1" fill="white">ALL</text>
+    </svg>
+  </div>
+  <div class="splash-title">ALL Pedidos</div>
+  <div class="splash-sub">Tu comida, cuando querés</div>
+</div>
+
+<!-- AUTH -->
+<div id="v-auth" class="vista">
+  <div class="auth-hero">
+    <div class="auth-logo">ALL <span>Pedidos</span></div>
+    <div class="auth-sub">Registrate para hacer tu primer pedido</div>
+  </div>
+  <div class="auth-body">
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchAuthTab('login',this)">Ingresar</div>
+      <div class="auth-tab" onclick="switchAuthTab('registro',this)">Registrarse</div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="auth-login">
+      <div id="err-login" class="msg-err"></div>
+      <div class="field-label">Email</div>
+      <input type="email" id="l-email" placeholder="tu@email.com" class="input"/>
+      <div class="field-label">Contraseña</div>
+      <div class="pass-wrap">
+        <input type="password" id="l-pass" placeholder="••••••••" class="input"/>
+        <span class="pass-ojo" onclick="togglePass('l-pass',this)">👁</span>
+      </div>
+      <button class="btn-main" onclick="login()">Ingresar →</button>
+    </div>
+
+    <!-- REGISTRO -->
+    <div id="auth-registro" class="hidden">
+      <div id="err-registro" class="msg-err"></div>
+      <div class="field-label">Nombre completo</div>
+      <input type="text" id="r-nombre" placeholder="Ej: María García" class="input"/>
+      <div class="field-label">Teléfono</div>
+      <input type="tel" id="r-tel" placeholder="Ej: 2914123456" class="input"/>
+      <div class="field-label">Email</div>
+      <input type="email" id="r-email" placeholder="tu@email.com" class="input"/>
+      <div class="field-label">Contraseña</div>
+      <div class="pass-wrap">
+        <input type="password" id="r-pass" placeholder="Mínimo 6 caracteres" class="input"/>
+        <span class="pass-ojo" onclick="togglePass('r-pass',this)">👁</span>
+      </div>
+      <div class="field-label">Dirección de entrega</div>
+      <input type="text" id="r-dir" placeholder="Ej: San Martín 542, Bahía Blanca" class="input"/>
+      <button class="btn-main" onclick="registro()">Crear cuenta →</button>
+    </div>
+    <div class="version">ALL Pedidos v1.0</div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="v-home" class="vista">
+  <div class="topbar-home">
+    <div>
+      <div class="topbar-home-title">¿Qué querés pedir?</div>
+      <div id="home-dir" style="font-size:11px;color:rgba(255,255,255,0.8);margin-top:2px">📍 Cargando...</div>
+    </div>
+    <div class="topbar-avatar" id="home-avatar" onclick="irA('v-perfil')">?</div>
+  </div>
+  <div class="home-scroll">
+    <div class="home-section">Restaurantes</div>
+    <div id="lista-restos-home"><div class="loading-text">Cargando...</div></div>
+    <div class="version">ALL Pedidos v1.0</div>
+  </div>
+  <div class="navbar">
+    <button class="nav-item active" onclick="irA('v-home');setNavActive(this)">
+      <div class="nav-item-icon">🏠</div><div class="nav-item-label">Inicio</div>
+    </button>
+    <button class="nav-item" onclick="irA('v-mispedidos');setNavActive(this);cargarMisPedidos()">
+      <div class="nav-item-icon">📦</div><div class="nav-item-label">Pedidos</div>
+    </button>
+    <button class="nav-item" onclick="irA('v-perfil');setNavActive(this);cargarPerfil()">
+      <div class="nav-item-icon">👤</div><div class="nav-item-label">Perfil</div>
+    </button>
+  </div>
+</div>
+
+<!-- MENÚ RESTAURANTE -->
+<div id="v-menu" class="vista">
+  <div class="menu-topbar">
+    <div class="menu-topbar-row">
+      <button class="back-btn" onclick="irA('v-home')">‹</button>
+      <div class="menu-resto-nombre" id="menu-resto-nombre">Restaurante</div>
+      <button class="carrito-btn" onclick="irA('v-carrito')" id="carrito-btn" style="display:none">
+        🛒 <span id="carrito-count-label">0</span>
+        <div class="carrito-count" id="carrito-count">0</div>
+      </button>
+    </div>
+    <div class="cat-tabs" id="cat-tabs-menu"></div>
+  </div>
+  <div class="menu-scroll" id="menu-scroll">
+    <div class="loading-text">Cargando menú...</div>
+  </div>
+</div>
+
+<!-- CARRITO -->
+<div id="v-carrito" class="vista">
+  <div class="carrito-topbar">
+    <button class="back-btn" onclick="history.back();irA('v-menu')">‹</button>
+    <div class="carrito-topbar-title">Tu carrito</div>
+  </div>
+  <div class="carrito-scroll" id="carrito-scroll">
+    <div class="loading-text">Carrito vacío</div>
+  </div>
+  <div class="carrito-footer">
+    <div class="carrito-total-row">
+      <div class="carrito-total-label">Total</div>
+      <div class="carrito-total-val" id="carrito-total">$0</div>
+    </div>
+    <button class="btn-main" onclick="irA('v-checkout');renderCheckout()">Continuar con el pedido →</button>
+  </div>
+</div>
+
+<!-- CHECKOUT -->
+<div id="v-checkout" class="vista">
+  <div class="checkout-topbar">
+    <button class="back-btn" onclick="irA('v-carrito')">‹</button>
+    <div style="font-size:16px;font-weight:700;color:#1A1A1A;flex:1">Confirmar pedido</div>
+  </div>
+  <div class="checkout-scroll" id="checkout-scroll"></div>
+  <div class="checkout-footer">
+    <div id="err-checkout" class="msg-err"></div>
+    <button class="btn-main" id="btn-confirmar-pedido" onclick="confirmarPedido()">Confirmar pedido ✓</button>
+  </div>
+</div>
+
+<!-- SEGUIMIENTO -->
+<div id="v-seguimiento" class="vista">
+  <div class="seg-topbar">
+    <button class="back-btn" onclick="irA('v-mispedidos');cargarMisPedidos()">‹</button>
+    <div style="font-size:16px;font-weight:700;color:#1A1A1A;flex:1">Seguimiento</div>
+  </div>
+  <div class="seg-scroll" id="seg-scroll"></div>
+</div>
+
+<!-- MIS PEDIDOS -->
+<div id="v-mispedidos" class="vista">
+  <div class="mispedidos-topbar">
+    <button class="back-btn" onclick="irA('v-home')">‹</button>
+    <div style="font-size:16px;font-weight:700;color:#1A1A1A;flex:1">Mis pedidos</div>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:14px" id="mispedidos-scroll">
+    <div class="loading-text">Cargando...</div>
+  </div>
+  <div class="navbar">
+    <button class="nav-item" onclick="irA('v-home');setNavActive(this)">
+      <div class="nav-item-icon">🏠</div><div class="nav-item-label">Inicio</div>
+    </button>
+    <button class="nav-item active" onclick="setNavActive(this)">
+      <div class="nav-item-icon">📦</div><div class="nav-item-label">Pedidos</div>
+    </button>
+    <button class="nav-item" onclick="irA('v-perfil');setNavActive(this);cargarPerfil()">
+      <div class="nav-item-icon">👤</div><div class="nav-item-label">Perfil</div>
+    </button>
+  </div>
+</div>
+
+<!-- PERFIL -->
+<div id="v-perfil" class="vista">
+  <div class="perfil-topbar">
+    <div class="perfil-avatar" id="perfil-avatar">?</div>
+    <div class="perfil-nombre" id="perfil-nombre">–</div>
+    <div class="perfil-email" id="perfil-email">–</div>
+  </div>
+  <div class="perfil-scroll">
+    <div class="perfil-card">
+      <div class="perfil-card-title">Mis datos</div>
+      <div class="perfil-campo">
+        <div class="field-label">Nombre</div>
+        <input type="text" id="p-nombre" class="input" placeholder="Tu nombre"/>
+      </div>
+      <div class="perfil-campo">
+        <div class="field-label">Teléfono</div>
+        <input type="tel" id="p-tel" class="input" placeholder="Tu teléfono"/>
+      </div>
+      <div class="perfil-campo">
+        <div class="field-label">Dirección base</div>
+        <input type="text" id="p-dir" class="input" placeholder="Tu dirección habitual"/>
+      </div>
+      <div id="msg-perfil-ok" class="msg-ok"></div>
+      <button class="btn-main" onclick="guardarPerfil()">Guardar cambios</button>
+    </div>
+    <button class="btn-sec" onclick="cerrarSesion()">Cerrar sesión</button>
+    <div class="version">ALL Pedidos v1.0</div>
+  </div>
+  <div class="navbar">
+    <button class="nav-item" onclick="irA('v-home');setNavActive(this)">
+      <div class="nav-item-icon">🏠</div><div class="nav-item-label">Inicio</div>
+    </button>
+    <button class="nav-item" onclick="irA('v-mispedidos');setNavActive(this);cargarMisPedidos()">
+      <div class="nav-item-icon">📦</div><div class="nav-item-label">Pedidos</div>
+    </button>
+    <button class="nav-item active" onclick="setNavActive(this)">
+      <div class="nav-item-icon">👤</div><div class="nav-item-label">Perfil</div>
+    </button>
+  </div>
+</div>
+
+<!-- RECLAMO -->
+<div id="v-reclamo" class="vista">
+  <div class="reclamo-topbar">
+    <button class="back-btn" onclick="irA('v-seguimiento')">‹</button>
+    <div style="font-size:16px;font-weight:700;color:#1A1A1A;flex:1">Hacer un reclamo</div>
+  </div>
+  <div class="reclamo-scroll" style="flex:1;overflow-y:auto;padding:14px">
+    <div style="background:#fff;border-radius:14px;padding:16px;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700;color:#1A1A1A;margin-bottom:12px">¿Qué pasó con tu pedido?</div>
+      <div id="err-reclamo" class="msg-err"></div>
+      <div id="ok-reclamo" class="msg-ok"></div>
+      <div class="field-label">Descripción del problema</div>
+      <textarea id="reclamo-desc" class="notas-input" style="height:100px;width:100%;padding:12px;font-size:13px;border-radius:10px;border:1.5px solid #eee;background:#fafafa;color:#1A1A1A;outline:none;resize:none" placeholder="Ej: Me faltó un producto, llegó frío, etc."></textarea>
+      <div class="field-label" style="margin-top:12px">Foto (opcional)</div>
+      <div style="padding:12px;background:#f5f5f5;border-radius:10px;border:1.5px dashed #ddd;text-align:center;cursor:pointer;margin-bottom:14px" onclick="document.getElementById('reclamo-foto-input').click()">📷 Subir foto</div>
+      <input type="file" id="reclamo-foto-input" accept="image/*" style="display:none" onchange="previewReclamoFoto(this)"/>
+      <img id="reclamo-foto-preview" style="width:100%;border-radius:10px;margin-bottom:14px;display:none"/>
+      <button class="btn-main" style="background:#E24B4A" onclick="enviarReclamo()">Enviar reclamo</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DIRECCIÓN -->
+<div id="modal-dir">
+  <div class="modal-dir-body">
+    <div class="modal-dir-title">📍 Dirección de entrega</div>
+    <div class="field-label">Tu dirección</div>
+    <input type="text" id="modal-dir-input" class="input" placeholder="Ej: San Martín 542"/>
+    <button class="btn-main" onclick="guardarDirModal()">Confirmar dirección</button>
+    <button class="btn-sec" onclick="cerrarModalDir()">Cancelar</button>
+  </div>
+</div>
+
+<!-- ALERTA DIRECCIÓN -->
+<div id="alerta-dir">
+  <div>
+    <div class="alerta-dir-text">📍 Estás pidiendo a una dirección diferente a tu dirección habitual. ¿Querés cambiarla?</div>
+    <div class="alerta-dir-btns">
+      <button class="alerta-btn alerta-btn-naranja" onclick="abrirModalDir()">Cambiar</button>
+      <button class="alerta-btn alerta-btn-gris" onclick="cerrarAlertaDir()">Dejar así</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="ticket-input" accept="image/*" style="display:none" onchange="previewTicket(this)"/>
+
+<script>
+const SUPABASE_URL = 'https://rkinieckmmlvldnccbzm.supabase.co'
+const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJraW5pZWNrbW1sdmxkbmNjYnptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNDM1NTQsImV4cCI6MjA5NTgxOTU1NH0.Mb82xSMu5KSwgju-rUEh-BBWNVLmJ3Fso5EZy4QeOvs'
+const { createClient } = supabase
+const sb = createClient(SUPABASE_URL, ANON_KEY)
+
+var usuarioActual = null
+var perfilActual = null
+var restoActual = null
+var carrito = []
+var metodoPago = null
+var ticketUrl = null
+var dirEntrega = ''
+var pedidoActivoId = null
+
+const ESTADOS = {
+  nuevo:      { label:'Nuevo pedido',    icon:'🆕', color:'#FF4D00', sub:'Tu pedido fue recibido' },
+  preparando: { label:'Preparando',      icon:'👨‍🍳', color:'#B8860B', sub:'Están preparando tu pedido' },
+  camino:     { label:'En camino',       icon:'🏍',  color:'#1565C0', sub:'Tu pedido está en camino' },
+  entregado:  { label:'Entregado',       icon:'✅',  color:'#2D6A2D', sub:'¡Tu pedido llegó!' },
+  cancelado:  { label:'Cancelado',       icon:'❌',  color:'#aaa',    sub:'El pedido fue cancelado' }
+}
+
+// ── NAVEGACIÓN ───────────────────────────────────────────────────────────────
+function irA(vistaId){
+  document.querySelectorAll('.vista').forEach(function(v){ v.classList.remove('activa') })
+  document.getElementById(vistaId).classList.add('activa')
+}
+
+function setNavActive(el){
+  var navbar = el.closest('.navbar')
+  if(!navbar) return
+  navbar.querySelectorAll('.nav-item').forEach(function(b){ b.classList.remove('active') })
+  el.classList.add('active')
+}
+
+// ── INICIO ───────────────────────────────────────────────────────────────────
+sb.auth.getSession().then(async function(res){
+  await new Promise(function(r){ setTimeout(r,1200) }) // splash
+  if(res.data.session){
+    usuarioActual = res.data.session.user
+    await cargarPerfil()
+    irA('v-home')
+    cargarRestaurantes()
+  } else {
+    irA('v-auth')
+  }
+})
+
+// ── AUTH ─────────────────────────────────────────────────────────────────────
+function switchAuthTab(tab, el){
+  document.querySelectorAll('.auth-tab').forEach(function(t){ t.classList.remove('active') })
+  el.classList.add('active')
+  document.getElementById('auth-login').classList.toggle('hidden', tab !== 'login')
+  document.getElementById('auth-registro').classList.toggle('hidden', tab !== 'registro')
+}
+
+async function login(){
+  var email = document.getElementById('l-email').value.trim()
+  var pass = document.getElementById('l-pass').value
+  var err = document.getElementById('err-login')
+  err.style.display='none'
+  if(!email||!pass){ err.style.display='block'; err.textContent='Completá email y contraseña'; return }
+  var res = await sb.auth.signInWithPassword({email:email,password:pass})
+  if(res.error){ err.style.display='block'; err.textContent='Email o contraseña incorrectos'; return }
+  usuarioActual = res.data.user
+  await cargarPerfil()
+  irA('v-home')
+  cargarRestaurantes()
+}
+
+async function registro(){
+  var nombre = document.getElementById('r-nombre').value.trim()
+  var tel = document.getElementById('r-tel').value.trim()
+  var email = document.getElementById('r-email').value.trim()
+  var pass = document.getElementById('r-pass').value
+  var dir = document.getElementById('r-dir').value.trim()
+  var err = document.getElementById('err-registro')
+  err.style.display='none'
+  if(!nombre||!email||!pass){ err.style.display='block'; err.textContent='Completá nombre, email y contraseña'; return }
+  if(pass.length<6){ err.style.display='block'; err.textContent='La contraseña debe tener al menos 6 caracteres'; return }
+  var res = await sb.auth.signUp({email:email, password:pass, options:{data:{nombre:nombre}}})
+  if(res.error){ err.style.display='block'; err.textContent='Error: '+res.error.message; return }
+  usuarioActual = res.data.user
+  // crear perfil
+  await sb.from('perfiles').upsert({id:usuarioActual.id, nombre:nombre, telefono:tel, direccion_base:dir})
+  perfilActual = {nombre:nombre, telefono:tel, direccion_base:dir}
+  dirEntrega = dir
+  irA('v-home')
+  cargarRestaurantes()
+}
+
+async function cerrarSesion(){
+  await sb.auth.signOut()
+  usuarioActual=null; perfilActual=null; carrito=[]; restoActual=null
+  irA('v-auth')
+}
+
+// ── PERFIL ───────────────────────────────────────────────────────────────────
+async function cargarPerfil(){
+  if(!usuarioActual) return
+  var res = await sb.from('perfiles').select('*').eq('id',usuarioActual.id).single()
+  if(res.data){
+    perfilActual = res.data
+    dirEntrega = res.data.direccion_base||''
+  }
+  actualizarUIperfil()
+}
+
+function actualizarUIperfil(){
+  if(!perfilActual) return
+  var nombre = perfilActual.nombre||usuarioActual.email.split('@')[0]
+  var iniciales = nombre.substring(0,2).toUpperCase()
+  var el = document.getElementById('home-avatar'); if(el) el.textContent = iniciales
+  var pa = document.getElementById('perfil-avatar'); if(pa) pa.textContent = iniciales
+  var pn = document.getElementById('perfil-nombre'); if(pn) pn.textContent = nombre
+  var pe = document.getElementById('perfil-email'); if(pe) pe.textContent = usuarioActual.email
+  var hn = document.getElementById('home-dir'); if(hn) hn.textContent = '📍 '+(dirEntrega||'Sin dirección')
+  var pnf = document.getElementById('p-nombre'); if(pnf) pnf.value = perfilActual.nombre||''
+  var ptf = document.getElementById('p-tel'); if(ptf) ptf.value = perfilActual.telefono||''
+  var pdf = document.getElementById('p-dir'); if(pdf) pdf.value = perfilActual.direccion_base||''
+}
+
+async function guardarPerfil(){
+  var nombre = document.getElementById('p-nombre').value.trim()
+  var tel = document.getElementById('p-tel').value.trim()
+  var dir = document.getElementById('p-dir').value.trim()
+  var msg = document.getElementById('msg-perfil-ok')
+  await sb.from('perfiles').upsert({id:usuarioActual.id, nombre:nombre, telefono:tel, direccion_base:dir})
+  perfilActual = {nombre:nombre, telefono:tel, direccion_base:dir}
+  dirEntrega = dir
+  actualizarUIperfil()
+  msg.style.display='block'; msg.textContent='✓ Cambios guardados'
+  setTimeout(function(){ msg.style.display='none' },2000)
+}
+
+// ── RESTAURANTES ─────────────────────────────────────────────────────────────
+async function cargarRestaurantes(){
+  var lista = document.getElementById('lista-restos-home')
+  var res = await sb.from('restaurantes').select('*').order('nombre')
+  if(res.error||!res.data){ lista.innerHTML='<div class="loading-text">Error cargando restaurantes</div>'; return }
+  var emojis = {'El Bodegón NKT':'🦞',"Colantonio's":'🍕','Kusama Sushi':'🍣'}
+  var tiposLabel = {restaurante:'🍽 Restaurante', kiosco:'🏪 Kiosco', despensa:'🛒 Despensa', market:'🏬 Market'}
+  lista.innerHTML = res.data.map(function(r){
+    var emoji = emojis[r.nombre]||'🍽'
+    var ab = r.abierto !== false
+    var tipoLabel = tiposLabel[r.tipo||'restaurante']||'🍽 Local'
+    var imgHtml = r.logo_url ? '<img src="'+r.logo_url+'" style="width:100%;height:100%;object-fit:cover"/>' : '<span style="font-size:48px">'+emoji+'</span>'
+    return '<div class="resto-card" onclick="abrirResto(\''+r.id+'\')">'
+      +'<div class="resto-card-img">'+imgHtml
+      +'<span class="resto-card-badge '+(ab?'badge-abierto':'badge-cerrado')+'">'+(ab?'● Abierto':'● Cerrado')+'</span>'
+      +'<span class="badge-tipo">'+tipoLabel+'</span>'
+      +'</div>'
+      +'<div class="resto-card-body">'
+      +'<div class="resto-card-nombre">'+r.nombre+'</div>'
+      +'<div class="resto-card-cat">'+(r.categoria||'')+'</div>'
+      +'<div class="resto-card-info">'
+      +'<span>🕐 '+(r.tiempo_entrega_min||20)+'-'+(r.tiempo_entrega_max||40)+' min</span>'
+      +(r.direccion?'<span>📍 '+r.direccion+'</span>':'')
+      +'</div>'
+      +'</div></div>'
+  }).join('')
+}
+
+// ── MENÚ ─────────────────────────────────────────────────────────────────────
+async function abrirResto(restoId){
+  irA('v-menu')
+  var res = await sb.from('restaurantes').select('*').eq('id',restoId).single()
+  if(res.error||!res.data) return
+  restoActual = res.data
+  document.getElementById('menu-resto-nombre').textContent = restoActual.nombre
+  actualizarCarritoBtn()
+
+  // cargar productos
+  var prods = await sb.from('productos').select('*').eq('restaurante_id',restoId).eq('disponible',true).order('categoria').order('orden')
+  if(prods.error||!prods.data){ document.getElementById('menu-scroll').innerHTML='<div class="loading-text">Error cargando menú</div>'; return }
+
+  // agrupar
+  var cats = {}, catKeys = []
+  var orden = restoActual.categorias_menu||[]
+  prods.data.forEach(function(p){
+    var cat = p.categoria||'General'
+    if(!cats[cat]){ cats[cat]=[]; }
+    cats[cat].push(p)
+  })
+  var ordered = []
+  orden.forEach(function(c){ if(cats[c]) ordered.push(c) })
+  Object.keys(cats).forEach(function(c){ if(!ordered.includes(c)) ordered.push(c) })
+  catKeys = ordered
+
+  // tabs categorías
+  var tabsHtml = catKeys.map(function(c){
+    return '<div class="cat-tab" onclick="scrollTocat(\'cat-'+c.replace(/\s/g,'_')+'\')">' +c+'</div>'
+  }).join('')
+  document.getElementById('cat-tabs-menu').innerHTML = tabsHtml
+
+  // menú
+  var hoy = new Date().toISOString().split('T')[0]
+  var html = ''
+  catKeys.forEach(function(cat){
+    html += '<div class="menu-cat-title" id="cat-'+cat.replace(/\s/g,'_')+'">'+cat+'</div>'
+    cats[cat].forEach(function(p){
+      var tienePromo = p.promocion_activa&&p.precio_promocion&&p.promocion_inicio<=hoy&&p.promocion_fin>=hoy
+      var precio = tienePromo ? p.precio_promocion : p.precio
+      var enCarrito = carrito.find(function(i){ return i.id===p.id })
+      var qty = enCarrito ? enCarrito.qty : 0
+      var imgHtml = p.imagen_url ? '<img src="'+p.imagen_url+'" style="width:100%;height:100%;object-fit:cover"/>' : '🍽'
+      html += '<div class="prod-item'+(p.disponible?'':' prod-item-nodisponible')+'" id="prod-card-'+p.id+'">'
+      html += '<div class="prod-item-img">'+imgHtml+'</div>'
+      html += '<div class="prod-item-info">'
+      html += '<div class="prod-item-nombre">'+p.nombre+'</div>'
+      if(p.descripcion) html += '<div class="prod-item-desc">'+p.descripcion+'</div>'
+      html += '<div class="prod-item-precio">$'+Number(precio).toLocaleString('es-AR')
+      if(tienePromo) html += '<span class="prod-item-precio-orig">$'+Number(p.precio).toLocaleString('es-AR')+'</span>'
+      html += '</div></div>'
+      if(qty > 0){
+        html += '<div class="prod-qty">'
+        html += '<button class="qty-btn" onclick="cambiarQty(\''+p.id+'\',-1,event)">−</button>'
+        html += '<span class="qty-num">'+qty+'</span>'
+        html += '<button class="qty-btn" onclick="cambiarQty(\''+p.id+'\',1,event)">+</button>'
+        html += '</div>'
+      } else {
+        html += '<button class="prod-item-add" onclick="agregarAlCarrito('+JSON.stringify(p)+',event)">+</button>'
+      }
+      html += '</div>'
+    })
+  })
+  document.getElementById('menu-scroll').innerHTML = html
+
+  // alerta dirección
+  verificarDireccion()
+}
+
+function scrollTocat(id){
+  var el = document.getElementById(id)
+  if(el) el.scrollIntoView({behavior:'smooth', block:'start'})
+}
+
+// ── CARRITO ───────────────────────────────────────────────────────────────────
+function agregarAlCarrito(prod, event){
+  event.stopPropagation()
+  var hoy = new Date().toISOString().split('T')[0]
+  var tienePromo = prod.promocion_activa&&prod.precio_promocion&&prod.promocion_inicio<=hoy&&prod.promocion_fin>=hoy
+  var precio = tienePromo ? prod.precio_promocion : prod.precio
+  var existe = carrito.find(function(i){ return i.id===prod.id })
+  if(existe){ existe.qty++ }
+  else { carrito.push({id:prod.id, nombre:prod.nombre, precio:precio, qty:1}) }
+  actualizarCarritoBtn()
+  renderMenuProducto(prod.id)
+}
+
+function cambiarQty(prodId, delta, event){
+  if(event) event.stopPropagation()
+  var item = carrito.find(function(i){ return i.id===prodId })
+  if(!item) return
+  item.qty += delta
+  if(item.qty <= 0) carrito = carrito.filter(function(i){ return i.id!==prodId })
+  actualizarCarritoBtn()
+  renderMenuProducto(prodId)
+  if(document.getElementById('v-carrito').classList.contains('activa')) renderCarrito()
+}
+
+function renderMenuProducto(prodId){
+  var el = document.getElementById('prod-card-'+prodId)
+  if(!el) return
+  var item = carrito.find(function(i){ return i.id===prodId })
+  var qty = item ? item.qty : 0
+  var qtyEl = el.querySelector('.prod-qty')
+  var addEl = el.querySelector('.prod-item-add')
+  if(qty > 0){
+    if(addEl){ addEl.style.display='none' }
+    if(qtyEl){
+      qtyEl.querySelector('.qty-num').textContent = qty
+    } else {
+      var div = document.createElement('div'); div.className='prod-qty'
+      div.innerHTML='<button class="qty-btn" onclick="cambiarQty(\''+prodId+'\',-1,event)">−</button>'
+        +'<span class="qty-num">'+qty+'</span>'
+        +'<button class="qty-btn" onclick="cambiarQty(\''+prodId+'\',1,event)">+</button>'
+      el.appendChild(div)
+      if(addEl) addEl.remove()
+    }
+  } else {
+    if(qtyEl) qtyEl.remove()
+    if(!el.querySelector('.prod-item-add')){
+      // re-agregar botón add - reload menu es más simple
+      abrirResto(restoActual.id)
+    }
+  }
+}
+
+function actualizarCarritoBtn(){
+  var total = carrito.reduce(function(s,i){ return s+i.qty },0)
+  var btn = document.getElementById('carrito-btn')
+  var count = document.getElementById('carrito-count')
+  if(btn){ btn.style.display = total>0 ? 'flex' : 'none' }
+  if(count){ count.textContent = total }
+}
+
+function renderCarrito(){
+  var scroll = document.getElementById('carrito-scroll')
+  if(!carrito.length){ scroll.innerHTML='<div class="loading-text">Tu carrito está vacío</div>'; document.getElementById('carrito-total').textContent='$0'; return }
+  var total = 0
+  var html = carrito.map(function(item){
+    var sub = item.precio * item.qty
+    total += sub
+    return '<div class="carrito-item">'
+      +'<div class="carrito-item-info">'
+      +'<div class="carrito-item-nombre">'+item.nombre+'</div>'
+      +'<div class="carrito-item-precio">$'+Number(item.precio).toLocaleString('es-AR')+' c/u</div>'
+      +'</div>'
+      +'<div class="prod-qty">'
+      +'<button class="qty-btn" onclick="cambiarQty(\''+item.id+'\',-1,event)">−</button>'
+      +'<span class="qty-num">'+item.qty+'</span>'
+      +'<button class="qty-btn" onclick="cambiarQty(\''+item.id+'\',1,event)">+</button>'
+      +'</div>'
+      +'<div style="font-size:14px;font-weight:700;color:#1A1A1A;min-width:60px;text-align:right">$'+Number(sub).toLocaleString('es-AR')+'</div>'
+      +'</div>'
+  }).join('')
+  scroll.innerHTML = html
+  document.getElementById('carrito-total').textContent = '$'+Number(total).toLocaleString('es-AR')
+}
+
+// ── CHECKOUT ──────────────────────────────────────────────────────────────────
+function renderCheckout(){
+  renderCarrito()
+  var total = carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
+  var html = ''
+
+  // dirección
+  html += '<div class="checkout-section">'
+  html += '<div class="checkout-section-title">📍 Dirección de entrega</div>'
+  html += '<div class="dir-row"><div class="dir-icon">📍</div>'
+  html += '<div class="dir-text">'+(dirEntrega||'Sin dirección')+'</div>'
+  html += '<div class="dir-change" onclick="abrirModalDir()">Cambiar</div></div>'
+  html += '</div>'
+
+  // método de pago
+  html += '<div class="checkout-section">'
+  html += '<div class="checkout-section-title">💳 Método de pago</div>'
+  html += '<div class="pago-opt'+(metodoPago==='efectivo'?' selected':'')+'" onclick="seleccionarPago(\'efectivo\')">'
+  html += '<div class="pago-opt-icon">💵</div>'
+  html += '<div class="pago-opt-info"><div class="pago-opt-label">Efectivo</div><div class="pago-opt-sub">Pagás al recibir</div></div>'
+  html += '<div class="pago-check">'+(metodoPago==='efectivo'?'✓':'')+'</div></div>'
+  html += '<div class="pago-opt'+(metodoPago==='transferencia'?' selected':'')+'" onclick="seleccionarPago(\'transferencia\')">'
+  html += '<div class="pago-opt-icon">🏦</div>'
+  html += '<div class="pago-opt-info"><div class="pago-opt-label">Transferencia</div><div class="pago-opt-sub">Subí el comprobante</div></div>'
+  html += '<div class="pago-check">'+(metodoPago==='transferencia'?'✓':'')+'</div></div>'
+  html += '<div id="ticket-section" style="'+(metodoPago==='transferencia'?'':'display:none')+'">'
+  html += '<div style="margin-top:10px;padding:14px;background:#f5f5f5;border-radius:12px;border:1.5px dashed #ddd;text-align:center;cursor:pointer" onclick="document.getElementById(\'ticket-input\').click()">📎 Subir comprobante de transferencia</div>'
+  if(ticketUrl) html += '<img src="'+ticketUrl+'" style="width:100%;border-radius:10px;margin-top:8px"/>'
+  html += '</div>'
+  html += '</div>'
+
+  // notas
+  html += '<div class="checkout-section">'
+  html += '<div class="checkout-section-title">📝 Notas (opcional)</div>'
+  html += '<textarea id="checkout-notas" class="notas-input" placeholder="Ej: Sin cebolla, tocar el timbre..."></textarea>'
+  html += '</div>'
+
+  // resumen
+  html += '<div class="checkout-section">'
+  html += '<div class="checkout-section-title">🧾 Resumen</div>'
+  carrito.forEach(function(item){
+    html += '<div class="resumen-item"><span>'+item.qty+'× '+item.nombre+'</span><span>$'+Number(item.precio*item.qty).toLocaleString('es-AR')+'</span></div>'
+  })
+  html += '<div class="resumen-total"><span>Total</span><span>$'+Number(total).toLocaleString('es-AR')+'</span></div>'
+  html += '</div>'
+
+  document.getElementById('checkout-scroll').innerHTML = html
+}
+
+function seleccionarPago(metodo){
+  metodoPago = metodo
+  renderCheckout()
+}
+
+function previewTicket(input){
+  var file = input.files[0]; if(!file) return
+  var reader = new FileReader()
+  reader.onload = async function(e){
+    var ext = file.name.split('.').pop()
+    var fileName = 'ticket_'+Date.now()+'.'+ext
+    var up = await sb.storage.from('productos').upload('tickets/'+fileName, file, {upsert:true})
+    if(!up.error){
+      ticketUrl = sb.storage.from('productos').getPublicUrl('tickets/'+fileName).data.publicUrl
+      renderCheckout()
+    }
+  }
+  reader.readAsDataURL(file)
+}
+
+async function confirmarPedido(){
+  var err = document.getElementById('err-checkout'); err.style.display='none'
+  if(!dirEntrega){ err.style.display='block'; err.textContent='Ingresá una dirección de entrega'; return }
+  if(!metodoPago){ err.style.display='block'; err.textContent='Seleccioná un método de pago'; return }
+  if(metodoPago==='transferencia'&&!ticketUrl){ err.style.display='block'; err.textContent='Subí el comprobante de transferencia'; return }
+  if(!carrito.length){ err.style.display='block'; err.textContent='Tu carrito está vacío'; return }
+
+  var total = carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
+  var notas = document.getElementById('checkout-notas')
+  var data = {
+    cliente_id: usuarioActual.id,
+    restaurante_id: restoActual.id,
+    items: carrito,
+    total: total,
+    estado: 'nuevo',
+    direccion_entrega: dirEntrega,
+    metodo_pago: metodoPago,
+    ticket_url: ticketUrl||null,
+    notas: notas ? notas.value : ''
+  }
+
+  var btn = document.getElementById('btn-confirmar-pedido')
+  btn.textContent='Procesando...'
+  var res = await sb.from('pedidos').insert([data]).select().single()
+  btn.textContent='Confirmar pedido ✓'
+  if(res.error){ err.style.display='block'; err.textContent='Error: '+res.error.message; return }
+
+  pedidoActivoId = res.data.id
+  carrito = []; metodoPago=null; ticketUrl=null
+  actualizarCarritoBtn()
+  irA('v-seguimiento')
+  cargarSeguimiento(pedidoActivoId)
+}
+
+// ── SEGUIMIENTO ───────────────────────────────────────────────────────────────
+var segInterval = null
+
+async function cargarSeguimiento(pedidoId){
+  if(segInterval) clearInterval(segInterval)
+  renderSeguimiento(pedidoId)
+  segInterval = setInterval(function(){ renderSeguimiento(pedidoId) }, 10000)
+}
+
+async function renderSeguimiento(pedidoId){
+  var res = await sb.from('pedidos').select('*').eq('id',pedidoId).single()
+  if(res.error||!res.data) return
+  var p = res.data
+  var estado = ESTADOS[p.estado]||ESTADOS.nuevo
+  var pasos = ['nuevo','preparando','camino','entregado']
+  var idxActual = pasos.indexOf(p.estado)
+
+  var html = ''
+  // card estado
+  html += '<div class="seg-estado-card" style="background:'+estado.color+'">'
+  html += '<div class="seg-estado-icon">'+estado.icon+'</div>'
+  html += '<div class="seg-estado-label">'+estado.label+'</div>'
+  html += '<div class="seg-estado-sub">'+estado.sub+'</div>'
+  html += '</div>'
+
+  // pasos
+  html += '<div class="seg-steps">'
+  pasos.forEach(function(paso,i){
+    var done = i < idxActual
+    var active = i === idxActual
+    var e = ESTADOS[paso]
+    html += '<div class="seg-step">'
+    html += '<div class="seg-step-dot '+(done?'done':active?'active':'')+'">'+e.icon+'</div>'
+    html += '<div class="seg-step-label '+(done?'done':active?'active':'')+'">'+e.label+'</div>'
+    html += '</div>'
+    if(i < pasos.length-1){
+      html += '<div class="seg-step-line '+(done?'done':'')+'"></div>'
+    }
+  })
+  html += '</div>'
+
+  // info pedido
+  html += '<div class="seg-info-card">'
+  html += '<div class="seg-info-title">Detalle del pedido</div>'
+  p.items.forEach(function(item){
+    html += '<div class="seg-info-row"><span class="seg-info-label">'+item.qty+'× '+item.nombre+'</span><span class="seg-info-val">$'+Number(item.precio*item.qty).toLocaleString('es-AR')+'</span></div>'
+  })
+  html += '<div class="seg-info-row" style="margin-top:8px;padding-top:8px;border-top:1px solid #f5f5f5"><span class="seg-info-label" style="font-weight:700">Total</span><span class="seg-info-val">$'+Number(p.total).toLocaleString('es-AR')+'</span></div>'
+  html += '<div class="seg-info-row"><span class="seg-info-label">Pago</span><span class="seg-info-val">'+p.metodo_pago+'</span></div>'
+  html += '<div class="seg-info-row"><span class="seg-info-label">Dirección</span><span class="seg-info-val">'+p.direccion_entrega+'</span></div>'
+  html += '</div>'
+
+  // reclamo (solo si entregado)
+  if(p.estado==='entregado'){
+    html += '<button class="btn-reclamo" onclick="irA(\'v-reclamo\');pedidoActivoId=\''+p.id+'\'">⚠️ Hacer un reclamo</button>'
+  }
+
+  document.getElementById('seg-scroll').innerHTML = html
+}
+
+// ── MIS PEDIDOS ───────────────────────────────────────────────────────────────
+async function cargarMisPedidos(){
+  var scroll = document.getElementById('mispedidos-scroll')
+  scroll.innerHTML = '<div class="loading-text">Cargando...</div>'
+  if(!usuarioActual) return
+  var res = await sb.from('pedidos').select('*,restaurantes(nombre)').eq('cliente_id',usuarioActual.id).order('created_at',{ascending:false})
+  if(res.error||!res.data||!res.data.length){ scroll.innerHTML='<div class="loading-text">Aún no tenés pedidos</div>'; return }
+  var tagClass = {nuevo:'tag-nuevo',preparando:'tag-preparando',camino:'tag-camino',entregado:'tag-entregado',cancelado:'tag-cancelado'}
+  scroll.innerHTML = res.data.map(function(p){
+    var estadoLabel = ESTADOS[p.estado]?ESTADOS[p.estado].label:p.estado
+    var items = p.items.map(function(i){ return i.qty+'× '+i.nombre }).join(', ')
+    var fecha = new Date(p.created_at).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})
+    return '<div class="pedido-hist-card" onclick="pedidoActivoId=\''+p.id+'\';irA(\'v-seguimiento\');cargarSeguimiento(\''+p.id+'\')">'
+      +'<div class="pedido-hist-head">'
+      +'<span class="pedido-hist-num">Pedido</span>'
+      +'<span class="pedido-hist-fecha">'+fecha+'</span>'
+      +'</div>'
+      +'<div class="pedido-hist-resto">'+(p.restaurantes?p.restaurantes.nombre:'–')+'</div>'
+      +'<div class="pedido-hist-items">'+items+'</div>'
+      +'<div class="pedido-hist-footer">'
+      +'<span class="pedido-hist-total">$'+Number(p.total).toLocaleString('es-AR')+'</span>'
+      +'<span class="tag '+(tagClass[p.estado]||'tag-nuevo')+'">'+estadoLabel+'</span>'
+      +'</div>'
+      +'</div>'
+  }).join('')
+}
+
+// ── RECLAMO ───────────────────────────────────────────────────────────────────
+function previewReclamoFoto(input){
+  var file = input.files[0]; if(!file) return
+  var reader = new FileReader()
+  reader.onload = function(e){
+    var img = document.getElementById('reclamo-foto-preview')
+    img.src = e.target.result; img.style.display='block'
+  }
+  reader.readAsDataURL(file)
+}
+
+async function enviarReclamo(){
+  var desc = document.getElementById('reclamo-desc').value.trim()
+  var err = document.getElementById('err-reclamo')
+  var ok = document.getElementById('ok-reclamo')
+  err.style.display='none'; ok.style.display='none'
+  if(!desc){ err.style.display='block'; err.textContent='Describí el problema'; return }
+
+  var fotoUrl = null
+  var fotoInput = document.getElementById('reclamo-foto-input')
+  if(fotoInput.files[0]){
+    var file=fotoInput.files[0], ext=file.name.split('.').pop()
+    var up=await sb.storage.from('productos').upload('reclamos/'+Date.now()+'.'+ext, file, {upsert:true})
+    if(!up.error) fotoUrl=sb.storage.from('productos').getPublicUrl('reclamos/'+Date.now()+'.'+ext).data.publicUrl
+  }
+
+  var res=await sb.from('reclamos').insert([{
+    pedido_id:pedidoActivoId, cliente_id:usuarioActual.id,
+    descripcion:desc, foto_url:fotoUrl
+  }])
+  if(res.error){ err.style.display='block'; err.textContent='Error enviando reclamo'; return }
+  ok.style.display='block'; ok.textContent='✓ Reclamo enviado correctamente'
+  document.getElementById('reclamo-desc').value=''
+  setTimeout(function(){ irA('v-seguimiento') },1500)
+}
+
+// ── DIRECCIÓN ─────────────────────────────────────────────────────────────────
+function abrirModalDir(){
+  cerrarAlertaDir()
+  document.getElementById('modal-dir-input').value = dirEntrega
+  document.getElementById('modal-dir').classList.add('open')
+}
+
+function cerrarModalDir(){
+  document.getElementById('modal-dir').classList.remove('open')
+}
+
+function guardarDirModal(){
+  var val = document.getElementById('modal-dir-input').value.trim()
+  if(!val) return
+  dirEntrega = val
+  actualizarUIperfil()
+  cerrarModalDir()
+  if(document.getElementById('v-checkout').classList.contains('activa')) renderCheckout()
+}
+
+function verificarDireccion(){
+  if(!perfilActual||!perfilActual.direccion_base||!dirEntrega) return
+  if(dirEntrega !== perfilActual.direccion_base){
+    var alerta = document.getElementById('alerta-dir')
+    alerta.classList.add('show')
+    setTimeout(function(){ alerta.classList.remove('show') },8000)
+  }
+}
+
+function cerrarAlertaDir(){
+  document.getElementById('alerta-dir').classList.remove('show')
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function togglePass(inputId, btn){
+  var input = document.getElementById(inputId)
+  if(input.type==='password'){ input.type='text'; btn.textContent='🙈' }
+  else { input.type='password'; btn.textContent='👁' }
+}
+</script>
+</body>
+</html>
