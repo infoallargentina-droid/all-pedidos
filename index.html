@@ -7,1465 +7,807 @@
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="ALL Pedidos"/>
-<meta name="theme-color" content="#FF4D00"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-touch-fullscreen" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="ALL Admin"/>
+<meta name="theme-color" content="#1A1A1A"/>
 <link rel="manifest" href="manifest.json"/>
-<link rel="apple-touch-icon" href="icon-192.png"/>
-<title>ALL — Pedidos v1.3</title>
-<style>
-  /* PWA full screen fixes */
-  :root {
-    --sat: env(safe-area-inset-top);
-    --sab: env(safe-area-inset-bottom);
-    --sal: env(safe-area-inset-left);
-    --sar: env(safe-area-inset-right);
-  }
-</style>
+<title>ALL — Admin</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDp2PL3VtFDvetuzLh1gJkbiWsjHNQl1wU&libraries=places&language=es" async defer></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5}
-body{font-family:system-ui,-apple-system,sans-serif}
-.vista{display:none;width:100%;height:100%;min-height:100vh;max-height:100vh;flex-direction:column;overflow:hidden}
-html,body{height:100%;max-height:100vh;overflow:hidden}
-.vista.activa{display:flex}
-
-/* SPLASH */
-#v-splash{background:#FF4D00;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding-top:env(safe-area-inset-top)}
-.splash-logo{width:80px;height:80px;border-radius:24px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center}
-.splash-title{font-size:28px;font-weight:800;color:#fff;letter-spacing:-1px}
-.splash-sub{font-size:13px;color:rgba(255,255,255,0.7)}
-
-/* AUTH */
-#v-auth{background:#1A1A1A;flex-direction:column;overflow:hidden}
-.auth-hero{background:#1A1A1A;padding:calc(44px + env(safe-area-inset-top)) 24px 28px;display:flex;flex-direction:column;align-items:center;gap:10px;flex-shrink:0}
-.auth-logo{font-size:36px;font-weight:800;color:#fff;letter-spacing:-2px}
-.auth-logo span{color:#FF4D00}
-.auth-sub{font-size:12px;color:rgba(255,255,255,0.4);text-align:center}
-.auth-body{flex:1;background:#fff;border-radius:28px 28px 0 0;padding:28px 20px;overflow-y:auto}
-.auth-tabs{display:flex;margin-bottom:24px;background:#f5f5f5;border-radius:12px;padding:4px}
-.auth-tab{flex:1;padding:10px;text-align:center;font-size:14px;font-weight:600;border-radius:10px;cursor:pointer;color:#888;transition:.2s}
-.auth-tab.active{background:#fff;color:#1A1A1A;box-shadow:0 1px 4px rgba(0,0,0,0.1)}
+html,body{width:100%;height:100%;overflow:hidden}
+body{font-family:system-ui,-apple-system,sans-serif;background:#1A1A1A}
+#screen-login{display:flex;width:100%;height:100vh;background:#1A1A1A;flex-direction:column;overflow:hidden}
+#screen-panel{display:none;width:100%;height:100vh;background:#f5f5f5;flex-direction:column;overflow:hidden}
+.login-hero{background:#1A1A1A;padding:48px 24px 24px;display:flex;flex-direction:column;align-items:center;gap:10px;flex-shrink:0}
+.login-title{font-size:26px;font-weight:700;letter-spacing:-1px;color:#fff}
+.login-sub{font-size:12px;color:rgba(255,255,255,0.4)}
+.login-body{flex:1;background:#fff;border-radius:28px 28px 0 0;padding:28px 20px;overflow-y:auto}
 .field-label{font-size:12px;font-weight:600;color:#1A1A1A;margin-bottom:8px}
-.input{width:100%;padding:14px;font-size:15px;border-radius:12px;border:1.5px solid #eee;background:#fafafa;color:#1A1A1A;margin-bottom:14px;outline:none}
-.input:focus{border-color:#FF4D00}
-.btn-main{width:100%;padding:16px;background:#FF4D00;color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer}
-.btn-sec{width:100%;padding:14px;background:#f5f5f5;color:#1A1A1A;border:none;border-radius:14px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
-.pass-wrap{position:relative;margin-bottom:14px}
-.pass-wrap .input{margin-bottom:0;padding-right:48px}
-.pass-ojo{position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px}
-.msg-err{font-size:12px;padding:10px;background:#FFF0F0;border-radius:8px;color:#E24B4A;margin-bottom:12px;display:none}
+.input{width:100%;padding:14px;font-size:15px;border-radius:12px;border:1.5px solid #eee;background:#fafafa;color:#1A1A1A;margin-bottom:16px;outline:none}
+.btn-main{width:100%;padding:16px;background:#1A1A1A;color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer}
+.btn-naranja{background:#FF4D00 !important}
+.btn-rojo{background:#E24B4A !important}
+.btn-verde{background:#2D6A2D !important}
+.error-msg{color:#E24B4A;font-size:12px;margin-bottom:12px;padding:10px;background:#FFF0F0;border-radius:8px;display:none}
+.topbar{padding:48px 16px 12px;background:#1A1A1A;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.topbar-logo{font-size:20px;font-weight:700;letter-spacing:-1px;color:#fff}
+.topbar-logo span{color:#FF4D00}
+.topbar-sub{font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px}
+.topbar-right{margin-left:auto}
+.nav{display:flex;background:#1A1A1A;padding:0 12px 12px;overflow-x:auto;gap:6px;flex-shrink:0}
+.nav::-webkit-scrollbar{display:none}
+.nav-btn{padding:8px 16px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);white-space:nowrap;flex-shrink:0}
+.nav-btn.active{background:#FF4D00;color:#fff}
+.content{flex:1;padding:14px;overflow-y:auto}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat-card{background:#fff;border-radius:16px;padding:16px;border:1px solid #eee}
+.stat-card.highlight{background:#FF4D00}
+.stat-icon{font-size:24px;margin-bottom:8px}
+.stat-val{font-size:28px;font-weight:700;color:#1A1A1A}
+.stat-label{font-size:11px;color:#888;margin-top:2px}
+.stat-card.highlight .stat-val{color:#fff}
+.stat-card.highlight .stat-label{color:rgba(255,255,255,0.7)}
+.section-title{font-size:11px;font-weight:700;color:#888;letter-spacing:1px;text-transform:uppercase;margin:16px 0 10px}
+.rest-card{background:#fff;border-radius:16px;border:1px solid #eee;margin-bottom:10px;overflow:hidden}
+.rest-head{padding:14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f5f5f5}
+.rest-emoji{font-size:26px;width:48px;height:48px;border-radius:12px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rest-info{flex:1}
+.rest-nombre{font-size:15px;font-weight:600;color:#1A1A1A}
+.rest-cat{font-size:11px;color:#888;margin-top:2px}
+.rest-badge{font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px}
+.rest-badge.abierto{background:#E8F5E9;color:#2D6A2D}
+.rest-badge.cerrado{background:#f5f5f5;color:#aaa}
+.rest-stats{display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 14px;gap:8px}
+.rest-stat{text-align:center}
+.rest-stat-val{font-size:16px;font-weight:700;color:#1A1A1A}
+.rest-stat-label{font-size:10px;color:#888}
+.rest-actions{display:flex;gap:8px;padding:10px 14px;border-top:1px solid #f5f5f5}
+.btn-sm{padding:7px 14px;border-radius:20px;border:none;font-size:11px;font-weight:700;cursor:pointer}
+.btn-sm-naranja{background:#FFF0E5;color:#FF4D00}
+.btn-sm-rojo{background:#FFF0F0;color:#E24B4A}
+.btn-sm-gris{background:#f5f5f5;color:#888}
+.btn-sm-verde{background:#E8F5E9;color:#2D6A2D}
+.user-card{background:#fff;border-radius:14px;border:1px solid #eee;margin-bottom:10px;overflow:hidden}
+.user-head{padding:14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f5f5f5}
+.user-avatar{width:42px;height:42px;border-radius:50%;background:#FF4D00;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.user-info{flex:1}
+.user-nombre{font-size:14px;font-weight:600;color:#1A1A1A}
+.user-email{font-size:11px;color:#888;margin-top:2px}
+.user-rol{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:#f5f5f5;color:#555}
+.user-actions{display:flex;gap:8px;padding:10px 14px;flex-wrap:wrap}
+.user-badge-pausado{background:#FFF0F0;color:#E24B4A;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px}
+.user-badge-activo{background:#E8F5E9;color:#2D6A2D;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px}
+.btn-add{width:100%;padding:14px;background:#f5f5f5;color:#1A1A1A;border:1.5px dashed #ddd;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:flex-end;z-index:100}
+.modal{background:#fff;border-radius:24px 24px 0 0;padding:24px 20px;width:100%;max-height:85vh;overflow-y:auto}
+.modal-title{font-size:18px;font-weight:700;color:#1A1A1A;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
+.modal-close{font-size:20px;cursor:pointer;color:#888}
+.modal select{width:100%;padding:14px;font-size:15px;border-radius:12px;border:1.5px solid #eee;background:#fafafa;color:#1A1A1A;margin-bottom:16px;outline:none}
+.pass-wrap{position:relative;margin-bottom:16px}
+.pass-wrap input{margin-bottom:0;padding-right:48px}
+.pass-ojo{position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;user-select:none}
 .msg-ok{font-size:12px;padding:10px;background:#E8F5E9;border-radius:8px;color:#2D6A2D;margin-bottom:12px;display:none}
-
-/* HOME */
-#v-home{background:#f5f5f5}
-.topbar-home{background:#FF4D00;padding:calc(44px + env(safe-area-inset-top)) 16px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
-.topbar-home-title{font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.5px;flex:1}
-.topbar-avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0}
-.home-scroll{flex:1;overflow-y:auto;padding:14px;-webkit-overflow-scrolling:touch}
-.home-section{font-size:11px;font-weight:700;color:#888;letter-spacing:1px;text-transform:uppercase;margin:14px 0 10px}
-.restos-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.resto-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);cursor:pointer;transition:.15s}
-.resto-card:active{transform:scale(0.97)}
-.resto-card-img{width:100%;height:120px;background:#FFF4EF;display:flex;align-items:center;justify-content:center;font-size:36px;position:relative;overflow:hidden;flex-shrink:0}
-.resto-card-img img{width:100%;height:100%;object-fit:cover;display:block}
-.resto-card-badge{position:absolute;top:8px;right:8px;font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px}
-.badge-abierto{background:#E8F5E9;color:#2D6A2D}
-.badge-cerrado{background:rgba(0,0,0,0.6);color:#fff}
-.resto-card-body{padding:10px}
-.resto-card-nombre{font-size:13px;font-weight:700;color:#1A1A1A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.resto-card-cat{font-size:11px;color:#888;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.resto-card-info{display:flex;gap:8px;margin-top:6px}
-.resto-card-info span{font-size:10px;color:#aaa}
-
-/* CATEGORÍAS HOME */
-.cats-home{display:flex;gap:10px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none;margin-bottom:4px}
-.cats-home::-webkit-scrollbar{display:none}
-.cat-home-btn{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;cursor:pointer;padding:4px 2px}
-.cat-home-icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;transition:.15s;border:2px solid transparent}
-.cat-home-btn.active .cat-home-icon{border-color:#FF4D00;transform:scale(1.05)}
-.cat-home-label{font-size:10px;font-weight:700;color:#555;text-align:center;white-space:nowrap}
-.cat-home-btn.active .cat-home-label{color:#FF4D00}
-
-/* MENÚ */
-#v-menu{background:#f5f5f5}
-.menu-topbar{background:#fff;padding:calc(44px + env(safe-area-inset-top)) 16px 0;border-bottom:1px solid #eee;flex-shrink:0}
-.menu-topbar-row{display:flex;align-items:center;gap:10px;padding-bottom:12px}
-.back-btn{font-size:28px;color:#1A1A1A;cursor:pointer;background:none;border:none;padding:0;line-height:1}
-.menu-resto-nombre{font-size:16px;font-weight:700;color:#1A1A1A;flex:1}
-.carrito-fab{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;border:none;border-radius:28px;padding:14px 24px;font-size:14px;font-weight:700;cursor:pointer;display:none;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(0,0,0,0.3);z-index:50;white-space:nowrap}
-.carrito-fab.visible{display:flex}
-.carrito-fab-count{background:#FF4D00;border-radius:20px;padding:3px 10px;font-size:13px;font-weight:800}
-.cat-tabs{display:flex;gap:8px;overflow-x:auto;padding:0 0 12px;scrollbar-width:none}
-.cat-tabs::-webkit-scrollbar{display:none}
-.cat-tab{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;border:none;background:#f5f5f5;color:#888;flex-shrink:0}
-.cat-tab.active{background:#FF4D00;color:#fff}
-.menu-scroll{flex:1;overflow-y:auto;padding:14px 14px 80px}
-.menu-cat-title{font-size:11px;font-weight:700;color:#FF4D00;letter-spacing:1px;text-transform:uppercase;margin:16px 0 8px}
-.prod-item{background:#fff;border-radius:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,0.05)}
-.prod-item-img{width:72px;height:72px;border-radius:10px;background:#FFF4EF;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;overflow:hidden}
-.prod-item-img img{width:100%;height:100%;object-fit:cover;display:block}
-.prod-item-info{flex:1;min-width:0}
-.prod-item-nombre{font-size:14px;font-weight:700;color:#1A1A1A}
-.prod-item-desc{font-size:11px;color:#888;margin-top:2px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.prod-item-precio{font-size:15px;font-weight:700;color:#FF4D00;margin-top:6px}
-.prod-item-precio-orig{font-size:12px;color:#aaa;text-decoration:line-through;margin-left:4px;font-weight:400}
-.prod-qty{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.qty-btn{width:30px;height:30px;border-radius:50%;border:2px solid #FF4D00;background:#fff;color:#FF4D00;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;font-weight:700}
-.qty-num{font-size:14px;font-weight:700;color:#1A1A1A;min-width:22px;text-align:center}
-.prod-item-add{width:32px;height:32px;border-radius:50%;background:#FF4D00;color:#fff;border:none;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;line-height:1;font-weight:300}
-.prod-nodisponible{opacity:0.4;pointer-events:none}
-
-/* CARRITO */
-#v-carrito{background:#f5f5f5}
-.carrito-topbar{background:#fff;padding:calc(44px + env(safe-area-inset-top)) 16px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;flex-shrink:0}
-.carrito-scroll{flex:1;overflow-y:auto;padding:14px}
-.carrito-item{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
-.carrito-item-info{flex:1}
-.carrito-item-nombre{font-size:14px;font-weight:700;color:#1A1A1A}
-.carrito-item-precio{font-size:13px;color:#888;margin-top:2px}
-.carrito-item-sub{font-size:14px;font-weight:700;color:#FF4D00;min-width:70px;text-align:right}
-.carrito-footer{background:#fff;padding:14px 20px 20px;border-top:1px solid #eee;flex-shrink:0}
-.carrito-subtotal{display:flex;justify-content:space-between;font-size:13px;color:#888;margin-bottom:6px}
-.carrito-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.carrito-total-val{font-size:22px;font-weight:800;color:#1A1A1A}
-
-/* CHECKOUT */
-#v-checkout{background:#f5f5f5}
-.checkout-topbar{background:#fff;padding:calc(44px + env(safe-area-inset-top)) 16px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;flex-shrink:0}
-.checkout-scroll{flex:1;overflow-y:auto;padding:14px}
-.checkout-section{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px}
-.checkout-section-title{font-size:13px;font-weight:700;color:#1A1A1A;margin-bottom:14px;display:flex;align-items:center;gap:6px}
-.dir-row{display:flex;align-items:center;gap:10px;background:#FFF4EF;border-radius:12px;padding:12px}
-.dir-text{flex:1;font-size:13px;color:#1A1A1A;font-weight:600}
-.dir-change{font-size:12px;color:#FF4D00;font-weight:700;cursor:pointer;white-space:nowrap}
-.pago-opt{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;border:2px solid #eee;margin-bottom:8px;cursor:pointer}
-.pago-opt.selected{border-color:#FF4D00;background:#FFF4EF}
-.pago-opt-icon{font-size:22px;width:36px;text-align:center;flex-shrink:0}
-.pago-opt-info{flex:1}
-.pago-opt-label{font-size:14px;font-weight:600;color:#1A1A1A}
-.pago-opt-sub{font-size:11px;color:#888;margin-top:2px}
-.pago-check{width:20px;height:20px;border-radius:50%;border:2px solid #ddd;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
-.pago-opt.selected .pago-check{background:#FF4D00;border-color:#FF4D00;color:#fff}
-.propina-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.propina-chip{padding:8px 16px;border-radius:20px;border:2px solid #eee;background:#fafafa;font-size:13px;font-weight:600;color:#555;cursor:pointer}
-.propina-chip.selected{border-color:#FF4D00;background:#FFF4EF;color:#FF4D00}
-.resumen-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;color:#555}
-.resumen-row.total{font-size:16px;font-weight:800;color:#1A1A1A;padding-top:10px;margin-top:6px;border-top:2px solid #eee}
-.resumen-row.envio{color:#1565C0}
-.resumen-row.comision{color:#888}
-.resumen-row.propina{color:#2D6A2D}
-.zona-badge{display:inline-block;background:#E3F2FD;color:#1565C0;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-top:6px}
-.notas-input{width:100%;padding:12px;font-size:13px;border-radius:10px;border:1.5px solid #eee;background:#fafafa;color:#1A1A1A;outline:none;resize:none;height:70px}
-.checkout-footer{background:#fff;padding:14px 20px 20px;border-top:1px solid #eee;flex-shrink:0}
-
-/* SEGUIMIENTO */
-#v-seguimiento{background:#f5f5f5}
-.seg-topbar{background:#fff;padding:calc(44px + env(safe-area-inset-top)) 16px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;flex-shrink:0}
-.seg-scroll{flex:1;overflow-y:auto;padding:14px}
-.seg-estado-card{border-radius:18px;padding:20px;margin-bottom:14px;text-align:center}
-.seg-estado-icon{font-size:52px;margin-bottom:8px}
-.seg-estado-label{font-size:22px;font-weight:800;color:#fff}
-.seg-estado-sub{font-size:13px;color:rgba(255,255,255,0.85);margin-top:4px}
-.seg-steps{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px}
-.seg-step{display:flex;align-items:center;gap:12px;padding:6px 0}
-.seg-step-dot{width:30px;height:30px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
-.seg-step-dot.done{background:#2D6A2D;color:#fff}
-.seg-step-dot.active{background:#FF4D00;color:#fff}
-.seg-step-line{width:2px;height:20px;background:#eee;margin-left:14px}
-.seg-step-line.done{background:#2D6A2D}
-.seg-step-info{flex:1}
-.seg-step-label{font-size:13px;font-weight:600;color:#aaa}
-.seg-step-label.done{color:#2D6A2D}
-.seg-step-label.active{color:#1A1A1A;font-weight:700}
-.seg-info-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px}
-.seg-info-title{font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
-.seg-info-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid #f9f9f9}
-.seg-info-label{color:#888}
-.seg-info-val{font-weight:600;color:#1A1A1A;text-align:right;max-width:60%}
-.btn-reclamo{width:100%;padding:14px;background:#FFF0F0;color:#E24B4A;border:1.5px solid #FFD0D0;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px}
-
-/* MIS PEDIDOS */
-#v-mispedidos{background:#f5f5f5}
-.mispedidos-topbar{background:#fff;padding:calc(44px + env(safe-area-inset-top)) 16px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;flex-shrink:0}
-.pedido-hist-card{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.05)}
-.pedido-hist-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
-.pedido-hist-num{font-size:12px;font-weight:700;color:#FF4D00}
-.pedido-hist-fecha{font-size:11px;color:#aaa}
-.pedido-hist-resto{font-size:15px;font-weight:700;color:#1A1A1A;margin-bottom:3px}
-.pedido-hist-items{font-size:12px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pedido-hist-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:8px;border-top:1px solid #f5f5f5}
-.tag{font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px}
-.tag-nuevo{background:#FFF0E5;color:#FF4D00}
-.tag-preparando{background:#FFF9E5;color:#B8860B}
-.tag-camino{background:#E3F2FD;color:#1565C0}
-.tag-entregado{background:#E8F5E9;color:#2D6A2D}
-.tag-cancelado{background:#f5f5f5;color:#aaa}
-
-/* PERFIL */
-#v-perfil{background:#f5f5f5}
-.perfil-topbar{background:#FF4D00;padding:calc(44px + env(safe-area-inset-top)) 16px 24px;display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0}
-.perfil-avatar{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff}
-.perfil-nombre-txt{font-size:18px;font-weight:700;color:#fff}
-.perfil-email-txt{font-size:12px;color:rgba(255,255,255,0.7)}
-.perfil-scroll{flex:1;overflow-y:auto;padding:14px}
-.perfil-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:10px}
-.perfil-card-title{font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
-
-/* RECLAMO */
-#v-reclamo{background:#f5f5f5}
-.reclamo-topbar{background:#fff;padding:calc(44px + env(safe-area-inset-top)) 16px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;flex-shrink:0}
-
-/* NAVBAR */
-.navbar{display:flex;background:#fff;border-top:1px solid #eee;flex-shrink:0;padding-bottom:max(14px,env(safe-area-inset-bottom));padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px 4px;cursor:pointer;border:none;background:none;position:relative}
-.nav-item-icon{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:.2s}
-.nav-item.active .nav-item-icon{background:#FFF0E5}
-.nav-item-icon svg{width:22px;height:22px;stroke:#aaa;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.nav-item.active .nav-item-icon svg{stroke:#FF4D00}
-.nav-item-label{font-size:10px;font-weight:600;color:#aaa;margin-top:3px}
-.nav-item.active .nav-item-label{color:#FF4D00}
-.nav-dot{position:absolute;top:6px;right:calc(50% - 18px);width:8px;height:8px;background:#FF4D00;border-radius:50%;border:2px solid #fff;display:none}
-.nav-dot.show{display:block}
-
-/* MODAL DIR */
-#modal-dir{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:none;align-items:flex-end}
-#modal-dir.open{display:flex}
-.modal-body{background:#fff;border-radius:24px 24px 0 0;padding:24px 20px calc(24px + env(safe-area-inset-bottom));width:100%}
-.modal-title{font-size:18px;font-weight:700;color:#1A1A1A;margin-bottom:16px}
-
-/* ALERTA DIR */
-#alerta-dir{position:fixed;top:60px;left:12px;right:12px;background:#1A1A1A;border-radius:14px;padding:14px 16px;z-index:300;display:none;flex-direction:column;gap:10px}
-#alerta-dir.show{display:flex}
-.alerta-text{font-size:13px;color:#fff}
-.alerta-btns{display:flex;gap:8px}
-.alerta-btn{padding:8px 16px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:none}
-.alerta-btn-naranja{background:#FF4D00;color:#fff}
-.alerta-btn-gris{background:rgba(255,255,255,0.15);color:#fff}
-
-.hidden{display:none!important}
-
-/* RASPADITA */
-#v-raspadita{background:#1A1A1A}
-.rasp-topbar{background:#1A1A1A;padding:calc(44px + env(safe-area-inset-top)) 16px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
-.rasp-scroll{flex:1;overflow-y:auto;padding:14px}
-.rasp-card{background:#fff;border-radius:20px;padding:20px;margin-bottom:14px;text-align:center}
-.rasp-card-titulo{font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:6px}
-.rasp-card-sub{font-size:13px;color:#888;margin-bottom:20px}
-.scratch-container{position:relative;width:240px;height:160px;margin:0 auto 20px;border-radius:16px;overflow:hidden;cursor:pointer;user-select:none}
-.scratch-prize{position:absolute;inset:0;background:linear-gradient(135deg,#FF4D00,#FF8C00);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;border-radius:16px}
-.scratch-prize-icon{font-size:40px}
-.scratch-prize-text{font-size:16px;font-weight:800;color:#fff;text-align:center;padding:0 12px}
-.scratch-cover{position:absolute;inset:0;border-radius:16px;background:linear-gradient(135deg,#888,#555);display:flex;align-items:center;justify-content:center;transition:.3s}
-.scratch-cover-text{font-size:14px;font-weight:700;color:#fff;text-align:center}
-.scratch-cover.revelada{opacity:0;pointer-events:none}
-.scratch-hint{font-size:12px;color:#aaa;margin-top:8px}
-.rasp-ganadora{background:linear-gradient(135deg,#FF4D00,#FF8C00);border-radius:16px;padding:16px;margin-bottom:12px;text-align:center}
-.rasp-ganadora-label{font-size:12px;color:rgba(255,255,255,0.8);margin-bottom:4px}
-.rasp-ganadora-premio{font-size:20px;font-weight:800;color:#fff}
-.rasp-empty{text-align:center;padding:40px 20px;color:#888;font-size:14px}
-.nav-badge{position:absolute;top:6px;right:calc(50% - 22px);background:#FF4D00;color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center}
-.nav-item-wrap{position:relative;display:flex;flex-direction:column;align-items:center}
-.loading-text{text-align:center;padding:32px;color:#aaa;font-size:13px}
-.version{font-size:10px;color:#ccc;text-align:center;padding:12px}
-.premio-banner{background:linear-gradient(135deg,#FF4D00,#FF8C00);border-radius:14px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;cursor:pointer}
-.premio-banner-icon{font-size:28px;flex-shrink:0}
-.premio-banner-info{flex:1}
-.premio-banner-title{font-size:13px;font-weight:800;color:#fff}
-.premio-banner-sub{font-size:11px;color:rgba(255,255,255,0.8);margin-top:2px}
-.premio-banner-arrow{font-size:20px;color:rgba(255,255,255,0.7)}
+.msg-err{font-size:12px;padding:10px;background:#FFF0F0;border-radius:8px;color:#E24B4A;margin-bottom:12px;display:none}
+.loading-spinner{text-align:center;padding:20px;color:#888;font-size:13px}
+.hidden{display:none !important}
+.cat-admin-card{background:#fff;border-radius:14px;border:1px solid #eee;margin-bottom:10px;overflow:hidden}
+.cat-admin-head{padding:14px;display:flex;align-items:center;gap:12px}
+.cat-admin-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.cat-admin-info{flex:1}
+.cat-admin-nombre{font-size:15px;font-weight:600;color:#1A1A1A}
+.cat-admin-id{font-size:11px;color:#aaa;margin-top:2px}
+.cat-admin-actions{display:flex;gap:8px;padding:10px 14px;border-top:1px solid #f5f5f5}
+.color-picker-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.color-opt{width:36px;height:36px;border-radius:10px;cursor:pointer;border:3px solid transparent;font-size:16px;display:flex;align-items:center;justify-content:center}
+.color-opt.selected{border-color:#1A1A1A}
 </style>
 </head>
 <body>
 
-<!-- SPLASH -->
-<div id="v-splash" class="vista activa">
-  <div class="splash-logo">
-    <svg width="48" height="48" viewBox="0 0 60 60">
-      <circle cx="30" cy="30" r="26" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="140 24" stroke-dashoffset="-4" stroke-linecap="round"/>
-      <circle cx="50" cy="13" r="4" fill="#FFD166"/>
+<div id="screen-login">
+  <div class="login-hero">
+    <svg width="70" height="70" viewBox="0 0 60 60">
+      <rect width="60" height="60" rx="14" fill="#FF4D00"/>
       <text x="30" y="38" text-anchor="middle" font-family="system-ui" font-weight="700" font-size="20" letter-spacing="-1" fill="white">ALL</text>
     </svg>
+    <div class="login-title">Panel Admin</div>
+    <div class="login-sub">Acceso exclusivo para administradores</div>
   </div>
-  <div class="splash-title">ALL Pedidos</div>
-  <div class="splash-sub">Tu comida, cuando querés</div>
-</div>
-
-<!-- AUTH -->
-<div id="v-auth" class="vista">
-  <div class="auth-hero">
-    <div class="auth-logo">ALL <span>Pedidos</span></div>
-    <div class="auth-sub">Registrate para hacer tu primer pedido</div>
-  </div>
-  <div class="auth-body">
-    <div class="auth-tabs">
-      <div class="auth-tab active" onclick="switchAuthTab('login',this)">Ingresar</div>
-      <div class="auth-tab" onclick="switchAuthTab('registro',this)">Registrarse</div>
+  <div class="login-body">
+    <div id="error-msg" class="error-msg"></div>
+    <div class="field-label">Email</div>
+    <input type="email" placeholder="admin@all.com" class="input" id="login-email"/>
+    <div class="field-label">Contraseña</div>
+    <div class="pass-wrap">
+      <input type="password" placeholder="••••••••" class="input" id="login-pass"/>
+      <span class="pass-ojo" onclick="togglePass('login-pass',this)">👁</span>
     </div>
-    <div id="auth-login">
-      <div id="err-login" class="msg-err"></div>
-      <div class="field-label">Email</div>
-      <input type="email" id="l-email" placeholder="tu@email.com" class="input"/>
-      <div class="field-label">Contraseña</div>
-      <div class="pass-wrap"><input type="password" id="l-pass" placeholder="••••••••" class="input"/><span class="pass-ojo" onclick="togglePass('l-pass',this)">👁</span></div>
-      <button class="btn-main" onclick="login()">Ingresar →</button>
+    <button class="btn-main" id="btn-ingresar" onclick="ingresar()">Ingresar al panel →</button>
+  </div>
+</div>
+
+<div id="screen-panel">
+  <div class="topbar">
+    <div>
+      <div class="topbar-logo">ALL <span>Admin</span></div>
+      <div class="topbar-sub" id="user-email-display">Panel de administración</div>
     </div>
-    <div id="auth-registro" class="hidden">
-      <div id="err-registro" class="msg-err"></div>
-      <div class="field-label">Nombre completo</div>
-      <input type="text" id="r-nombre" placeholder="Ej: María García" class="input"/>
-      <div class="field-label">Teléfono</div>
-      <input type="tel" id="r-tel" placeholder="Ej: 2914123456" class="input"/>
-      <div class="field-label">Email</div>
-      <input type="email" id="r-email" placeholder="tu@email.com" class="input"/>
-      <div class="field-label">Contraseña</div>
-      <div class="pass-wrap"><input type="password" id="r-pass" placeholder="Mínimo 6 caracteres" class="input"/><span class="pass-ojo" onclick="togglePass('r-pass',this)">👁</span></div>
-      <div class="field-label">Dirección de entrega</div>
-      <input type="text" id="r-dir" placeholder="Ej: San Martín 542, Bahía Blanca" class="input" autocomplete="off"/>
-      <button class="btn-main" onclick="registro()">Crear cuenta →</button>
-    </div>
-    <div class="version">ALL Pedidos v1.2</div>
-  </div>
-</div>
-
-<!-- HOME -->
-<div id="v-home" class="vista">
-  <div class="topbar-home">
-    <div style="flex:1;min-width:0">
-      <div class="topbar-home-title">¿Qué querés pedir?</div>
-      <div id="home-dir" style="font-size:11px;color:rgba(255,255,255,0.8);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📍 Cargando...</div>
-    </div>
-    <div class="topbar-avatar" id="home-avatar" onclick="irA('v-perfil');setNavActive3(2)">?</div>
-  </div>
-  <div class="home-scroll">
-    <div class="cats-home" id="cats-home"></div>
-    <div class="home-section" id="home-section-label">Todos los locales</div>
-    <div class="restos-grid" id="lista-restos-home"><div class="loading-text" style="grid-column:span 2">Cargando...</div></div>
-    <div class="version">ALL Pedidos v1.2</div>
-  </div>
-  <div class="navbar" id="navbar-home">
-    <button class="nav-item active" onclick="setNavActive3(0)">
-      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
-      <div class="nav-item-label">Inicio</div>
-    </button>
-    <button class="nav-item" onclick="irA('v-mispedidos');setNavActive3(1);cargarMisPedidos()">
-      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
-      <div class="nav-item-label">Pedidos</div>
-    </button>
-    <button class="nav-item" onclick="irA('v-raspadita');setNavActive3(2);cargarRaspaditas()">
-      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/><path d="M7 10l2 2 4-4"/></svg></div>
-      <div class="nav-item-label">Premios</div>
-      <div class="nav-dot" id="rasp-nav-badge"></div>
-    </button>
-    <button class="nav-item" onclick="irA('v-perfil');setNavActive3(3);cargarPerfil()">
-      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-      <div class="nav-item-label">Perfil</div>
-    </button>
-  </div>
-</div>
-
-<!-- MENÚ -->
-<div id="v-menu" class="vista">
-  <div class="menu-topbar">
-    <div class="menu-topbar-row">
-      <button class="back-btn" onclick="irA('v-home')">‹</button>
-      <div class="menu-resto-nombre" id="menu-resto-nombre">Restaurante</div>
-    </div>
-    <div class="cat-tabs" id="cat-tabs-menu"></div>
-  </div>
-  <div class="menu-scroll" id="menu-scroll"><div class="loading-text">Cargando menú...</div></div>
-  <button class="carrito-fab" id="carrito-fab" onclick="irA('v-carrito');renderCarrito()">
-    🛒 Ver carrito · <span id="fab-items">0 items</span>
-    <span class="carrito-fab-count" id="fab-total">$0</span>
-  </button>
-</div>
-
-<!-- CARRITO -->
-<div id="v-carrito" class="vista">
-  <div class="carrito-topbar">
-    <button class="back-btn" onclick="irA('v-menu')">‹</button>
-    <div style="font-size:16px;font-weight:700;color:#1A1A1A;flex:1">Tu carrito</div>
-    <div id="carrito-resto-nombre" style="font-size:12px;color:#888"></div>
-  </div>
-  <div class="carrito-scroll" id="carrito-scroll"></div>
-  <div class="carrito-footer">
-    <div class="carrito-subtotal"><span>Subtotal</span><span id="carrito-subtotal-val">$0</span></div>
-    <div class="carrito-total-row"><span style="font-size:14px;font-weight:600;color:#888">Total estimado</span><div class="carrito-total-val" id="carrito-total">$0</div></div>
-    <button class="btn-main" onclick="irA('v-checkout');renderCheckout()">Continuar →</button>
-  </div>
-</div>
-
-<!-- CHECKOUT -->
-<div id="v-checkout" class="vista">
-  <div class="checkout-topbar">
-    <button class="back-btn" onclick="irA('v-carrito')">‹</button>
-    <div style="font-size:16px;font-weight:700;color:#1A1A1A;flex:1">Confirmar pedido</div>
-  </div>
-  <div class="checkout-scroll" id="checkout-scroll"></div>
-  <div class="checkout-footer">
-    <div id="err-checkout" class="msg-err"></div>
-    <button class="btn-main" id="btn-confirmar" onclick="confirmarPedido()">Confirmar pedido ✓</button>
-  </div>
-</div>
-
-<!-- SEGUIMIENTO -->
-<div id="v-seguimiento" class="vista">
-  <div class="seg-topbar">
-    <button class="back-btn" onclick="irA('v-mispedidos');cargarMisPedidos()">‹</button>
-    <div style="font-size:16px;font-weight:700;color:#1A1A1A;flex:1">Seguimiento</div>
-    <div id="seg-actualiza" style="font-size:10px;color:#aaa">Actualiza cada 10s</div>
-  </div>
-  <div class="seg-scroll" id="seg-scroll"></div>
-</div>
-
-<!-- MIS PEDIDOS -->
-<div id="v-mispedidos" class="vista">
-  <div class="mispedidos-topbar">
-    <button class="back-btn" onclick="irA('v-home')">‹</button>
-    <div style="font-size:16px;font-weight:700;color:#1A1A1A;flex:1">Mis pedidos</div>
-  </div>
-  <div style="flex:1;overflow-y:auto;padding:14px" id="mispedidos-scroll"><div class="loading-text">Cargando...</div></div>
-  <div class="navbar">
-    <button class="nav-item" onclick="irA('v-home');setNavActive3(0)">
-      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
-      <div class="nav-item-label">Inicio</div>
-    </button>
-    <button class="nav-item active">
-      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
-      <div class="nav-item-label">Pedidos</div>
-    </button>
-    <button class="nav-item" onclick="irA('v-raspadita');setNavActive3(2);cargarRaspaditas()">
-      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/><path d="M7 10l2 2 4-4"/></svg></div>
-      <div class="nav-item-label">Premios</div>
-    </button>
-    <button class="nav-item" onclick="irA('v-perfil');setNavActive3(3);cargarPerfil()">
-      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-      <div class="nav-item-label">Perfil</div>
-    </button>
-  </div>
-</div>
-
-<!-- PERFIL -->
-<div id="v-perfil" class="vista">
-  <div class="perfil-topbar">
-    <div class="perfil-avatar" id="perfil-avatar">?</div>
-    <div class="perfil-nombre-txt" id="perfil-nombre">–</div>
-    <div class="perfil-email-txt" id="perfil-email">–</div>
-  </div>
-  <div class="perfil-scroll">
-    <div class="perfil-card">
-      <div class="perfil-card-title">Mis datos</div>
-      <div class="field-label">Nombre</div><input type="text" id="p-nombre" class="input" placeholder="Tu nombre"/>
-      <div class="field-label">Teléfono</div><input type="tel" id="p-tel" class="input" placeholder="Tu teléfono"/>
-      <div class="field-label">Dirección base</div><input type="text" id="p-dir" class="input" placeholder="Tu dirección habitual" autocomplete="off"/>
-      <div id="msg-perfil-ok" class="msg-ok"></div>
-      <button class="btn-main" onclick="guardarPerfil()">Guardar cambios</button>
-    </div>
-    <button class="btn-sec" onclick="cerrarSesion()">Cerrar sesión</button>
-    <div class="version">ALL Pedidos v1.2</div>
-  </div>
-  <div class="navbar">
-    <button class="nav-item" onclick="irA('v-home');setNavActive3(0)">
-      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
-      <div class="nav-item-label">Inicio</div>
-    </button>
-    <button class="nav-item" onclick="irA('v-mispedidos');setNavActive3(1);cargarMisPedidos()">
-      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
-      <div class="nav-item-label">Pedidos</div>
-    </button>
-    <button class="nav-item" onclick="irA('v-raspadita');setNavActive3(2);cargarRaspaditas()">
-      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/><path d="M7 10l2 2 4-4"/></svg></div>
-      <div class="nav-item-label">Premios</div>
-    </button>
-    <button class="nav-item active">
-      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-      <div class="nav-item-label">Perfil</div>
-    </button>
-  </div>
-</div>
-
-<!-- RECLAMO -->
-<div id="v-reclamo" class="vista">
-  <div class="reclamo-topbar">
-    <button class="back-btn" onclick="irA('v-seguimiento')">‹</button>
-    <div style="font-size:16px;font-weight:700;color:#1A1A1A;flex:1">Hacer un reclamo</div>
-  </div>
-  <div style="flex:1;overflow-y:auto;padding:14px">
-    <div style="background:#fff;border-radius:14px;padding:16px">
-      <div id="err-reclamo" class="msg-err"></div>
-      <div id="ok-reclamo" class="msg-ok"></div>
-      <div class="field-label">¿Qué pasó?</div>
-      <textarea id="reclamo-desc" style="width:100%;padding:12px;font-size:13px;border-radius:10px;border:1.5px solid #eee;background:#fafafa;color:#1A1A1A;outline:none;resize:none;height:100px;margin-bottom:14px" placeholder="Describí el problema..."></textarea>
-      <div class="field-label">Foto (opcional)</div>
-      <div style="padding:14px;background:#f5f5f5;border-radius:10px;border:1.5px dashed #ddd;text-align:center;cursor:pointer;margin-bottom:14px" onclick="document.getElementById('reclamo-foto-input').click()">📷 Subir foto</div>
-      <input type="file" id="reclamo-foto-input" accept="image/*" style="display:none" onchange="previewReclamoFoto(this)"/>
-      <img id="reclamo-foto-preview" style="width:100%;border-radius:10px;margin-bottom:14px;display:none"/>
-      <button class="btn-main" style="background:#E24B4A" onclick="enviarReclamo()">Enviar reclamo</button>
+    <div class="topbar-right">
+      <button style="background:rgba(255,255,255,0.1);border:none;color:#fff;padding:8px 14px;border-radius:20px;font-size:12px;cursor:pointer" onclick="cerrarSesion()">Salir</button>
     </div>
   </div>
-</div>
-
-<!-- RASPADITA -->
-<div id="v-raspadita" class="vista">
-  <div class="rasp-topbar">
-    <button class="back-btn" style="color:#fff" onclick="irA('v-home')">‹</button>
-    <div style="font-size:18px;font-weight:800;color:#fff;flex:1">🎰 Mis raspaditas</div>
-    <div id="rasp-count-badge" style="background:#FF4D00;color:#fff;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;display:none"></div>
+  <div class="nav">
+    <button class="nav-btn active" onclick="switchTab('dashboard',this)">Dashboard</button>
+    <button class="nav-btn" onclick="switchTab('restaurantes',this)">Restaurantes</button>
+    <button class="nav-btn" onclick="switchTab('pedidos',this)">Pedidos</button>
+    <button class="nav-btn" onclick="switchTab('cadetes',this)">Cadetes</button>
+    <button class="nav-btn" onclick="switchTab('usuarios',this)">Usuarios</button>
+    <button class="nav-btn" onclick="switchTab('categorias',this)">Categorías</button>
   </div>
-  <div class="rasp-scroll" id="rasp-scroll">
-    <div class="loading-text" style="color:#888">Cargando...</div>
-  </div>
-</div>
 
-<!-- MODAL RASPADITA INMEDIATA -->
-<div id="modal-raspadita" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;display:none;align-items:center;justify-content:center;flex-direction:column;padding:20px">
-  <div style="background:#fff;border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center">
-    <div style="font-size:13px;font-weight:600;color:#FF4D00;margin-bottom:6px">🎉 ¡Pedido confirmado!</div>
-    <div style="font-size:20px;font-weight:800;color:#1A1A1A;margin-bottom:4px">Tu raspadita</div>
-    <div style="font-size:12px;color:#888;margin-bottom:20px">Tocá para revelar tu premio</div>
-    
-    <!-- Scratch card -->
-    <div id="modal-scratch-container" style="position:relative;width:220px;height:150px;margin:0 auto 16px;border-radius:16px;overflow:hidden;cursor:pointer" onclick="rasparModal()">
-      <div id="modal-scratch-prize" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;border-radius:16px">
-        <div id="modal-prize-icon" style="font-size:40px">🎁</div>
-        <div id="modal-prize-text" style="font-size:15px;font-weight:800;color:#fff;padding:0 12px"></div>
-      </div>
-      <div id="modal-scratch-cover" style="position:absolute;inset:0;border-radius:16px;background:linear-gradient(135deg,#555,#333);display:flex;align-items:center;justify-content:center;transition:opacity 0.8s">
-        <div style="font-size:13px;font-weight:700;color:#fff;text-align:center">🤞 Tocá para<br>revelar</div>
-      </div>
+  <!-- DASHBOARD -->
+  <div id="tab-dashboard" class="content">
+    <div class="stats-grid">
+      <div class="stat-card highlight"><div class="stat-icon">📦</div><div class="stat-val" id="stat-pedidos">0</div><div class="stat-label">Pedidos hoy</div></div>
+      <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-val">$0</div><div class="stat-label">Ingresos hoy</div></div>
+      <div class="stat-card"><div class="stat-icon">🍽</div><div class="stat-val" id="stat-restos">–</div><div class="stat-label">Restaurantes</div></div>
+      <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-val" id="stat-usuarios">–</div><div class="stat-label">Usuarios</div></div>
     </div>
+    <div class="section-title">Restaurantes activos</div>
+    <div id="dash-restos"><div class="loading-spinner">Cargando...</div></div>
+  </div>
 
-    <div id="modal-prize-result" style="display:none;margin-bottom:16px">
-      <div id="modal-prize-ganadora" style="background:linear-gradient(135deg,#FF4D00,#FF8C00);border-radius:14px;padding:14px;margin-bottom:10px;display:none">
-        <div style="font-size:11px;color:rgba(255,255,255,0.8);margin-bottom:4px">🎉 ¡Ganaste!</div>
-        <div id="modal-prize-nombre" style="font-size:18px;font-weight:800;color:#fff"></div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.8);margin-top:6px">Se aplicará automáticamente en tu próximo pedido</div>
-      </div>
-      <div id="modal-prize-nada" style="background:#f5f5f5;border-radius:14px;padding:14px;margin-bottom:10px;display:none">
-        <div style="font-size:14px;color:#888">😅 Esta vez no fue...<br>¡Seguí pidiendo!</div>
-      </div>
-      <button onclick="cerrarRaspaditaModal()" class="btn-main">Ver seguimiento del pedido</button>
+  <!-- RESTAURANTES -->
+  <div id="tab-restaurantes" class="content hidden">
+    <div class="section-title">Restaurantes registrados</div>
+    <div id="lista-restaurantes"><div class="loading-spinner">Cargando...</div></div>
+    <button class="btn-add" onclick="abrirModal('modal-resto')">+ Agregar restaurante</button>
+  </div>
+
+  <!-- PEDIDOS -->
+  <div id="tab-pedidos" class="content hidden">
+    <div class="section-title">Pedidos de hoy</div>
+    <div id="lista-pedidos"><div class="loading-spinner">Cargando pedidos...</div></div>
+  </div>
+
+  <!-- CADETES -->
+  <div id="tab-cadetes" class="content hidden">
+    <div class="section-title">Cadetes registrados</div>
+    <div id="lista-cadetes"><div class="loading-spinner">Cargando cadetes...</div></div>
+    <button class="btn-add" onclick="abrirModal('modal-nuevo-usuario');document.getElementById('new-rol').value='cadete'">+ Agregar cadete</button>
+  </div>
+
+  <!-- USUARIOS -->
+  <div id="tab-usuarios" class="content hidden">
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="btn-sm btn-sm-naranja" style="padding:10px 16px" onclick="filtrarUsuarios('todos')">Todos</button>
+      <button class="btn-sm btn-sm-gris" style="padding:10px 16px" onclick="filtrarUsuarios('encargado')">Encargados</button>
+      <button class="btn-sm btn-sm-gris" style="padding:10px 16px" onclick="filtrarUsuarios('cadete')">Cadetes</button>
+      <button class="btn-sm btn-sm-gris" style="padding:10px 16px" onclick="filtrarUsuarios('cliente')">Clientes</button>
     </div>
-    
-    <div id="modal-scratch-hint" style="font-size:11px;color:#aaa">Tocá la tarjeta para raspar</div>
+    <div id="lista-usuarios"><div class="loading-spinner">Cargando usuarios...</div></div>
+    <button class="btn-add" onclick="abrirModal('modal-nuevo-usuario')">+ Agregar usuario</button>
+  </div>
+  <!-- CATEGORÍAS -->
+  <div id="tab-categorias" class="content hidden">
+    <div class="section-title">Categorías de locales</div>
+    <div style="font-size:12px;color:#888;margin-bottom:14px">Estas categorías aparecen en la app del cliente para filtrar los locales.</div>
+    <div id="lista-categorias"><div class="loading-spinner">Cargando...</div></div>
+    <button class="btn-add" onclick="abrirModalNuevaCategoria()">+ Agregar categoría</button>
   </div>
 </div>
 
-<!-- MODAL DIRECCIÓN -->
-<div id="modal-dir">
-  <div class="modal-body">
-    <div class="modal-title">📍 Dirección de entrega</div>
-    <div class="field-label">Tu dirección</div>
-    <input type="text" id="modal-dir-input" class="input" placeholder="Ej: San Martín 542, Bahía Blanca" autocomplete="off"/>
-    <button class="btn-main" onclick="guardarDirModal()">Confirmar</button>
-    <button class="btn-sec" onclick="cerrarModalDir()">Cancelar</button>
+<!-- MODAL NUEVO USUARIO -->
+<div id="modal-nuevo-usuario" class="modal-bg hidden" onclick="cerrarModalBg(event,'modal-nuevo-usuario')">
+  <div class="modal">
+    <div class="modal-title">Nuevo usuario <span class="modal-close" onclick="cerrarModal('modal-nuevo-usuario')">✕</span></div>
+    <div id="msg-nuevo-ok" class="msg-ok"></div>
+    <div id="msg-nuevo-err" class="msg-err"></div>
+    <div class="field-label">Nombre completo</div>
+    <input type="text" id="new-nombre" placeholder="Ej: Juan Pérez" class="input"/>
+    <div class="field-label">Email</div>
+    <input type="email" id="new-email" placeholder="usuario@gmail.com" class="input"/>
+    <div class="field-label">Contraseña</div>
+    <div class="pass-wrap"><input type="password" id="new-pass" placeholder="Mínimo 6 caracteres" class="input"/><span class="pass-ojo" onclick="togglePass('new-pass',this)">👁</span></div>
+    <div class="field-label">Rol</div>
+    <select id="new-rol" class="input" style="margin-bottom:16px" onchange="toggleRestSelect()">
+      <option value="cliente">Cliente</option>
+      <option value="encargado">Encargado de restaurante</option>
+      <option value="cadete">Cadete</option>
+      <option value="admin">Admin</option>
+    </select>
+    <div id="rest-select-wrap">
+      <div class="field-label">Restaurante asignado</div>
+      <select id="new-rest" class="input" style="margin-bottom:16px">
+        <option value="">Cargando...</option>
+      </select>
+    </div>
+    <button class="btn-main btn-naranja" onclick="crearUsuario()">Crear usuario</button>
+    <button class="btn-add" style="margin-top:8px" onclick="cerrarModal('modal-nuevo-usuario')">Cancelar</button>
   </div>
 </div>
 
-<!-- ALERTA DIRECCIÓN -->
-<div id="alerta-dir">
-  <div class="alerta-text">📍 Tu dirección de entrega es diferente a tu dirección habitual. ¿Querés cambiarla?</div>
-  <div class="alerta-btns">
-    <button class="alerta-btn alerta-btn-naranja" onclick="abrirModalDir()">Cambiar dirección</button>
-    <button class="alerta-btn alerta-btn-gris" onclick="cerrarAlertaDir()">Dejar así</button>
+<!-- MODAL CAMBIAR CONTRASEÑA -->
+<div id="modal-cambiar-pass" class="modal-bg hidden" onclick="cerrarModalBg(event,'modal-cambiar-pass')">
+  <div class="modal">
+    <div class="modal-title">Cambiar contraseña <span class="modal-close" onclick="cerrarModal('modal-cambiar-pass')">✕</span></div>
+    <div id="msg-pass-ok" class="msg-ok"></div>
+    <div id="msg-pass-err" class="msg-err"></div>
+    <div class="field-label">Usuario</div>
+    <input type="text" id="pass-user-nombre" class="input" readonly style="background:#f5f5f5"/>
+    <input type="hidden" id="pass-user-id"/>
+    <div class="field-label">Nueva contraseña</div>
+    <div class="pass-wrap"><input type="password" id="nueva-pass" placeholder="Mínimo 6 caracteres" class="input"/><span class="pass-ojo" onclick="togglePass('nueva-pass',this)">👁</span></div>
+    <button class="btn-main btn-naranja" onclick="cambiarPassword()">Guardar contraseña</button>
+    <button class="btn-add" style="margin-top:8px" onclick="cerrarModal('modal-cambiar-pass')">Cancelar</button>
   </div>
 </div>
 
-<input type="file" id="ticket-input" accept="image/*" style="display:none" onchange="subirTicket(this)"/>
+<!-- MODAL NUEVO RESTAURANTE -->
+<div id="modal-resto" class="modal-bg hidden" onclick="cerrarModalBg(event,'modal-resto')">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="modal-resto-titulo">Nuevo restaurante</span>
+      <span class="modal-close" onclick="cerrarModal('modal-resto')">✕</span>
+    </div>
+    <div id="msg-resto-ok" class="msg-ok"></div>
+    <div id="msg-resto-err" class="msg-err"></div>
+    <input type="hidden" id="resto-id"/>
+    <div class="field-label">Nombre</div>
+    <input type="text" id="resto-nombre" placeholder="Ej: La Pizzería" class="input"/>
+    <div class="field-label">Categoría</div>
+    <input type="text" id="resto-cat" placeholder="Ej: Pizza · Pasta" class="input"/>
+    <div class="field-label">Dirección</div>
+    <input type="text" id="resto-dir" placeholder="Ej: San Martín 500" class="input"/>
+    <div class="field-label">Tiempo entrega (min)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <input type="number" id="resto-tmin" placeholder="Mín" value="20" class="input" style="margin-bottom:0"/>
+      <input type="number" id="resto-tmax" placeholder="Máx" value="40" class="input" style="margin-bottom:0"/>
+    </div>
+    <button class="btn-main btn-naranja" onclick="guardarRestaurante()">Guardar restaurante</button>
+    <button class="btn-add" style="margin-top:8px" onclick="cerrarModal('modal-resto')">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL CATEGORIA -->
+<div id="modal-categoria" class="modal-bg hidden" onclick="cerrarModalBg(event,'modal-categoria')">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="modal-cat-titulo">Nueva categoría</span>
+      <span class="modal-close" onclick="cerrarModal('modal-categoria')">✕</span>
+    </div>
+    <div id="msg-cat-ok" class="msg-ok"></div>
+    <div id="msg-cat-err" class="msg-err"></div>
+    <input type="hidden" id="cat-id"/>
+    <div class="field-label">Nombre</div>
+    <input type="text" id="cat-nombre" placeholder="Ej: Restaurantes, Pet Shop..." class="input"/>
+    <div class="field-label">Emoji / Ícono</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+      <span style="font-size:28px;cursor:pointer" onclick="selectEmoji(this)">🍽</span>
+      <span style="font-size:28px;cursor:pointer" onclick="selectEmoji(this)">🏪</span>
+      <span style="font-size:28px;cursor:pointer" onclick="selectEmoji(this)">🛒</span>
+      <span style="font-size:28px;cursor:pointer" onclick="selectEmoji(this)">📦</span>
+      <span style="font-size:28px;cursor:pointer" onclick="selectEmoji(this)">🐾</span>
+      <span style="font-size:28px;cursor:pointer" onclick="selectEmoji(this)">💊</span>
+      <span style="font-size:28px;cursor:pointer" onclick="selectEmoji(this)">🥐</span>
+      <span style="font-size:28px;cursor:pointer" onclick="selectEmoji(this)">🍕</span>
+      <span style="font-size:28px;cursor:pointer" onclick="selectEmoji(this)">🍣</span>
+      <span style="font-size:28px;cursor:pointer" onclick="selectEmoji(this)">🍔</span>
+      <span style="font-size:28px;cursor:pointer" onclick="selectEmoji(this)">☕</span>
+      <span style="font-size:28px;cursor:pointer" onclick="selectEmoji(this)">🧴</span>
+      <span style="font-size:28px;cursor:pointer" onclick="selectEmoji(this)">👗</span>
+      <span style="font-size:28px;cursor:pointer" onclick="selectEmoji(this)">📱</span>
+      <span style="font-size:28px;cursor:pointer" onclick="selectEmoji(this)">🌿</span>
+      <span style="font-size:28px;cursor:pointer" onclick="selectEmoji(this)">🎮</span>
+    </div>
+    <div class="field-label">Emoji seleccionado</div>
+    <input type="text" id="cat-emoji" placeholder="Ej: 🍽" class="input" style="font-size:20px"/>
+    <div class="field-label">Color</div>
+    <div class="color-picker-row">
+      <div class="color-opt selected" style="background:#FFF0E5" data-color="#FF4D00" data-bg="#FFF0E5" onclick="selectColor(this)">🟠</div>
+      <div class="color-opt" style="background:#F3E5F5" data-color="#7B1FA2" data-bg="#F3E5F5" onclick="selectColor(this)">🟣</div>
+      <div class="color-opt" style="background:#E3F2FD" data-color="#1565C0" data-bg="#E3F2FD" onclick="selectColor(this)">🔵</div>
+      <div class="color-opt" style="background:#E8F5E9" data-color="#2D6A2D" data-bg="#E8F5E9" onclick="selectColor(this)">🟢</div>
+      <div class="color-opt" style="background:#FBE9E7" data-color="#E65100" data-bg="#FBE9E7" onclick="selectColor(this)">🔴</div>
+      <div class="color-opt" style="background:#FFEBEE" data-color="#C62828" data-bg="#FFEBEE" onclick="selectColor(this)">❤️</div>
+      <div class="color-opt" style="background:#FFF8E1" data-color="#BF8600" data-bg="#FFF8E1" onclick="selectColor(this)">🟡</div>
+      <div class="color-opt" style="background:#f5f5f5" data-color="#1A1A1A" data-bg="#f5f5f5" onclick="selectColor(this)">⚫</div>
+    </div>
+    <input type="hidden" id="cat-color" value="#FF4D00"/>
+    <input type="hidden" id="cat-color-bg" value="#FFF0E5"/>
+    <div class="field-label">Orden</div>
+    <input type="number" id="cat-orden" placeholder="Ej: 1" class="input" value="1"/>
+    <button class="btn-main btn-naranja" onclick="guardarCategoria()">Guardar categoría</button>
+    <button class="btn-add" style="margin-top:8px" onclick="cerrarModal('modal-categoria')">Cancelar</button>
+  </div>
+</div>
 
 <script>
 const SUPABASE_URL = 'https://rkinieckmmlvldnccbzm.supabase.co'
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJraW5pZWNrbW1sdmxkbmNjYnptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNDM1NTQsImV4cCI6MjA5NTgxOTU1NH0.Mb82xSMu5KSwgju-rUEh-BBWNVLmJ3Fso5EZy4QeOvs'
+const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJraW5pZWNrbW1sdmxkbmNjYnptIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDI0MzU1NCwiZXhwIjoyMDk1ODE5NTU0fQ.yADbKI4Hu8uguPT-KhFMdzuN4Cg-UNv9x5tykjBf4SY'
+
 const { createClient } = supabase
 const sb = createClient(SUPABASE_URL, ANON_KEY)
+const sbAdmin = createClient(SUPABASE_URL, SERVICE_KEY, {
+  auth: { autoRefreshToken: false, persistSession: false }
+})
 
-var usuarioActual = null
-var perfilActual = null
-var restoActual = null
-var carrito = []
-var metodoPago = null
-var ticketUrl = null
-var dirEntrega = ''
-var propinaSeleccionada = 0
-var costoEnvio = 0
-var zonaNombre = ''
-var comisionConfig = { activa: false, porcentaje: 0 }
-var pedidoActivoId = null
-var segInterval = null
+var todosUsuarios = []
+var restaurantesCache = []
 
-const PROPINAS = [0, 200, 400, 600, 800, 1000]
-const ESTADOS = {
-  nuevo:      { label:'Nuevo pedido',  icon:'🆕', color:'#FF4D00', sub:'Tu pedido fue recibido' },
-  preparando: { label:'Preparando',    icon:'👨‍🍳', color:'#B8860B', sub:'Están preparando tu pedido' },
-  camino:     { label:'En camino',     icon:'🏍',  color:'#1565C0', sub:'Tu pedido está en camino' },
-  entregado:  { label:'Entregado',     icon:'✅',  color:'#2D6A2D', sub:'¡Tu pedido llegó!' },
-  cancelado:  { label:'Cancelado',     icon:'❌',  color:'#888',    sub:'El pedido fue cancelado' }
-}
-
-// ── NAVEGACIÓN ───────────────────────────────────────────────────────────────
-function irA(vistaId){
-  document.querySelectorAll('.vista').forEach(function(v){ v.classList.remove('activa') })
-  document.getElementById(vistaId).classList.add('activa')
-}
-
-function setNavActive3(idx){
-  document.querySelectorAll('.navbar').forEach(function(nb){
-    var items = nb.querySelectorAll('.nav-item')
-    items.forEach(function(it,i){ it.classList.toggle('active', i===idx) })
-  })
-}
-
-// ── INICIO ────────────────────────────────────────────────────────────────────
-sb.auth.getSession().then(async function(res){
-  await new Promise(function(r){ setTimeout(r,1200) })
-  await cargarConfiguracion()
-  if(res.data.session){
-    usuarioActual = res.data.session.user
-    await cargarPerfil()
-    irA('v-home')
-    await cargarCategoriasTipos()
-    cargarRestaurantes()
-  } else {
-    irA('v-auth')
+// ─── SESIÓN ─────────────────────────────────────────────────────────────────
+sb.auth.getSession().then(function(result){
+  if(result.data.session && result.data.session.user.email === 'info.all.argentina@gmail.com'){
+    mostrarPanel(result.data.session.user.email)
   }
 })
 
-async function cargarConfiguracion(){
-  var res = await sb.from('configuracion').select('clave,valor')
-  if(res.data){
-    res.data.forEach(function(c){
-      if(c.clave==='comision_activa') comisionConfig.activa = c.valor==='true'
-      if(c.clave==='comision_porcentaje') comisionConfig.porcentaje = parseFloat(c.valor)||0
-    })
+async function ingresar(){
+  var email = document.getElementById('login-email').value.trim()
+  var pass = document.getElementById('login-pass').value
+  var btn = document.getElementById('btn-ingresar')
+  var err = document.getElementById('error-msg')
+  if(!email || !pass){ err.style.display='block'; err.textContent='Completá email y contraseña'; return }
+  btn.textContent = 'Ingresando...'
+  err.style.display = 'none'
+  var result = await sb.auth.signInWithPassword({ email: email, password: pass })
+  if(result.error){ err.style.display='block'; err.textContent='Email o contraseña incorrectos'; btn.textContent='Ingresar al panel →'; return }
+  if(result.data.user.email !== 'info.all.argentina@gmail.com'){
+    err.style.display='block'; err.textContent='No tenés permisos de administrador'
+    btn.textContent='Ingresar al panel →'; await sb.auth.signOut(); return
   }
+  mostrarPanel(result.data.user.email)
 }
 
-// ── AUTH ──────────────────────────────────────────────────────────────────────
-function switchAuthTab(tab,el){
-  document.querySelectorAll('.auth-tab').forEach(function(t){ t.classList.remove('active') })
-  el.classList.add('active')
-  document.getElementById('auth-login').classList.toggle('hidden', tab!=='login')
-  document.getElementById('auth-registro').classList.toggle('hidden', tab!=='registro')
-}
-
-async function login(){
-  var email=document.getElementById('l-email').value.trim()
-  var pass=document.getElementById('l-pass').value
-  var err=document.getElementById('err-login'); err.style.display='none'
-  if(!email||!pass){ err.style.display='block'; err.textContent='Completá email y contraseña'; return }
-  var res=await sb.auth.signInWithPassword({email:email,password:pass})
-  if(res.error){ err.style.display='block'; err.textContent='Email o contraseña incorrectos'; return }
-  usuarioActual=res.data.user
-  await cargarPerfil()
-  irA('v-home'); await cargarCategoriasTipos(); cargarRestaurantes()
-}
-
-async function registro(){
-  var nombre=document.getElementById('r-nombre').value.trim()
-  var tel=document.getElementById('r-tel').value.trim()
-  var email=document.getElementById('r-email').value.trim()
-  var pass=document.getElementById('r-pass').value
-  var dir=document.getElementById('r-dir').value.trim()
-  var err=document.getElementById('err-registro'); err.style.display='none'
-  if(!nombre||!email||!pass){ err.style.display='block'; err.textContent='Completá nombre, email y contraseña'; return }
-  if(pass.length<6){ err.style.display='block'; err.textContent='La contraseña debe tener al menos 6 caracteres'; return }
-  var res=await sb.auth.signUp({email:email,password:pass,options:{data:{nombre:nombre}}})
-  if(res.error){ err.style.display='block'; err.textContent='Error: '+res.error.message; return }
-  usuarioActual=res.data.user
-  await sb.from('perfiles').upsert({id:usuarioActual.id,nombre:nombre,telefono:tel,direccion_base:dir})
-  perfilActual={nombre:nombre,telefono:tel,direccion_base:dir}
-  dirEntrega=dir
-  irA('v-home'); await cargarCategoriasTipos(); cargarRestaurantes()
+function mostrarPanel(email){
+  document.getElementById('screen-login').style.display = 'none'
+  document.getElementById('screen-panel').style.display = 'flex'
+  document.getElementById('user-email-display').textContent = email
+  cargarDashboard()
+  cargarUsuarios()
+  cargarRestaurantesSelect()
 }
 
 async function cerrarSesion(){
   await sb.auth.signOut()
-  usuarioActual=null; perfilActual=null; carrito=[]; restoActual=null
-  irA('v-auth')
+  document.getElementById('screen-panel').style.display = 'none'
+  document.getElementById('screen-login').style.display = 'flex'
+  document.getElementById('btn-ingresar').textContent = 'Ingresar al panel →'
 }
 
-// ── PERFIL ────────────────────────────────────────────────────────────────────
-async function cargarPerfil(){
-  if(!usuarioActual) return
-  var res=await sb.from('perfiles').select('*').eq('id',usuarioActual.id).single()
-  if(res.data){ perfilActual=res.data; dirEntrega=res.data.direccion_base||'' }
-  actualizarUIperfil()
-}
-
-function actualizarUIperfil(){
-  var nombre = (perfilActual&&perfilActual.nombre)||( usuarioActual&&usuarioActual.email.split('@')[0] )||'?'
-  var iniciales = nombre.substring(0,2).toUpperCase()
-  var setEl = function(id,val){ var e=document.getElementById(id); if(e) e.textContent=val }
-  setEl('home-avatar',iniciales); setEl('perfil-avatar',iniciales)
-  setEl('perfil-nombre',nombre)
-  setEl('perfil-email',usuarioActual?usuarioActual.email:'')
-  setEl('home-dir','📍 '+(dirEntrega||'Sin dirección configurada'))
-  var pn=document.getElementById('p-nombre'); if(pn) pn.value=(perfilActual&&perfilActual.nombre)||''
-  var pt=document.getElementById('p-tel'); if(pt) pt.value=(perfilActual&&perfilActual.telefono)||''
-  var pd=document.getElementById('p-dir'); if(pd) pd.value=(perfilActual&&perfilActual.direccion_base)||''
-}
-
-async function guardarPerfil(){
-  var nombre=document.getElementById('p-nombre').value.trim()
-  var tel=document.getElementById('p-tel').value.trim()
-  var dir=document.getElementById('p-dir').value.trim()
-  var msg=document.getElementById('msg-perfil-ok')
-  await sb.from('perfiles').upsert({id:usuarioActual.id,nombre:nombre,telefono:tel,direccion_base:dir})
-  perfilActual={nombre:nombre,telefono:tel,direccion_base:dir}
-  dirEntrega=dir; actualizarUIperfil()
-  msg.style.display='block'; msg.textContent='✓ Guardado'
-  setTimeout(function(){ msg.style.display='none' },2000)
-}
-
-// ── RESTAURANTES ──────────────────────────────────────────────────────────────
-async function cargarRestaurantes(){
-  var lista=document.getElementById('lista-restos-home')
-  var res=await sb.from('restaurantes').select('*').order('nombre')
-  if(res.error||!res.data){ lista.innerHTML='<div class="loading-text">Error cargando</div>'; return }
-  var emojis={'El Bodegón NKT':'🦞',"Colantonio's":'🍕','Kusama Sushi':'🍣'}
-  var tipos={restaurante:'🍽 Restaurante',kiosco:'🏪 Kiosco',despensa:'🛒 Despensa',market:'🏬 Market'}
-  lista.innerHTML=res.data.map(function(r){
-    var emoji=emojis[r.nombre]||'🍽'
-    var ab=r.abierto!==false
-    var tipo=tipos[r.tipo||'restaurante']||'🍽 Local'
-    var imgContent = r.logo_url
-      ? '<img src="'+r.logo_url+'" style="width:100%;height:100%;object-fit:cover;display:block" alt="'+r.nombre+'"/>'
-      : '<span style="font-size:52px">'+emoji+'</span>'
-    return '<div class="resto-card" onclick="abrirResto(\''+r.id+'\')">'
-      +'<div class="resto-card-img">'+imgContent
-      +'<span class="resto-card-badge '+(ab?'badge-abierto':'badge-cerrado')+'">'+(ab?'● Abierto':'● Cerrado')+'</span>'
-      +'<span class="badge-tipo">'+tipo+'</span>'
-      +'</div>'
-      +'<div class="resto-card-body">'
-      +'<div class="resto-card-nombre">'+r.nombre+'</div>'
-      +'<div class="resto-card-cat">'+(r.categoria||'')+'</div>'
-      +'<div class="resto-card-info">'
-      +'<span>🕐 '+(r.tiempo_entrega_min||20)+'-'+(r.tiempo_entrega_max||40)+' min</span>'
-      +(r.direccion?'<span>📍 '+r.direccion+'</span>':'')
-      +'</div></div></div>'
-  }).join('')
-}
-
-// ── MENÚ ──────────────────────────────────────────────────────────────────────
-async function abrirResto(restoId){
-  irA('v-menu')
-  carrito=[]; propinaSeleccionada=0; costoEnvio=0; zonaNombre=''
-  actualizarFab()
-  var res=await sb.from('restaurantes').select('*').eq('id',restoId).single()
-  if(res.error||!res.data) return
-  restoActual=res.data
-  document.getElementById('menu-resto-nombre').textContent=restoActual.nombre
-  document.getElementById('carrito-resto-nombre').textContent=restoActual.nombre
-
-  // calcular zona de envío si hay dirección
-  if(dirEntrega && restoActual.lat && restoActual.lng){
-    await calcularZonaEnvio()
-  }
-
-  var prods=await sb.from('productos').select('*').eq('restaurante_id',restoId).eq('disponible',true).order('categoria').order('orden')
-  if(prods.error||!prods.data){ document.getElementById('menu-scroll').innerHTML='<div class="loading-text">Error cargando menú</div>'; return }
-
-  var cats={}, ordered=[]
-  var ordenCats=restoActual.categorias_menu||[]
-  prods.data.forEach(function(p){
-    var cat=p.categoria||'General'
-    if(!cats[cat]) cats[cat]=[]
-    cats[cat].push(p)
+// ─── TABS ───────────────────────────────────────────────────────────────────
+function switchTab(tab, el){
+  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active') })
+  el.classList.add('active')
+  var tabs = ['dashboard','restaurantes','pedidos','cadetes','usuarios']
+  tabs.forEach(function(t){
+    document.getElementById('tab-'+t).classList[t === tab ? 'remove' : 'add']('hidden')
   })
-  ordenCats.forEach(function(c){ if(cats[c]) ordered.push(c) })
-  Object.keys(cats).forEach(function(c){ if(!ordered.includes(c)) ordered.push(c) })
+  if(tab === 'usuarios') cargarUsuarios()
+  if(tab === 'cadetes') cargarCadetes()
+  if(tab === 'categorias') cargarCategorias()
+  if(tab === 'restaurantes') cargarRestaurantes()
+}
 
-  document.getElementById('cat-tabs-menu').innerHTML=ordered.map(function(c){
-    return '<div class="cat-tab" onclick="scrollACat(\'mcat-'+c.replace(/[^a-z0-9]/gi,'_')+'\')" >'+c+'</div>'
-  }).join('')
-
-  var hoy=new Date().toISOString().split('T')[0]
-  var html=''
-  ordered.forEach(function(cat){
-    html+='<div class="menu-cat-title" id="mcat-'+cat.replace(/[^a-z0-9]/gi,'_')+'">'+cat+'</div>'
-    cats[cat].forEach(function(p){
-      var tienePromo=p.promocion_activa&&p.precio_promocion&&p.promocion_inicio<=hoy&&p.promocion_fin>=hoy
-      var precio=tienePromo?p.precio_promocion:p.precio
-      var imgHtml=p.imagen_url?'<img src="'+p.imagen_url+'" style="width:100%;height:100%;object-fit:cover;display:block" alt="'+p.nombre+'"/>':'🍽'
-      html+='<div class="prod-item'+(p.disponible?'':' prod-nodisponible')+'" id="pitem-'+p.id+'">'
-      html+='<div class="prod-item-img">'+imgHtml+'</div>'
-      html+='<div class="prod-item-info">'
-      html+='<div class="prod-item-nombre">'+p.nombre+'</div>'
-      if(p.descripcion) html+='<div class="prod-item-desc">'+p.descripcion+'</div>'
-      html+='<div class="prod-item-precio">$'+Number(precio).toLocaleString('es-AR')
-      if(tienePromo) html+='<span class="prod-item-precio-orig">$'+Number(p.precio).toLocaleString('es-AR')+'</span>'
-      html+='</div></div>'
-      html+='<button class="prod-item-add" id="padd-'+p.id+'" onclick="agregarItem(\''+p.id+'\',\''+p.nombre.replace(/'/g,"\\'")+'\',' +precio+')">+</button>'
-      html+='<div class="prod-qty hidden" id="pqty-'+p.id+'">'
-      html+='<button class="qty-btn" onclick="cambiarQty(\''+p.id+'\',-1)">−</button>'
-      html+='<span class="qty-num" id="pnum-'+p.id+'">0</span>'
-      html+='<button class="qty-btn" onclick="cambiarQty(\''+p.id+'\',1)">+</button>'
-      html+='</div>'
-      html+='</div>'
+// ─── DASHBOARD ──────────────────────────────────────────────────────────────
+async function cargarDashboard(){
+  var result = await sb.from('restaurantes').select('id,nombre,categoria,abierto')
+  if(result.data){
+    document.getElementById('stat-restos').textContent = result.data.length
+    var emojis = { 'El Bodegón NKT':'🦞', "Colantonio's":'🍕', 'Kusama Sushi':'🍣' }
+    var html = ''
+    result.data.forEach(function(r){
+      var emoji = emojis[r.nombre] || '🍽'
+      var ab = r.abierto !== false
+      html += '<div class="rest-card"><div class="rest-head">'
+      html += '<div class="rest-emoji">'+emoji+'</div>'
+      html += '<div class="rest-info"><div class="rest-nombre">'+r.nombre+'</div>'
+      html += '<div class="rest-cat">'+(r.categoria||'')+'</div></div>'
+      html += '<span class="rest-badge '+(ab?'abierto':'cerrado')+'">'+(ab?'Abierto':'Cerrado')+'</span>'
+      html += '</div></div>'
     })
-  })
-  document.getElementById('menu-scroll').innerHTML=html
-
-  verificarDireccion()
-}
-
-function scrollACat(id){
-  var el=document.getElementById(id)
-  if(el) el.scrollIntoView({behavior:'smooth',block:'start'})
-}
-
-// ── CARRITO ───────────────────────────────────────────────────────────────────
-function agregarItem(prodId, nombre, precio){
-  var existe=carrito.find(function(i){ return i.id===prodId })
-  if(existe){ existe.qty++ }
-  else { carrito.push({id:prodId,nombre:nombre,precio:precio,qty:1}) }
-  actualizarItemUI(prodId)
-  actualizarFab()
-}
-
-function cambiarQty(prodId, delta){
-  var item=carrito.find(function(i){ return i.id===prodId })
-  if(!item) return
-  item.qty+=delta
-  if(item.qty<=0) carrito=carrito.filter(function(i){ return i.id!==prodId })
-  actualizarItemUI(prodId)
-  actualizarFab()
-  // si carrito abierto, re-render
-  if(document.getElementById('v-carrito').classList.contains('activa')) renderCarrito()
-}
-
-function actualizarItemUI(prodId){
-  var item=carrito.find(function(i){ return i.id===prodId })
-  var addBtn=document.getElementById('padd-'+prodId)
-  var qtyDiv=document.getElementById('pqty-'+prodId)
-  var numEl=document.getElementById('pnum-'+prodId)
-  if(!addBtn||!qtyDiv) return
-  if(item && item.qty>0){
-    addBtn.classList.add('hidden')
-    qtyDiv.classList.remove('hidden')
-    if(numEl) numEl.textContent=item.qty
-  } else {
-    addBtn.classList.remove('hidden')
-    qtyDiv.classList.add('hidden')
+    document.getElementById('dash-restos').innerHTML = html || '<div class="loading-spinner">Sin restaurantes</div>'
   }
 }
 
-function actualizarFab(){
-  var fab=document.getElementById('carrito-fab')
-  var totalItems=carrito.reduce(function(s,i){ return s+i.qty },0)
-  var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
-  // calcular descuento por crédito
-  var descuentoCredito = 0
-  if(aplicarCredito && creditoDesc){
-    // si el premio es un % descuento
-    var matchPct = creditoDesc.match(/(\d+)\s*%/)
-    if(matchPct) descuentoCredito = Math.round(subtotal * parseInt(matchPct[1]) / 100)
-    // si es monto fijo
-    var matchMonto = creditoDesc.match(/\$\s*([\d.]+)/)
-    if(matchMonto && !matchPct) descuentoCredito = parseFloat(matchMonto[1].replace('.',''))
-  }
-  if(totalItems>0){
-    fab.classList.add('visible')
-    document.getElementById('fab-items').textContent=totalItems+(totalItems===1?' item':' items')
-    document.getElementById('fab-total').textContent='$'+Number(subtotal).toLocaleString('es-AR')
-  } else {
-    fab.classList.remove('visible')
-  }
-}
-
-function renderCarrito(){
-  var scroll=document.getElementById('carrito-scroll')
-  if(!carrito.length){ scroll.innerHTML='<div class="loading-text">Tu carrito está vacío</div>'; return }
-  var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
-  // calcular descuento por crédito
-  var descuentoCredito = 0
-  if(aplicarCredito && creditoDesc){
-    // si el premio es un % descuento
-    var matchPct = creditoDesc.match(/(\d+)\s*%/)
-    if(matchPct) descuentoCredito = Math.round(subtotal * parseInt(matchPct[1]) / 100)
-    // si es monto fijo
-    var matchMonto = creditoDesc.match(/\$\s*([\d.]+)/)
-    if(matchMonto && !matchPct) descuentoCredito = parseFloat(matchMonto[1].replace('.',''))
-  }
-  var comision=comisionConfig.activa ? Math.round(subtotal*comisionConfig.porcentaje/100) : 0
-  var total=Math.max(0,subtotal+costoEnvio+comision+propinaSeleccionada-descuentoCredito)
-
-  scroll.innerHTML=carrito.map(function(item){
-    var sub=item.precio*item.qty
-    return '<div class="carrito-item">'
-      +'<div class="carrito-item-info">'
-      +'<div class="carrito-item-nombre">'+item.nombre+'</div>'
-      +'<div class="carrito-item-precio">$'+Number(item.precio).toLocaleString('es-AR')+' c/u</div>'
-      +'</div>'
-      +'<div class="prod-qty">'
-      +'<button class="qty-btn" onclick="cambiarQty(\''+item.id+'\',-1)">−</button>'
-      +'<span class="qty-num">'+item.qty+'</span>'
-      +'<button class="qty-btn" onclick="cambiarQty(\''+item.id+'\',1)">+</button>'
-      +'</div>'
-      +'<div class="carrito-item-sub">$'+Number(sub).toLocaleString('es-AR')+'</div>'
-      +'</div>'
-  }).join('')
-
-  document.getElementById('carrito-subtotal-val').textContent='$'+Number(subtotal).toLocaleString('es-AR')
-  document.getElementById('carrito-total').textContent='$'+Number(total).toLocaleString('es-AR')
-}
-
-// ── ZONAS DE ENVÍO ────────────────────────────────────────────────────────────
-async function calcularZonaEnvio(){
-  if(!restoActual||!restoActual.lat||!restoActual.lng||!dirEntrega) return
-  // geocodificar dirección del cliente
-  try {
-    var geoUrl='https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(dirEntrega)+'&format=json&limit=1'
-    var geoRes=await fetch(geoUrl,{headers:{'User-Agent':'ALL-Pedidos/1.0'}})
-    var geoData=await geoRes.json()
-    if(!geoData||!geoData.length) return
-    var clienteLat=parseFloat(geoData[0].lat)
-    var clienteLng=parseFloat(geoData[0].lon)
-    var distKm=haversine(restoActual.lat,restoActual.lng,clienteLat,clienteLng)
-
-    var zonas=await sb.from('zonas_envio').select('*').eq('restaurante_id',restoActual.id).order('orden')
-    if(zonas.data&&zonas.data.length){
-      var zonaEncontrada=null
-      for(var z of zonas.data){
-        if(distKm<=z.radio_km){ zonaEncontrada=z; break }
-      }
-      if(zonaEncontrada){
-        costoEnvio=zonaEncontrada.precio
-        zonaNombre=zonaEncontrada.nombre+' ('+distKm.toFixed(1)+' km)'
-      } else {
-        costoEnvio=0; zonaNombre='Fuera de zona de entrega'
-      }
+// ─── RESTAURANTES ───────────────────────────────────────────────────────────
+async function cargarRestaurantes(){
+  var lista = document.getElementById('lista-restaurantes')
+  lista.innerHTML = '<div class="loading-spinner">Cargando...</div>'
+  var result = await sb.from('restaurantes').select('*').order('nombre')
+  if(result.error){ lista.innerHTML = '<div class="loading-spinner">Error cargando</div>'; return }
+  restaurantesCache = result.data || []
+  if(!restaurantesCache.length){ lista.innerHTML = '<div class="loading-spinner">Sin restaurantes</div>'; return }
+  var emojis = { 'El Bodegón NKT':'🦞', "Colantonio's":'🍕', 'Kusama Sushi':'🍣' }
+  var html = ''
+  restaurantesCache.forEach(function(r){
+    var emoji = emojis[r.nombre] || '🍽'
+    var ab = r.abierto !== false
+    html += '<div class="rest-card">'
+    html += '<div class="rest-head">'
+    html += '<div class="rest-emoji">'+emoji+'</div>'
+    html += '<div class="rest-info"><div class="rest-nombre">'+r.nombre+'</div>'
+    html += '<div class="rest-cat">'+(r.categoria||'')+'</div></div>'
+    html += '<span class="rest-badge '+(ab?'abierto':'cerrado')+'">'+(ab?'Abierto':'Cerrado')+'</span>'
+    html += '</div>'
+    html += '<div class="rest-actions">'
+    html += '<button class="btn-sm btn-sm-naranja" onclick="editarResto(\''+r.id+'\')">✏️ Editar</button>'
+    if(ab){
+      html += '<button class="btn-sm btn-sm-gris" onclick="toggleAbiertoResto(\''+r.id+'\',false)">⏸ Pausar</button>'
+    } else {
+      html += '<button class="btn-sm btn-sm-verde" onclick="toggleAbiertoResto(\''+r.id+'\',true)">▶️ Activar</button>'
     }
-  } catch(e){ console.log('Geo error:',e) }
-}
-
-function haversine(lat1,lng1,lat2,lng2){
-  var R=6371
-  var dLat=(lat2-lat1)*Math.PI/180
-  var dLng=(lng2-lng1)*Math.PI/180
-  var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2)
-  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))
-}
-
-// ── CHECKOUT ──────────────────────────────────────────────────────────────────
-async function renderCheckout(){
-  // verificar crédito pendiente
-  var creditoData = await verificarCreditoPendiente()
-  var creditoDesc = creditoData ? creditoData.credito_pendiente : null
-  var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
-  // calcular descuento por crédito
-  var descuentoCredito = 0
-  if(aplicarCredito && creditoDesc){
-    // si el premio es un % descuento
-    var matchPct = creditoDesc.match(/(\d+)\s*%/)
-    if(matchPct) descuentoCredito = Math.round(subtotal * parseInt(matchPct[1]) / 100)
-    // si es monto fijo
-    var matchMonto = creditoDesc.match(/\$\s*([\d.]+)/)
-    if(matchMonto && !matchPct) descuentoCredito = parseFloat(matchMonto[1].replace('.',''))
-  }
-  var comision=comisionConfig.activa ? Math.round(subtotal*comisionConfig.porcentaje/100) : 0
-  var total=Math.max(0,subtotal+costoEnvio+comision+propinaSeleccionada-descuentoCredito)
-  var html=''
-
-  // banner premio disponible
-  if(creditoDesc){
-    html+='<div class="premio-banner" onclick="toggleAplicarCredito()">'
-    html+='<div class="premio-banner-icon">🎁</div>'
-    html+='<div class="premio-banner-info">'
-    html+='<div class="premio-banner-title">Premio disponible: '+creditoDesc+'</div>'
-    html+='<div class="premio-banner-sub">'+(aplicarCredito?'✓ Aplicado a este pedido':'Tocá para aplicarlo')+'</div>'
-    html+='</div>'
-    html+='<div class="premio-banner-arrow">'+(aplicarCredito?'✓':'›')+'</div>'
-    html+='</div>'
-  }
-
-  // dirección
-  html+='<div class="checkout-section">'
-  html+='<div class="checkout-section-title">📍 Dirección de entrega</div>'
-  html+='<div class="dir-row"><div class="dir-text">'+(dirEntrega||'Sin dirección')+'</div>'
-  html+='<div class="dir-change" onclick="abrirModalDir()">Cambiar</div></div>'
-  if(zonaNombre) html+='<div class="zona-badge">🚗 '+zonaNombre+'</div>'
-  html+='</div>'
-
-  // pago
-  html+='<div class="checkout-section">'
-  html+='<div class="checkout-section-title">💳 Método de pago</div>'
-  html+='<div class="pago-opt'+(metodoPago==='efectivo'?' selected':'')+'" onclick="seleccionarPago(\'efectivo\')">'
-  html+='<div class="pago-opt-icon">💵</div><div class="pago-opt-info"><div class="pago-opt-label">Efectivo</div><div class="pago-opt-sub">Pagás al recibir</div></div>'
-  html+='<div class="pago-check">'+(metodoPago==='efectivo'?'✓':'')+'</div></div>'
-  html+='<div class="pago-opt'+(metodoPago==='transferencia'?' selected':'')+'" onclick="seleccionarPago(\'transferencia\')">'
-  html+='<div class="pago-opt-icon">🏦</div><div class="pago-opt-info"><div class="pago-opt-label">Transferencia</div><div class="pago-opt-sub">Subí el comprobante</div></div>'
-  html+='<div class="pago-check">'+(metodoPago==='transferencia'?'✓':'')+'</div></div>'
-  if(metodoPago==='transferencia'){
-    html+='<div style="margin-top:10px;padding:14px;background:#f5f5f5;border-radius:12px;border:1.5px dashed #ddd;text-align:center;cursor:pointer" onclick="document.getElementById(\'ticket-input\').click()">📎 '+(ticketUrl?'✓ Comprobante cargado — tocar para cambiar':'Subir comprobante de transferencia')+'</div>'
-    if(ticketUrl) html+='<img src="'+ticketUrl+'" style="width:100%;border-radius:10px;margin-top:8px"/>'
-  }
-  html+='</div>'
-
-  // propina
-  html+='<div class="checkout-section">'
-  html+='<div class="checkout-section-title">🙌 Propina para el cadete (opcional)</div>'
-  html+='<div class="propina-chips">'
-  PROPINAS.forEach(function(p){
-    html+='<div class="propina-chip'+(propinaSeleccionada===p?' selected':'')+'" onclick="seleccionarPropina('+p+')">'+(p===0?'Sin propina':'$'+p)+'</div>'
+    html += '<button class="btn-sm btn-sm-rojo" onclick="eliminarResto(\''+r.id+'\',\''+r.nombre.replace(/'/g,"\\'")+ '\')">🗑 Eliminar</button>'
+    html += '</div></div>'
   })
-  html+='</div></div>'
-
-  // notas
-  html+='<div class="checkout-section">'
-  html+='<div class="checkout-section-title">📝 Notas (opcional)</div>'
-  html+='<textarea id="checkout-notas" class="notas-input" placeholder="Ej: Sin cebolla, tocar timbre..."></textarea>'
-  html+='</div>'
-
-  // resumen
-  html+='<div class="checkout-section">'
-  html+='<div class="checkout-section-title">🧾 Resumen</div>'
-  carrito.forEach(function(item){
-    html+='<div class="resumen-row"><span>'+item.qty+'× '+item.nombre+'</span><span>$'+Number(item.precio*item.qty).toLocaleString('es-AR')+'</span></div>'
-  })
-  if(descuentoCredito>0) html+='<div class="resumen-row" style="color:#2D6A2D"><span>🎁 Premio: '+creditoDesc+'</span><span>-$'+Number(descuentoCredito).toLocaleString('es-AR')+'</span></div>'
-  html+='<div class="resumen-row envio"><span>🚗 Envío'+(zonaNombre?' ('+zonaNombre+')':'')+'</span><span>'+(costoEnvio>0?'$'+Number(costoEnvio).toLocaleString('es-AR'):'A calcular')+'</span></div>'
-  if(comisionConfig.activa) html+='<div class="resumen-row comision"><span>⚙️ Comisión de servicio ('+comisionConfig.porcentaje+'%)</span><span>$'+Number(comision).toLocaleString('es-AR')+'</span></div>'
-  if(propinaSeleccionada>0) html+='<div class="resumen-row propina"><span>🙌 Propina cadete</span><span>$'+Number(propinaSeleccionada).toLocaleString('es-AR')+'</span></div>'
-  html+='<div class="resumen-row total"><span>Total</span><span>$'+Number(total).toLocaleString('es-AR')+'</span></div>'
-  html+='</div>'
-
-  document.getElementById('checkout-scroll').innerHTML=html
+  lista.innerHTML = html
 }
 
-function seleccionarPago(m){ metodoPago=m; renderCheckout() }
-function seleccionarPropina(p){ propinaSeleccionada=p; renderCheckout() }
-
-async function subirTicket(input){
-  var file=input.files[0]; if(!file) return
-  var ext=file.name.split('.').pop()
-  var up=await sb.storage.from('productos').upload('tickets/'+Date.now()+'.'+ext,file,{upsert:true})
-  if(!up.error){
-    ticketUrl=sb.storage.from('productos').getPublicUrl('tickets/'+Date.now()+'.'+ext).data.publicUrl
-    renderCheckout()
+async function cargarRestaurantesSelect(){
+  var result = await sb.from('restaurantes').select('id,nombre').order('nombre')
+  if(result.data){
+    restaurantesCache = result.data
+    var select = document.getElementById('new-rest')
+    select.innerHTML = result.data.map(function(r){
+      return '<option value="'+r.id+'">'+r.nombre+'</option>'
+    }).join('')
   }
 }
 
-async function confirmarPedido(){
-  var err=document.getElementById('err-checkout'); err.style.display='none'
-  if(!dirEntrega){ err.style.display='block'; err.textContent='Ingresá una dirección de entrega'; return }
-  if(!metodoPago){ err.style.display='block'; err.textContent='Seleccioná un método de pago'; return }
-  if(metodoPago==='transferencia'&&!ticketUrl){ err.style.display='block'; err.textContent='Subí el comprobante de transferencia'; return }
-  if(!carrito.length){ err.style.display='block'; err.textContent='Tu carrito está vacío'; return }
-  if(zonaNombre==='Fuera de zona de entrega'){ err.style.display='block'; err.textContent='Tu dirección está fuera de la zona de entrega'; return }
+function toggleRestSelect(){
+  var rol = document.getElementById('new-rol').value
+  document.getElementById('rest-select-wrap').style.display = rol === 'encargado' ? 'block' : 'none'
+}
 
-  var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
-  // calcular descuento por crédito
-  var descuentoCredito = 0
-  if(aplicarCredito && creditoDesc){
-    // si el premio es un % descuento
-    var matchPct = creditoDesc.match(/(\d+)\s*%/)
-    if(matchPct) descuentoCredito = Math.round(subtotal * parseInt(matchPct[1]) / 100)
-    // si es monto fijo
-    var matchMonto = creditoDesc.match(/\$\s*([\d.]+)/)
-    if(matchMonto && !matchPct) descuentoCredito = parseFloat(matchMonto[1].replace('.',''))
-  }
-  var comision=comisionConfig.activa?Math.round(subtotal*comisionConfig.porcentaje/100):0
-  var total=subtotal+costoEnvio+comision+propinaSeleccionada
-  var notas=document.getElementById('checkout-notas')
+function editarResto(id){
+  var r = restaurantesCache.find(function(x){ return x.id === id })
+  if(!r) return
+  document.getElementById('resto-id').value = r.id
+  document.getElementById('resto-nombre').value = r.nombre || ''
+  document.getElementById('resto-cat').value = r.categoria || ''
+  document.getElementById('resto-dir').value = r.direccion || ''
+  document.getElementById('resto-tmin').value = r.tiempo_entrega_min || 20
+  document.getElementById('resto-tmax').value = r.tiempo_entrega_max || 40
+  document.getElementById('modal-resto-titulo').textContent = 'Editar restaurante'
+  document.getElementById('msg-resto-ok').style.display = 'none'
+  document.getElementById('msg-resto-err').style.display = 'none'
+  abrirModal('modal-resto')
+}
 
-  var btn=document.getElementById('btn-confirmar'); btn.textContent='Procesando...'
-  var res=await sb.from('pedidos').insert([{
-    cliente_id:usuarioActual.id,
-    restaurante_id:restoActual.id,
-    items:carrito,
-    descuento_credito:descuentoCredito,
-    total:total,
-    subtotal:subtotal,
-    costo_envio:costoEnvio,
-    comision:comision,
-    propina:propinaSeleccionada,
-    estado:'nuevo',
-    direccion_entrega:dirEntrega,
-    metodo_pago:metodoPago,
-    ticket_url:ticketUrl||null,
-    notas:notas?notas.value:''
-  }]).select().single()
-  btn.textContent='Confirmar pedido ✓'
-  if(res.error){ err.style.display='block'; err.textContent='Error: '+res.error.message; return }
+async function toggleAbiertoResto(id, abierto){
+  await sb.from('restaurantes').update({ abierto: abierto }).eq('id', id)
+  cargarRestaurantes()
+  cargarDashboard()
+}
 
-  pedidoActivoId=res.data.id
-  var pedidoId=res.data.id
-  var clienteId=usuarioActual.id
-  carrito=[]; metodoPago=null; ticketUrl=null; propinaSeleccionada=0
-  // limpiar crédito si se usó
-  if(aplicarCredito){
-    await sb.from('perfiles').update({credito_pendiente:null,credito_raspadita_id:null}).eq('id',usuarioActual.id)
-    aplicarCredito=false
-  }
-  // generar raspadita al confirmar
-  var rasp = await generarRaspaditaCliente(pedidoId, clienteId)
-  if(rasp){
-    // mostrar raspadita antes del seguimiento
-    await mostrarRaspaditaInmediata(rasp)
+async function eliminarResto(id, nombre){
+  if(!confirm('¿Eliminar "'+nombre+'"? Esta acción no se puede deshacer.')) return
+  var result = await sb.from('restaurantes').delete().eq('id', id)
+  if(result.error){ alert('Error: '+result.error.message); return }
+  cargarRestaurantes()
+  cargarDashboard()
+  cargarRestaurantesSelect()
+}
+
+async function guardarRestaurante(){
+  var id = document.getElementById('resto-id').value
+  var nombre = document.getElementById('resto-nombre').value.trim()
+  var cat = document.getElementById('resto-cat').value.trim()
+  var dir = document.getElementById('resto-dir').value.trim()
+  var tmin = parseInt(document.getElementById('resto-tmin').value) || 20
+  var tmax = parseInt(document.getElementById('resto-tmax').value) || 40
+  var msgOk = document.getElementById('msg-resto-ok')
+  var msgErr = document.getElementById('msg-resto-err')
+  msgOk.style.display='none'; msgErr.style.display='none'
+  if(!nombre){ msgErr.style.display='block'; msgErr.textContent='Ingresá el nombre'; return }
+
+  var data = { nombre: nombre, categoria: cat, direccion: dir, tiempo_entrega_min: tmin, tiempo_entrega_max: tmax }
+  var result
+  if(id){
+    result = await sb.from('restaurantes').update(data).eq('id', id)
   } else {
-    irA('v-seguimiento'); cargarSeguimiento(pedidoActivoId)
+    result = await sb.from('restaurantes').insert([data])
+  }
+  if(result.error){ msgErr.style.display='block'; msgErr.textContent='Error: '+result.error.message; return }
+  msgOk.style.display='block'; msgOk.textContent = id ? '✓ Restaurante actualizado' : '✓ Restaurante agregado correctamente'
+  document.getElementById('resto-id').value = ''
+  document.getElementById('resto-nombre').value = ''
+  document.getElementById('resto-cat').value = ''
+  document.getElementById('resto-dir').value = ''
+  document.getElementById('modal-resto-titulo').textContent = 'Nuevo restaurante'
+  cargarRestaurantes()
+  cargarDashboard()
+  cargarRestaurantesSelect()
+}
+
+// ─── USUARIOS ───────────────────────────────────────────────────────────────
+async function cargarUsuarios(){
+  var lista = document.getElementById('lista-usuarios')
+  lista.innerHTML = '<div class="loading-spinner">Cargando usuarios...</div>'
+  try {
+    var result = await sbAdmin.auth.admin.listUsers()
+    if(result.error){ lista.innerHTML = '<div class="loading-spinner">Error: '+result.error.message+'</div>'; return }
+    todosUsuarios = result.data.users
+    document.getElementById('stat-usuarios').textContent = todosUsuarios.length
+    renderUsuarios(todosUsuarios)
+  } catch(e) {
+    lista.innerHTML = '<div class="loading-spinner">Error: ' + e.message + '</div>'
   }
 }
 
-// ── SEGUIMIENTO ───────────────────────────────────────────────────────────────
-async function cargarSeguimiento(pedidoId){
-  if(segInterval) clearInterval(segInterval)
-  await renderSeguimiento(pedidoId)
-  segInterval=setInterval(function(){ renderSeguimiento(pedidoId) },10000)
+function renderUsuarios(users){
+  var lista = document.getElementById('lista-usuarios')
+  if(!users.length){ lista.innerHTML = '<div class="loading-spinner">No hay usuarios</div>'; return }
+  var html = ''
+  users.forEach(function(u){
+    var iniciales = (u.email || '??').substring(0,2).toUpperCase()
+    var pausado = u.banned_until && new Date(u.banned_until) > new Date()
+    var colors = ['#FF4D00','#2D6A2D','#1565C0','#7B1FA2']
+    var color = colors[Math.abs(u.email.charCodeAt(0)) % colors.length]
+    var meta = u.user_metadata || {}
+    var rolLabel = meta.rol ? ' · '+meta.rol : ''
+    var restoLabel = meta.resto_nombre ? ' ('+meta.resto_nombre+')' : ''
+    html += '<div class="user-card"><div class="user-head">'
+    html += '<div class="user-avatar" style="background:'+color+'">'+iniciales+'</div>'
+    html += '<div class="user-info"><div class="user-nombre">'+u.email+'</div>'
+    html += '<div class="user-email">'+new Date(u.created_at).toLocaleDateString('es-AR')+rolLabel+restoLabel+'</div></div>'
+    html += pausado ? '<span class="user-badge-pausado">Pausado</span>' : '<span class="user-badge-activo">Activo</span>'
+    html += '</div><div class="user-actions">'
+    html += '<button class="btn-sm btn-sm-naranja" onclick="abrirCambiarPass(\''+u.id+'\',\''+u.email+'\')">🔑 Pass</button>'
+    if(pausado){
+      html += '<button class="btn-sm btn-sm-verde" onclick="reactivarUsuario(\''+u.id+'\')">▶️ Activar</button>'
+    } else {
+      html += '<button class="btn-sm btn-sm-gris" onclick="pausarUsuario(\''+u.id+'\')">⏸ Pausar</button>'
+    }
+    html += '<button class="btn-sm btn-sm-rojo" onclick="eliminarUsuario(\''+u.id+'\',\''+u.email+'\')">🗑 Borrar</button>'
+    html += '</div></div>'
+  })
+  lista.innerHTML = html
 }
 
-async function renderSeguimiento(pedidoId){
-  var res=await sb.from('pedidos').select('*,restaurantes(nombre)').eq('id',pedidoId).single()
-  if(res.error||!res.data) return
-  var p=res.data
-  var estado=ESTADOS[p.estado]||ESTADOS.nuevo
-  var pasos=['nuevo','preparando','camino','entregado']
-  var idxActual=pasos.indexOf(p.estado)
-  var html=''
-
-  html+='<div class="seg-estado-card" style="background:'+estado.color+'">'
-  html+='<div class="seg-estado-icon">'+estado.icon+'</div>'
-  html+='<div class="seg-estado-label">'+estado.label+'</div>'
-  html+='<div class="seg-estado-sub">'+estado.sub+'</div></div>'
-
-  html+='<div class="seg-steps">'
-  pasos.forEach(function(paso,i){
-    var done=i<idxActual, active=i===idxActual
-    var e=ESTADOS[paso]
-    html+='<div class="seg-step">'
-    html+='<div class="seg-step-dot '+(done?'done':active?'active':'')+'">'+e.icon+'</div>'
-    html+='<div class="seg-step-info"><div class="seg-step-label '+(done?'done':active?'active':'')+'">'+e.label+'</div></div>'
-    html+='</div>'
-    if(i<pasos.length-1) html+='<div class="seg-step-line '+(done?'done':'')+'"></div>'
+function filtrarUsuarios(rol){
+  if(rol === 'todos'){ renderUsuarios(todosUsuarios); return }
+  var filtrados = todosUsuarios.filter(function(u){
+    return u.user_metadata && u.user_metadata.rol === rol
   })
-  html+='</div>'
+  renderUsuarios(filtrados.length ? filtrados : todosUsuarios)
+}
 
-  html+='<div class="seg-info-card"><div class="seg-info-title">Detalle del pedido</div>'
-  if(p.restaurantes) html+='<div class="seg-info-row"><span class="seg-info-label">Local</span><span class="seg-info-val">'+p.restaurantes.nombre+'</span></div>'
-  p.items.forEach(function(item){
-    html+='<div class="seg-info-row"><span class="seg-info-label">'+item.qty+'× '+item.nombre+'</span><span class="seg-info-val">$'+Number(item.precio*item.qty).toLocaleString('es-AR')+'</span></div>'
-  })
-  html+='<div class="seg-info-row"><span class="seg-info-label">🚗 Envío</span><span class="seg-info-val">$'+Number(p.costo_envio||0).toLocaleString('es-AR')+'</span></div>'
-  if(p.comision>0) html+='<div class="seg-info-row"><span class="seg-info-label">⚙️ Comisión</span><span class="seg-info-val">$'+Number(p.comision).toLocaleString('es-AR')+'</span></div>'
-  if(p.propina>0) html+='<div class="seg-info-row"><span class="seg-info-label">🙌 Propina</span><span class="seg-info-val">$'+Number(p.propina).toLocaleString('es-AR')+'</span></div>'
-  html+='<div class="seg-info-row" style="font-weight:700"><span class="seg-info-label">Total</span><span class="seg-info-val" style="color:#FF4D00">$'+Number(p.total).toLocaleString('es-AR')+'</span></div>'
-  html+='<div class="seg-info-row"><span class="seg-info-label">Pago</span><span class="seg-info-val">'+p.metodo_pago+'</span></div>'
-  html+='<div class="seg-info-row"><span class="seg-info-label">Dirección</span><span class="seg-info-val">'+p.direccion_entrega+'</span></div>'
-  html+='</div>'
+// ─── CREAR USUARIO ── FIX: guarda resto_id en metadata ──────────────────────
+async function crearUsuario(){
+  var email = document.getElementById('new-email').value.trim()
+  var pass = document.getElementById('new-pass').value
+  var nombre = document.getElementById('new-nombre').value.trim()
+  var rol = document.getElementById('new-rol').value
+  var msgOk = document.getElementById('msg-nuevo-ok')
+  var msgErr = document.getElementById('msg-nuevo-err')
+  msgOk.style.display='none'; msgErr.style.display='none'
+  if(!email || !pass){ msgErr.style.display='block'; msgErr.textContent='Completá email y contraseña'; return }
 
-  if(p.estado==='entregado'){
-    html+='<button class="btn-reclamo" onclick="pedidoActivoId=\''+p.id+'\';irA(\'v-reclamo\')">⚠️ Hacer un reclamo</button>'
+  var metadata = { nombre: nombre, rol: rol }
+
+  // ── FIX: si es encargado, guardar el id Y nombre del restaurante ──
+  if(rol === 'encargado'){
+    var restoSelectVal = document.getElementById('new-rest').value
+    var restoOption = document.getElementById('new-rest')
+    var restoNombre = restoOption.options[restoOption.selectedIndex] ? restoOption.options[restoOption.selectedIndex].text : ''
+    if(restoSelectVal){
+      metadata.resto_id = restoSelectVal
+      metadata.resto_nombre = restoNombre
+      // emoji hardcodeado por nombre
+      var emojis = { 'El Bodegón NKT':'🦞', "Colantonio's":'🍕', 'Kusama Sushi':'🍣' }
+      metadata.resto_emoji = emojis[restoNombre] || '🍽'
+      // categoria del restaurante
+      var restoData = restaurantesCache.find(function(r){ return r.id === restoSelectVal })
+      if(restoData) metadata.resto_cat = restoData.categoria || ''
+    }
   }
-  document.getElementById('seg-scroll').innerHTML=html
+
+  var result = await sbAdmin.auth.admin.createUser({
+    email: email, password: pass, email_confirm: true,
+    user_metadata: metadata
+  })
+  if(result.error){ msgErr.style.display='block'; msgErr.textContent='Error: '+result.error.message; return }
+  msgOk.style.display='block'; msgOk.textContent='✓ Usuario creado correctamente'
+  document.getElementById('new-email').value = ''
+  document.getElementById('new-pass').value = ''
+  document.getElementById('new-nombre').value = ''
+  cargarUsuarios()
 }
 
-// ── MIS PEDIDOS ───────────────────────────────────────────────────────────────
-async function cargarMisPedidos(){
-  var scroll=document.getElementById('mispedidos-scroll')
-  scroll.innerHTML='<div class="loading-text">Cargando...</div>'
-  if(!usuarioActual) return
-  var res=await sb.from('pedidos').select('*,restaurantes(nombre)').eq('cliente_id',usuarioActual.id).order('created_at',{ascending:false})
-  if(res.error||!res.data||!res.data.length){ scroll.innerHTML='<div class="loading-text">Aún no tenés pedidos</div>'; return }
-  var tagC={nuevo:'tag-nuevo',preparando:'tag-preparando',camino:'tag-camino',entregado:'tag-entregado',cancelado:'tag-cancelado'}
-  scroll.innerHTML=res.data.map(function(p){
-    var estadoLabel=ESTADOS[p.estado]?ESTADOS[p.estado].label:p.estado
-    var items=p.items.map(function(i){ return i.qty+'× '+i.nombre }).join(', ')
-    var fecha=new Date(p.created_at).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})
-    return '<div class="pedido-hist-card" onclick="pedidoActivoId=\''+p.id+'\';irA(\'v-seguimiento\');cargarSeguimiento(\''+p.id+'\')">'
-      +'<div class="pedido-hist-head"><span class="pedido-hist-num">'+(p.restaurantes?p.restaurantes.nombre:'Pedido')+'</span><span class="pedido-hist-fecha">'+fecha+'</span></div>'
-      +'<div class="pedido-hist-items">'+items+'</div>'
-      +'<div class="pedido-hist-footer"><span style="font-size:15px;font-weight:700;color:#1A1A1A">$'+Number(p.total).toLocaleString('es-AR')+'</span>'
-      +'<span class="tag '+(tagC[p.estado]||'tag-nuevo')+'">'+estadoLabel+'</span>'
+// ─── CADETES ────────────────────────────────────────────────────────────────
+async function cargarCadetes(){
+  var lista = document.getElementById('lista-cadetes')
+  lista.innerHTML = '<div class="loading-spinner">Cargando cadetes...</div>'
+  try {
+    var result = await sbAdmin.auth.admin.listUsers()
+    if(result.error){ lista.innerHTML = '<div class="loading-spinner">Error</div>'; return }
+    var cadetes = result.data.users.filter(function(u){ return u.user_metadata && u.user_metadata.rol === 'cadete' })
+    if(!cadetes.length){ lista.innerHTML = '<div class="loading-spinner">No hay cadetes registrados</div>'; return }
+    var html = ''
+    cadetes.forEach(function(u){
+      html += '<div class="user-card"><div class="user-head">'
+      html += '<div class="user-avatar" style="background:#1A1A1A">🏍</div>'
+      html += '<div class="user-info"><div class="user-nombre">'+u.email+'</div>'
+      html += '<div class="user-email">'+(u.user_metadata.nombre||'Sin nombre')+'</div></div>'
+      html += '<span class="user-badge-activo">Cadete</span>'
+      html += '</div></div>'
+    })
+    lista.innerHTML = html
+  } catch(e) {
+    lista.innerHTML = '<div class="loading-spinner">Error: ' + e.message + '</div>'
+  }
+}
+
+// ─── CAMBIAR CONTRASEÑA ─────────────────────────────────────────────────────
+function abrirCambiarPass(userId, email){
+  document.getElementById('pass-user-id').value = userId
+  document.getElementById('pass-user-nombre').value = email
+  document.getElementById('nueva-pass').value = ''
+  document.getElementById('msg-pass-ok').style.display = 'none'
+  document.getElementById('msg-pass-err').style.display = 'none'
+  abrirModal('modal-cambiar-pass')
+}
+
+async function cambiarPassword(){
+  var userId = document.getElementById('pass-user-id').value
+  var nuevaPass = document.getElementById('nueva-pass').value
+  var msgOk = document.getElementById('msg-pass-ok')
+  var msgErr = document.getElementById('msg-pass-err')
+  msgOk.style.display='none'; msgErr.style.display='none'
+  if(!nuevaPass || nuevaPass.length < 6){ msgErr.style.display='block'; msgErr.textContent='Mínimo 6 caracteres'; return }
+  var result = await sbAdmin.auth.admin.updateUserById(userId, { password: nuevaPass })
+  if(result.error){ msgErr.style.display='block'; msgErr.textContent='Error: '+result.error.message; return }
+  msgOk.style.display='block'; msgOk.textContent='✓ Contraseña actualizada'
+}
+
+async function pausarUsuario(userId){
+  if(!confirm('¿Pausar este usuario?')) return
+  var result = await sbAdmin.auth.admin.updateUserById(userId, { ban_duration: '87600h' })
+  if(result.error){ alert('Error: '+result.error.message); return }
+  cargarUsuarios()
+}
+
+async function reactivarUsuario(userId){
+  var result = await sbAdmin.auth.admin.updateUserById(userId, { ban_duration: 'none' })
+  if(result.error){ alert('Error: '+result.error.message); return }
+  cargarUsuarios()
+}
+
+async function eliminarUsuario(userId, email){
+  if(!confirm('¿Eliminar el usuario '+email+'? Esta acción no se puede deshacer.')) return
+  var result = await sbAdmin.auth.admin.deleteUser(userId)
+  if(result.error){ alert('Error: '+result.error.message); return }
+  cargarUsuarios()
+}
+
+// ─── CATEGORÍAS ──────────────────────────────────────────────────────────────
+var categoriasCache = []
+var catColorSeleccionado = '#FF4D00'
+var catColorBgSeleccionado = '#FFF0E5'
+
+async function cargarCategorias(){
+  var lista = document.getElementById('lista-categorias')
+  lista.innerHTML = '<div class="loading-spinner">Cargando...</div>'
+  var res = await sb.from('categorias_locales').select('*').order('orden')
+  if(res.error){ lista.innerHTML='<div class="loading-spinner">Error: '+res.error.message+'</div>'; return }
+  categoriasCache = res.data || []
+  if(!categoriasCache.length){ lista.innerHTML='<div class="loading-spinner">Sin categorías</div>'; return }
+  lista.innerHTML = categoriasCache.map(function(c){
+    return '<div class="cat-admin-card">'
+      +'<div class="cat-admin-head">'
+      +'<div class="cat-admin-icon" style="background:'+c.color_bg+'">'+c.emoji+'</div>'
+      +'<div class="cat-admin-info">'
+      +'<div class="cat-admin-nombre">'+c.nombre+'</div>'
+      +'<div class="cat-admin-id">Orden: '+c.orden+' · '+(c.activa?'Activa':'Inactiva')+'</div>'
+      +'</div>'
+      +'<div style="display:flex;gap:6px">'
+      +(c.activa
+        ? '<button class="btn-sm btn-sm-gris" data-id="'+c.id+'" data-val="false" onclick="toggleCat(this.dataset.id,false)">⏸</button>'
+        : '<button class="btn-sm btn-sm-verde" data-id="'+c.id+'" data-val="true" onclick="toggleCat(this.dataset.id,true)">▶️</button>'
+      )
+      +'</div>'
+      +'</div>'
+      +'<div class="cat-admin-actions">'
+      +'<button class="btn-sm btn-sm-naranja" data-id="'+c.id+'" onclick="editarCategoria(this.dataset.id)">✏️ Editar</button>'
+      +'<button class="btn-sm btn-sm-rojo" data-id="'+c.id+'" data-nombre="'+c.nombre+'" onclick="eliminarCategoria(this.dataset.id,this.dataset.nombre)">🗑 Eliminar</button>'
       +'</div></div>'
   }).join('')
 }
 
-// ── RECLAMO ───────────────────────────────────────────────────────────────────
-function previewReclamoFoto(input){
-  var file=input.files[0]; if(!file) return
-  var reader=new FileReader()
-  reader.onload=function(e){ var img=document.getElementById('reclamo-foto-preview'); img.src=e.target.result; img.style.display='block' }
-  reader.readAsDataURL(file)
+function abrirModalNuevaCategoria(){
+  document.getElementById('cat-id').value = ''
+  document.getElementById('cat-nombre').value = ''
+  document.getElementById('cat-emoji').value = ''
+  document.getElementById('cat-orden').value = (categoriasCache.length+1).toString()
+  document.getElementById('cat-color').value = '#FF4D00'
+  document.getElementById('cat-color-bg').value = '#FFF0E5'
+  document.getElementById('modal-cat-titulo').textContent = 'Nueva categoría'
+  document.getElementById('msg-cat-ok').style.display='none'
+  document.getElementById('msg-cat-err').style.display='none'
+  document.querySelectorAll('.color-opt').forEach(function(el,i){ el.classList.toggle('selected',i===0) })
+  abrirModal('modal-categoria')
 }
 
-async function enviarReclamo(){
-  var desc=document.getElementById('reclamo-desc').value.trim()
-  var err=document.getElementById('err-reclamo'), ok=document.getElementById('ok-reclamo')
-  err.style.display='none'; ok.style.display='none'
-  if(!desc){ err.style.display='block'; err.textContent='Describí el problema'; return }
-  var fotoUrl=null
-  var fi=document.getElementById('reclamo-foto-input')
-  if(fi.files[0]){
-    var file=fi.files[0], ext=file.name.split('.').pop()
-    var up=await sb.storage.from('productos').upload('reclamos/'+Date.now()+'.'+ext,file,{upsert:true})
-    if(!up.error) fotoUrl=sb.storage.from('productos').getPublicUrl('reclamos/'+Date.now()+'.'+ext).data.publicUrl
-  }
-  var res=await sb.from('reclamos').insert([{pedido_id:pedidoActivoId,cliente_id:usuarioActual.id,descripcion:desc,foto_url:fotoUrl}])
-  if(res.error){ err.style.display='block'; err.textContent='Error enviando reclamo'; return }
-  ok.style.display='block'; ok.textContent='✓ Reclamo enviado correctamente'
-  document.getElementById('reclamo-desc').value=''
-  setTimeout(function(){ irA('v-seguimiento') },1500)
-}
-
-// ── DIRECCIÓN ─────────────────────────────────────────────────────────────────
-function abrirModalDir(){
-  cerrarAlertaDir()
-  document.getElementById('modal-dir-input').value=dirEntrega
-  document.getElementById('modal-dir').classList.add('open')
-}
-function cerrarModalDir(){ document.getElementById('modal-dir').classList.remove('open') }
-async function guardarDirModal(){
-  var val=document.getElementById('modal-dir-input').value.trim(); if(!val) return
-  dirEntrega=val; actualizarUIperfil(); cerrarModalDir()
-  if(restoActual&&restoActual.lat&&restoActual.lng) await calcularZonaEnvio()
-  if(document.getElementById('v-checkout').classList.contains('activa')) renderCheckout()
-}
-function verificarDireccion(){
-  if(!perfilActual||!perfilActual.direccion_base||!dirEntrega) return
-  if(dirEntrega.trim()!==perfilActual.direccion_base.trim()){
-    var a=document.getElementById('alerta-dir'); a.classList.add('show')
-    setTimeout(function(){ a.classList.remove('show') },8000)
-  }
-}
-function cerrarAlertaDir(){ document.getElementById('alerta-dir').classList.remove('show') }
-
-// ── UTILS ─────────────────────────────────────────────────────────────────────
-// ── GOOGLE MAPS AUTOCOMPLETE ─────────────────────────────────────────────────
-var autocompletes = {}
-
-function initAutocomplete(){
-  if(typeof google === 'undefined' || !google.maps || !google.maps.places) {
-    setTimeout(initAutocomplete, 500); return
-  }
-  var campos = [
-    { id: 'r-dir',          callback: function(place){ dirEntrega = place.formatted_address || place.name } },
-    { id: 'modal-dir-input',callback: function(place){ /* se aplica al confirmar */ } },
-    { id: 'p-dir',          callback: function(place){ /* se aplica al guardar */ } }
-  ]
-  campos.forEach(function(campo){
-    var input = document.getElementById(campo.id)
-    if(!input || autocompletes[campo.id]) return
-    var ac = new google.maps.places.Autocomplete(input, {
-      componentRestrictions: { country: 'ar' },
-      fields: ['formatted_address','name','geometry']
-    })
-    autocompletes[campo.id] = ac
-    ac.addListener('place_changed', function(){
-      var place = ac.getPlace()
-      if(!place || !place.formatted_address) return
-      input.value = place.formatted_address
-      campo.callback(place)
-      // guardar lat/lng del cliente si viene del modal o registro
-      if(campo.id === 'modal-dir-input' || campo.id === 'r-dir'){
-        if(place.geometry && place.geometry.location){
-          window._clienteLat = place.geometry.location.lat()
-          window._clienteLng = place.geometry.location.lng()
-        }
-      }
-    })
+function editarCategoria(id){
+  var c = categoriasCache.find(function(x){ return x.id===id })
+  if(!c) return
+  document.getElementById('cat-id').value = c.id
+  document.getElementById('cat-nombre').value = c.nombre
+  document.getElementById('cat-emoji').value = c.emoji||''
+  document.getElementById('cat-orden').value = c.orden||1
+  document.getElementById('cat-color').value = c.color||'#FF4D00'
+  document.getElementById('cat-color-bg').value = c.color_bg||'#FFF0E5'
+  document.getElementById('modal-cat-titulo').textContent = 'Editar categoría'
+  document.getElementById('msg-cat-ok').style.display='none'
+  document.getElementById('msg-cat-err').style.display='none'
+  document.querySelectorAll('.color-opt').forEach(function(el){
+    el.classList.toggle('selected', el.dataset.bg===c.color_bg)
   })
+  abrirModal('modal-categoria')
 }
 
-// inicializar cuando google maps cargue
-window.initAutocomplete = initAutocomplete
+async function guardarCategoria(){
+  var id = document.getElementById('cat-id').value
+  var nombre = document.getElementById('cat-nombre').value.trim()
+  var emoji = document.getElementById('cat-emoji').value.trim()
+  var color = document.getElementById('cat-color').value
+  var colorBg = document.getElementById('cat-color-bg').value
+  var orden = parseInt(document.getElementById('cat-orden').value)||1
+  var msgOk = document.getElementById('msg-cat-ok')
+  var msgErr = document.getElementById('msg-cat-err')
+  msgOk.style.display='none'; msgErr.style.display='none'
+  if(!nombre){ msgErr.style.display='block'; msgErr.textContent='Ingresá el nombre'; return }
+  var data = { nombre:nombre, emoji:emoji, color:color, color_bg:colorBg, orden:orden, activa:true }
+  var res = id
+    ? await sb.from('categorias_locales').update(data).eq('id',id)
+    : await sb.from('categorias_locales').insert([data])
+  if(res.error){ msgErr.style.display='block'; msgErr.textContent='Error: '+res.error.message; return }
+  msgOk.style.display='block'; msgOk.textContent='✓ Categoría guardada'
+  setTimeout(function(){ cerrarModal('modal-categoria'); cargarCategorias() },1000)
+}
+
+async function toggleCat(id, activa){
+  await sb.from('categorias_locales').update({activa:activa}).eq('id',id)
+  cargarCategorias()
+}
+
+async function eliminarCategoria(id, nombre){
+  if(!confirm('¿Eliminar "'+nombre+'"?')) return
+  await sb.from('categorias_locales').delete().eq('id',id)
+  cargarCategorias()
+}
+
+function selectEmoji(el){
+  document.getElementById('cat-emoji').value = el.textContent
+}
+
+function selectColor(el){
+  document.querySelectorAll('.color-opt').forEach(function(e){ e.classList.remove('selected') })
+  el.classList.add('selected')
+  document.getElementById('cat-color').value = el.dataset.color
+  document.getElementById('cat-color-bg').value = el.dataset.bg
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function abrirModal(id){ document.getElementById(id).classList.remove('hidden') }
+function cerrarModal(id){ document.getElementById(id).classList.add('hidden') }
+function cerrarModalBg(e, id){ if(e.target.id === id) cerrarModal(id) }
+
+function togglePass(inputId, btn){
+  var input = document.getElementById(inputId)
+  if(input.type === 'password'){ input.type = 'text'; btn.textContent = '🙈' }
+  else { input.type = 'password'; btn.textContent = '👁' }
+}
+
+// Inicializar: ocultar selector de restaurante hasta que se elija "encargado"
 document.addEventListener('DOMContentLoaded', function(){
-  setTimeout(initAutocomplete, 1000)
+  toggleRestSelect()
 })
 
-// re-inicializar al abrir modal dirección
-var _origAbrirModalDir = abrirModalDir
-abrirModalDir = function(){
-  _origAbrirModalDir()
-  setTimeout(initAutocomplete, 200)
-}
-
-// ── RASPADITAS ────────────────────────────────────────────────────────────────
-async function cargarRaspaditas(){
-  if(!usuarioActual) return
-  var scroll = document.getElementById('rasp-scroll')
-  scroll.innerHTML = '<div class="loading-text" style="color:#aaa">Cargando...</div>'
-  var res = await sb.from('raspaditas').select('*,restaurantes(nombre)').eq('cliente_id',usuarioActual.id).order('created_at',{ascending:false})
-  if(res.error||!res.data||!res.data.length){
-    scroll.innerHTML = '<div class="rasp-empty">🎰<br><br>Aún no tenés raspaditas.<br>Hacé un pedido y recibirás una al completarlo.</div>'
-    return
-  }
-  var pendientes = res.data.filter(function(r){ return !r.revelada }).length
-  var badge = document.getElementById('rasp-nav-badge')
-  if(badge){ badge.classList.toggle('show', pendientes>0) }
-  var countBadge = document.getElementById('rasp-count-badge')
-  if(countBadge){ countBadge.style.display = pendientes>0 ? 'block':'none'; countBadge.textContent = pendientes+' nueva'+(pendientes>1?'s':'') }
-
-  scroll.innerHTML = res.data.map(function(r){
-    var restoNombre = r.restaurantes ? r.restaurantes.nombre : 'Local'
-    var fecha = new Date(r.created_at).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})
-    if(r.revelada){
-      // ya revelada
-      return '<div class="rasp-card">'
-        +'<div class="rasp-card-titulo">'+restoNombre+'</div>'
-        +'<div class="rasp-card-sub">'+fecha+'</div>'
-        +(r.ganada
-          ? '<div class="rasp-ganadora"><div class="rasp-ganadora-label">🎉 ¡Ganaste!</div><div class="rasp-ganadora-premio">'+r.premio+'</div></div>'
-          : '<div style="padding:16px;background:#f5f5f5;border-radius:12px;color:#888;font-size:13px">😅 Esta vez no fue — ¡Seguí pidiendo!</div>'
-        )+'</div>'
-    } else {
-      // sin revelar — mostrar raspadita interactiva
-      return '<div class="rasp-card">'
-        +'<div class="rasp-card-titulo">🎰 Raspadita de '+restoNombre+'</div>'
-        +'<div class="rasp-card-sub">'+fecha+' · Tocá para raspar</div>'
-        +'<div class="scratch-container" id="scratch-'+r.id+'" data-id="'+r.id+'" data-premio="'+r.premio+'" data-ganada="'+r.ganada+'" onclick="revelarRaspadita(this.dataset.id,this.dataset.premio,this.dataset.ganada===\'true\')">'
-        +'<div class="scratch-prize">'
-        +(r.ganada ? '<div class="scratch-prize-icon">🎁</div><div class="scratch-prize-text">'+r.premio+'</div>' : '<div class="scratch-prize-icon">😅</div><div class="scratch-prize-text">¡Seguí intentando!</div>')
-        +'</div>'
-        +'<div class="scratch-cover" id="cover-'+r.id+'">'
-        +'<div class="scratch-cover-text">🤞 Tocá para<br>revelar tu premio</div>'
-        +'</div></div>'
-        +'<div class="scratch-hint">¡Tocá la tarjeta para ver tu premio!</div>'
-        +'</div>'
-    }
-  }).join('')
-}
-
-async function revelarRaspadita(raspaditaId, premio, ganada){
-  var cover = document.getElementById('cover-'+raspaditaId)
-  if(!cover) return
-  // animación
-  cover.style.transition = 'opacity 0.8s ease'
-  cover.style.opacity = '0'
-  setTimeout(async function(){
-    cover.classList.add('revelada')
-    await sb.from('raspaditas').update({revelada:true}).eq('id',raspaditaId)
-    // recargar para actualizar badge
-    setTimeout(function(){ cargarRaspaditas() }, 1500)
-  }, 800)
-}
-
-function instalarApp(){
-  if(deferredPrompt){
-    deferredPrompt.prompt()
-    deferredPrompt.userChoice.then(function(r){
-      deferredPrompt = null
-      var btn = document.getElementById('btn-instalar-app')
-      if(btn) btn.style.display = 'none'
-    })
-  }
-}
-
-// ── RASPADITA INMEDIATA AL CONFIRMAR ─────────────────────────────────────────
-var raspaditaModalData = null
-
-async function generarRaspaditaCliente(pedidoId, clienteId){
-  // verificar config del restaurante
-  if(!restoActual||!restoActual.id) return null
-  var config = await sb.from('raspaditas_config').select('*').eq('restaurante_id',restoActual.id).single()
-  if(!config.data||!config.data.activa||!config.data.premios||!config.data.premios.length) return null
-  
-  var premios = config.data.premios
-  var total = premios.reduce(function(s,p){ return s+p.probabilidad },0)
-  var rand = Math.random()*total
-  var acum = 0; var ganado = null
-  for(var i=0;i<premios.length;i++){
-    acum += premios[i].probabilidad
-    if(rand <= acum){ ganado = premios[i]; break }
-  }
-  if(!ganado) ganado = premios[premios.length-1]
-  
-  var esGanadora = !ganado.nombre.toLowerCase().includes('sin premio') && !ganado.nombre.toLowerCase().includes('nada')
-  
-  var res = await sb.from('raspaditas').insert([{
-    pedido_id:pedidoId,
-    cliente_id:clienteId,
-    restaurante_id:restoActual.id,
-    premio:ganado.nombre,
-    ganada:esGanadora,
-    revelada:false
-  }]).select().single()
-  
-  if(res.error) return null
-  return res.data
-}
-
-async function mostrarRaspaditaInmediata(raspadita){
-  raspaditaModalData = raspadita
-  // configurar prize
-  var prizeDiv = document.getElementById('modal-scratch-prize')
-  if(raspadita.ganada){
-    prizeDiv.style.background = 'linear-gradient(135deg,#FF4D00,#FF8C00)'
-    document.getElementById('modal-prize-icon').textContent = '🎁'
-    document.getElementById('modal-prize-text').textContent = raspadita.premio
-    document.getElementById('modal-prize-text').style.color = '#fff'
-  } else {
-    prizeDiv.style.background = 'linear-gradient(135deg,#888,#555)'
-    document.getElementById('modal-prize-icon').textContent = '😅'
-    document.getElementById('modal-prize-text').textContent = '¡Seguí intentando!'
-    document.getElementById('modal-prize-text').style.color = '#fff'
-  }
-  document.getElementById('modal-prize-result').style.display = 'none'
-  document.getElementById('modal-scratch-hint').style.display = 'block'
-  var cover = document.getElementById('modal-scratch-cover')
-  cover.style.opacity = '1'
-  cover.style.display = 'flex'
-  document.getElementById('modal-raspadita').style.display = 'flex'
-}
-
-async function rasparModal(){
-  if(!raspaditaModalData) return
-  var cover = document.getElementById('modal-scratch-cover')
-  cover.style.opacity = '0'
-  setTimeout(async function(){
-    cover.style.display = 'none'
-    document.getElementById('modal-scratch-hint').style.display = 'none'
-    document.getElementById('modal-prize-result').style.display = 'block'
-    
-    if(raspaditaModalData.ganada){
-      document.getElementById('modal-prize-ganadora').style.display = 'block'
-      document.getElementById('modal-prize-nada').style.display = 'none'
-      document.getElementById('modal-prize-nombre').textContent = raspaditaModalData.premio
-      // guardar crédito pendiente
-      await sb.from('raspaditas').update({revelada:true}).eq('id',raspaditaModalData.id)
-      // guardar en perfil del usuario como credito pendiente
-      await sb.from('perfiles').update({
-        credito_pendiente: raspaditaModalData.premio,
-        credito_raspadita_id: raspaditaModalData.id
-      }).eq('id',usuarioActual.id)
-    } else {
-      document.getElementById('modal-prize-ganadora').style.display = 'none'
-      document.getElementById('modal-prize-nada').style.display = 'block'
-      await sb.from('raspaditas').update({revelada:true}).eq('id',raspaditaModalData.id)
-    }
-  }, 800)
-}
-
-async function cerrarRaspaditaModal(){
-  document.getElementById('modal-raspadita').style.display = 'none'
-  irA('v-seguimiento')
-  cargarSeguimiento(pedidoActivoId)
-  // recargar perfil para actualizar crédito
-  await cargarPerfil()
-}
-
-// ── CRÉDITO PREMIO EN CHECKOUT ─────────────────────────────────────────────
-var aplicarCredito = false
-
-async function verificarCreditoPendiente(){
-  if(!usuarioActual) return null
-  var res = await sb.from('perfiles').select('credito_pendiente,credito_raspadita_id').eq('id',usuarioActual.id).single()
-  if(res.data && res.data.credito_pendiente) return res.data
-  return null
-}
-
-function toggleAplicarCredito(){
-  aplicarCredito = !aplicarCredito
-  renderCheckout()
-}
-
-function togglePass(inputId,btn){
-  var input=document.getElementById(inputId)
-  if(input.type==='password'){ input.type='text'; btn.textContent='🙈' }
-  else { input.type='password'; btn.textContent='👁' }
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('./sw.js') })
 }
 </script>
 </body>
