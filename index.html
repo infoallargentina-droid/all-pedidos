@@ -626,6 +626,7 @@ sb.auth.getSession().then(async function(res){
     usuarioActual = res.data.session.user
     await cargarPerfil()
     irA('v-home')
+    await cargarCategoriasTipos()
     cargarRestaurantes()
   } else {
     irA('v-auth')
@@ -659,7 +660,7 @@ async function login(){
   if(res.error){ err.style.display='block'; err.textContent='Email o contraseña incorrectos'; return }
   usuarioActual=res.data.user
   await cargarPerfil()
-  irA('v-home'); cargarRestaurantes()
+  irA('v-home'); await cargarCategoriasTipos(); cargarRestaurantes()
 }
 
 async function registro(){
@@ -677,7 +678,7 @@ async function registro(){
   await sb.from('perfiles').upsert({id:usuarioActual.id,nombre:nombre,telefono:tel,direccion_base:dir})
   perfilActual={nombre:nombre,telefono:tel,direccion_base:dir}
   dirEntrega=dir
-  irA('v-home'); cargarRestaurantes()
+  irA('v-home'); await cargarCategoriasTipos(); cargarRestaurantes()
 }
 
 async function cerrarSesion(){
