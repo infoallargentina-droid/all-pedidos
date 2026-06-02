@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -256,6 +257,12 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .nav-item-wrap{position:relative;display:flex;flex-direction:column;align-items:center}
 .loading-text{text-align:center;padding:32px;color:#aaa;font-size:13px}
 .version{font-size:10px;color:#ccc;text-align:center;padding:12px}
+.premio-banner{background:linear-gradient(135deg,#FF4D00,#FF8C00);border-radius:14px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.premio-banner-icon{font-size:28px;flex-shrink:0}
+.premio-banner-info{flex:1}
+.premio-banner-title{font-size:13px;font-weight:800;color:#fff}
+.premio-banner-sub{font-size:11px;color:rgba(255,255,255,0.8);margin-top:2px}
+.premio-banner-arrow{font-size:20px;color:rgba(255,255,255,0.7)}
 </style>
 </head>
 <body>
@@ -458,6 +465,40 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
   </div>
   <div class="rasp-scroll" id="rasp-scroll">
     <div class="loading-text" style="color:#888">Cargando...</div>
+  </div>
+</div>
+
+<!-- MODAL RASPADITA INMEDIATA -->
+<div id="modal-raspadita" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;display:none;align-items:center;justify-content:center;flex-direction:column;padding:20px">
+  <div style="background:#fff;border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center">
+    <div style="font-size:13px;font-weight:600;color:#FF4D00;margin-bottom:6px">🎉 ¡Pedido confirmado!</div>
+    <div style="font-size:20px;font-weight:800;color:#1A1A1A;margin-bottom:4px">Tu raspadita</div>
+    <div style="font-size:12px;color:#888;margin-bottom:20px">Tocá para revelar tu premio</div>
+    
+    <!-- Scratch card -->
+    <div id="modal-scratch-container" style="position:relative;width:220px;height:150px;margin:0 auto 16px;border-radius:16px;overflow:hidden;cursor:pointer" onclick="rasparModal()">
+      <div id="modal-scratch-prize" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;border-radius:16px">
+        <div id="modal-prize-icon" style="font-size:40px">🎁</div>
+        <div id="modal-prize-text" style="font-size:15px;font-weight:800;color:#fff;padding:0 12px"></div>
+      </div>
+      <div id="modal-scratch-cover" style="position:absolute;inset:0;border-radius:16px;background:linear-gradient(135deg,#555,#333);display:flex;align-items:center;justify-content:center;transition:opacity 0.8s">
+        <div style="font-size:13px;font-weight:700;color:#fff;text-align:center">🤞 Tocá para<br>revelar</div>
+      </div>
+    </div>
+
+    <div id="modal-prize-result" style="display:none;margin-bottom:16px">
+      <div id="modal-prize-ganadora" style="background:linear-gradient(135deg,#FF4D00,#FF8C00);border-radius:14px;padding:14px;margin-bottom:10px;display:none">
+        <div style="font-size:11px;color:rgba(255,255,255,0.8);margin-bottom:4px">🎉 ¡Ganaste!</div>
+        <div id="modal-prize-nombre" style="font-size:18px;font-weight:800;color:#fff"></div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.8);margin-top:6px">Se aplicará automáticamente en tu próximo pedido</div>
+      </div>
+      <div id="modal-prize-nada" style="background:#f5f5f5;border-radius:14px;padding:14px;margin-bottom:10px;display:none">
+        <div style="font-size:14px;color:#888">😅 Esta vez no fue...<br>¡Seguí pidiendo!</div>
+      </div>
+      <button onclick="cerrarRaspaditaModal()" class="btn-main">Ver seguimiento del pedido</button>
+    </div>
+    
+    <div id="modal-scratch-hint" style="font-size:11px;color:#aaa">Tocá la tarjeta para raspar</div>
   </div>
 </div>
 
@@ -763,6 +804,16 @@ function actualizarFab(){
   var fab=document.getElementById('carrito-fab')
   var totalItems=carrito.reduce(function(s,i){ return s+i.qty },0)
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
+  // calcular descuento por crédito
+  var descuentoCredito = 0
+  if(aplicarCredito && creditoDesc){
+    // si el premio es un % descuento
+    var matchPct = creditoDesc.match(/(\d+)\s*%/)
+    if(matchPct) descuentoCredito = Math.round(subtotal * parseInt(matchPct[1]) / 100)
+    // si es monto fijo
+    var matchMonto = creditoDesc.match(/\$\s*([\d.]+)/)
+    if(matchMonto && !matchPct) descuentoCredito = parseFloat(matchMonto[1].replace('.',''))
+  }
   if(totalItems>0){
     fab.classList.add('visible')
     document.getElementById('fab-items').textContent=totalItems+(totalItems===1?' item':' items')
@@ -776,8 +827,18 @@ function renderCarrito(){
   var scroll=document.getElementById('carrito-scroll')
   if(!carrito.length){ scroll.innerHTML='<div class="loading-text">Tu carrito está vacío</div>'; return }
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
+  // calcular descuento por crédito
+  var descuentoCredito = 0
+  if(aplicarCredito && creditoDesc){
+    // si el premio es un % descuento
+    var matchPct = creditoDesc.match(/(\d+)\s*%/)
+    if(matchPct) descuentoCredito = Math.round(subtotal * parseInt(matchPct[1]) / 100)
+    // si es monto fijo
+    var matchMonto = creditoDesc.match(/\$\s*([\d.]+)/)
+    if(matchMonto && !matchPct) descuentoCredito = parseFloat(matchMonto[1].replace('.',''))
+  }
   var comision=comisionConfig.activa ? Math.round(subtotal*comisionConfig.porcentaje/100) : 0
-  var total=subtotal+costoEnvio+comision+propinaSeleccionada
+  var total=Math.max(0,subtotal+costoEnvio+comision+propinaSeleccionada-descuentoCredito)
 
   scroll.innerHTML=carrito.map(function(item){
     var sub=item.precio*item.qty
@@ -838,10 +899,35 @@ function haversine(lat1,lng1,lat2,lng2){
 
 // ── CHECKOUT ──────────────────────────────────────────────────────────────────
 async function renderCheckout(){
+  // verificar crédito pendiente
+  var creditoData = await verificarCreditoPendiente()
+  var creditoDesc = creditoData ? creditoData.credito_pendiente : null
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
+  // calcular descuento por crédito
+  var descuentoCredito = 0
+  if(aplicarCredito && creditoDesc){
+    // si el premio es un % descuento
+    var matchPct = creditoDesc.match(/(\d+)\s*%/)
+    if(matchPct) descuentoCredito = Math.round(subtotal * parseInt(matchPct[1]) / 100)
+    // si es monto fijo
+    var matchMonto = creditoDesc.match(/\$\s*([\d.]+)/)
+    if(matchMonto && !matchPct) descuentoCredito = parseFloat(matchMonto[1].replace('.',''))
+  }
   var comision=comisionConfig.activa ? Math.round(subtotal*comisionConfig.porcentaje/100) : 0
-  var total=subtotal+costoEnvio+comision+propinaSeleccionada
+  var total=Math.max(0,subtotal+costoEnvio+comision+propinaSeleccionada-descuentoCredito)
   var html=''
+
+  // banner premio disponible
+  if(creditoDesc){
+    html+='<div class="premio-banner" onclick="toggleAplicarCredito()">'
+    html+='<div class="premio-banner-icon">🎁</div>'
+    html+='<div class="premio-banner-info">'
+    html+='<div class="premio-banner-title">Premio disponible: '+creditoDesc+'</div>'
+    html+='<div class="premio-banner-sub">'+(aplicarCredito?'✓ Aplicado a este pedido':'Tocá para aplicarlo')+'</div>'
+    html+='</div>'
+    html+='<div class="premio-banner-arrow">'+(aplicarCredito?'✓':'›')+'</div>'
+    html+='</div>'
+  }
 
   // dirección
   html+='<div class="checkout-section">'
@@ -887,6 +973,7 @@ async function renderCheckout(){
   carrito.forEach(function(item){
     html+='<div class="resumen-row"><span>'+item.qty+'× '+item.nombre+'</span><span>$'+Number(item.precio*item.qty).toLocaleString('es-AR')+'</span></div>'
   })
+  if(descuentoCredito>0) html+='<div class="resumen-row" style="color:#2D6A2D"><span>🎁 Premio: '+creditoDesc+'</span><span>-$'+Number(descuentoCredito).toLocaleString('es-AR')+'</span></div>'
   html+='<div class="resumen-row envio"><span>🚗 Envío'+(zonaNombre?' ('+zonaNombre+')':'')+'</span><span>'+(costoEnvio>0?'$'+Number(costoEnvio).toLocaleString('es-AR'):'A calcular')+'</span></div>'
   if(comisionConfig.activa) html+='<div class="resumen-row comision"><span>⚙️ Comisión de servicio ('+comisionConfig.porcentaje+'%)</span><span>$'+Number(comision).toLocaleString('es-AR')+'</span></div>'
   if(propinaSeleccionada>0) html+='<div class="resumen-row propina"><span>🙌 Propina cadete</span><span>$'+Number(propinaSeleccionada).toLocaleString('es-AR')+'</span></div>'
@@ -918,6 +1005,16 @@ async function confirmarPedido(){
   if(zonaNombre==='Fuera de zona de entrega'){ err.style.display='block'; err.textContent='Tu dirección está fuera de la zona de entrega'; return }
 
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
+  // calcular descuento por crédito
+  var descuentoCredito = 0
+  if(aplicarCredito && creditoDesc){
+    // si el premio es un % descuento
+    var matchPct = creditoDesc.match(/(\d+)\s*%/)
+    if(matchPct) descuentoCredito = Math.round(subtotal * parseInt(matchPct[1]) / 100)
+    // si es monto fijo
+    var matchMonto = creditoDesc.match(/\$\s*([\d.]+)/)
+    if(matchMonto && !matchPct) descuentoCredito = parseFloat(matchMonto[1].replace('.',''))
+  }
   var comision=comisionConfig.activa?Math.round(subtotal*comisionConfig.porcentaje/100):0
   var total=subtotal+costoEnvio+comision+propinaSeleccionada
   var notas=document.getElementById('checkout-notas')
@@ -927,6 +1024,7 @@ async function confirmarPedido(){
     cliente_id:usuarioActual.id,
     restaurante_id:restoActual.id,
     items:carrito,
+    descuento_credito:descuentoCredito,
     total:total,
     subtotal:subtotal,
     costo_envio:costoEnvio,
@@ -942,8 +1040,22 @@ async function confirmarPedido(){
   if(res.error){ err.style.display='block'; err.textContent='Error: '+res.error.message; return }
 
   pedidoActivoId=res.data.id
+  var pedidoId=res.data.id
+  var clienteId=usuarioActual.id
   carrito=[]; metodoPago=null; ticketUrl=null; propinaSeleccionada=0
-  irA('v-seguimiento'); cargarSeguimiento(pedidoActivoId)
+  // limpiar crédito si se usó
+  if(aplicarCredito){
+    await sb.from('perfiles').update({credito_pendiente:null,credito_raspadita_id:null}).eq('id',usuarioActual.id)
+    aplicarCredito=false
+  }
+  // generar raspadita al confirmar
+  var rasp = await generarRaspaditaCliente(pedidoId, clienteId)
+  if(rasp){
+    // mostrar raspadita antes del seguimiento
+    await mostrarRaspaditaInmediata(rasp)
+  } else {
+    irA('v-seguimiento'); cargarSeguimiento(pedidoActivoId)
+  }
 }
 
 // ── SEGUIMIENTO ───────────────────────────────────────────────────────────────
@@ -1187,6 +1299,113 @@ function instalarApp(){
       if(btn) btn.style.display = 'none'
     })
   }
+}
+
+// ── RASPADITA INMEDIATA AL CONFIRMAR ─────────────────────────────────────────
+var raspaditaModalData = null
+
+async function generarRaspaditaCliente(pedidoId, clienteId){
+  // verificar config del restaurante
+  var config = await sb.from('raspaditas_config').select('*').eq('restaurante_id',restoActual.id).single()
+  if(!config.data||!config.data.activa||!config.data.premios||!config.data.premios.length) return null
+  
+  var premios = config.data.premios
+  var total = premios.reduce(function(s,p){ return s+p.probabilidad },0)
+  var rand = Math.random()*total
+  var acum = 0; var ganado = null
+  for(var i=0;i<premios.length;i++){
+    acum += premios[i].probabilidad
+    if(rand <= acum){ ganado = premios[i]; break }
+  }
+  if(!ganado) ganado = premios[premios.length-1]
+  
+  var esGanadora = !ganado.nombre.toLowerCase().includes('sin premio') && !ganado.nombre.toLowerCase().includes('nada')
+  
+  var res = await sb.from('raspaditas').insert([{
+    pedido_id:pedidoId,
+    cliente_id:clienteId,
+    restaurante_id:restoActual.id,
+    premio:ganado.nombre,
+    ganada:esGanadora,
+    revelada:false
+  }]).select().single()
+  
+  if(res.error) return null
+  return res.data
+}
+
+async function mostrarRaspaditaInmediata(raspadita){
+  raspaditaModalData = raspadita
+  // configurar prize
+  var prizeDiv = document.getElementById('modal-scratch-prize')
+  if(raspadita.ganada){
+    prizeDiv.style.background = 'linear-gradient(135deg,#FF4D00,#FF8C00)'
+    document.getElementById('modal-prize-icon').textContent = '🎁'
+    document.getElementById('modal-prize-text').textContent = raspadita.premio
+    document.getElementById('modal-prize-text').style.color = '#fff'
+  } else {
+    prizeDiv.style.background = 'linear-gradient(135deg,#888,#555)'
+    document.getElementById('modal-prize-icon').textContent = '😅'
+    document.getElementById('modal-prize-text').textContent = '¡Seguí intentando!'
+    document.getElementById('modal-prize-text').style.color = '#fff'
+  }
+  document.getElementById('modal-prize-result').style.display = 'none'
+  document.getElementById('modal-scratch-hint').style.display = 'block'
+  var cover = document.getElementById('modal-scratch-cover')
+  cover.style.opacity = '1'
+  cover.style.display = 'flex'
+  document.getElementById('modal-raspadita').style.display = 'flex'
+}
+
+async function rasparModal(){
+  if(!raspaditaModalData) return
+  var cover = document.getElementById('modal-scratch-cover')
+  cover.style.opacity = '0'
+  setTimeout(async function(){
+    cover.style.display = 'none'
+    document.getElementById('modal-scratch-hint').style.display = 'none'
+    document.getElementById('modal-prize-result').style.display = 'block'
+    
+    if(raspaditaModalData.ganada){
+      document.getElementById('modal-prize-ganadora').style.display = 'block'
+      document.getElementById('modal-prize-nada').style.display = 'none'
+      document.getElementById('modal-prize-nombre').textContent = raspaditaModalData.premio
+      // guardar crédito pendiente
+      await sb.from('raspaditas').update({revelada:true}).eq('id',raspaditaModalData.id)
+      // guardar en perfil del usuario como credito pendiente
+      await sb.from('perfiles').update({
+        credito_pendiente: raspaditaModalData.premio,
+        credito_raspadita_id: raspaditaModalData.id
+      }).eq('id',usuarioActual.id)
+    } else {
+      document.getElementById('modal-prize-ganadora').style.display = 'none'
+      document.getElementById('modal-prize-nada').style.display = 'block'
+      await sb.from('raspaditas').update({revelada:true}).eq('id',raspaditaModalData.id)
+    }
+  }, 800)
+}
+
+async function cerrarRaspaditaModal(){
+  document.getElementById('modal-raspadita').style.display = 'none'
+  irA('v-seguimiento')
+  cargarSeguimiento(pedidoActivoId)
+  // recargar perfil para actualizar crédito
+  await cargarPerfil()
+}
+
+// ── CRÉDITO PREMIO EN CHECKOUT ─────────────────────────────────────────────
+var aplicarCredito = false
+
+async function verificarCreditoPendiente(){
+  if(!usuarioActual) return null
+  var res = await sb.from('perfiles').select('credito_pendiente,credito_raspadita_id').eq('id',usuarioActual.id).single()
+  if(res.data && res.data.credito_pendiente) return res.data
+  return null
+}
+
+function toggleAplicarCredito(){
+  aplicarCredito = !aplicarCredito
+  renderCheckout()
 }
 
 function togglePass(inputId,btn){
