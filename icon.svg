@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fondo naranja -->
+  <rect width="512" height="512" rx="100" fill="#FF4D00"/>
+  
+  <!-- Texto ALL -->
+  <text x="256" y="270" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="160" letter-spacing="-6" fill="white">ALL</text>
+
+  <!-- Sonrisa que arranca desde los puntos -->
+  <path d="M 72 265 A 126 90 0 0 0 440 265" fill="none" stroke="white" stroke-width="28" stroke-linecap="round"/>
+  
+  <!-- Puntos amarillos en los extremos de la sonrisa -->
+  <circle cx="72" cy="265" r="22" fill="#FFD166"/>
+  <circle cx="440" cy="265" r="22" fill="#FFD166"/>
+</svg>
