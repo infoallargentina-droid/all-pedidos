@@ -12,7 +12,7 @@
 <meta name="apple-touch-fullscreen" content="yes"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icon-192.png"/>
-<title>ALL — Pedidos v1.5</title>
+<title>ALL — Pedidos v1.6</title>
 <style>
   :root {
     --sat: env(safe-area-inset-top);
@@ -334,7 +334,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
       <input type="text" id="r-dir" placeholder="Ej: San Martín 542, Bahía Blanca" class="input" autocomplete="off"/>
       <button class="btn-main" onclick="registro()">Crear cuenta →</button>
     </div>
-    <div class="version">ALL Pedidos v1.5</div>
+    <div class="version">ALL Pedidos v1.6</div>
   </div>
 </div>
 
@@ -351,7 +351,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
     <div class="cats-home" id="cats-home"></div>
     <div class="home-section" id="home-section-label">Todos los locales</div>
     <div class="restos-grid" id="lista-restos-home"><div class="loading-text" style="grid-column:span 2">Cargando...</div></div>
-    <div class="version">ALL Pedidos v1.5</div>
+    <div class="version">ALL Pedidos v1.6</div>
   </div>
   <div class="navbar" id="navbar-home">
     <button class="nav-item active" onclick="setNavActive3(0)">
@@ -501,7 +501,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
       <button class="btn-main" onclick="guardarPerfil()">Guardar cambios</button>
     </div>
     <button class="btn-sec" onclick="cerrarSesion()">Cerrar sesión</button>
-    <div class="version">ALL Pedidos v1.5</div>
+    <div class="version">ALL Pedidos v1.6</div>
   </div>
   <div class="navbar">
     <button class="nav-item" onclick="irA('v-home');setNavActive3(0)">
@@ -613,7 +613,8 @@ const PROPINAS = [0, 200, 400, 600, 800, 1000]
 const ESTADOS = {
   nuevo:      { label:'Esperando confirmación', icon:'🕐', color:'#FF8C00', sub:'Tu pedido fue enviado al local, esperando que lo confirmen' },
   preparando: { label:'¡Aceptado! Preparando',  icon:'👨‍🍳', color:'#B8860B', sub:'El local aceptó tu pedido y lo está preparando' },
-  camino:     { label:'En camino',               icon:'🏍',  color:'#1565C0', sub:'Tu pedido salió del local y está en camino' },
+  en_camino:  { label:'En camino',               icon:'🏍',  color:'#1565C0', sub:'Tu pedido salió del local y está en camino' },
+  listo:      { label:'Listo para retirar',      icon:'✅',  color:'#2D6A2D', sub:'Tu pedido está listo' },
   entregado:  { label:'¡Entregado!',             icon:'✅',  color:'#2D6A2D', sub:'Tu pedido llegó. ¡Buen provecho!' },
   cancelado:  { label:'Pedido rechazado',        icon:'❌',  color:'#E24B4A', sub:'El local no pudo aceptar tu pedido' }
 }
@@ -1066,7 +1067,7 @@ async function renderSeguimiento(pedidoId){
   if(res.error||!res.data) return
   var p=res.data
   var estado=ESTADOS[p.estado]||ESTADOS.nuevo
-  var pasos=['nuevo','preparando','camino','entregado']
+  var pasos=['nuevo','preparando','en_camino','entregado']
   var idxActual=pasos.indexOf(p.estado)
   var html=''
 
@@ -1133,8 +1134,8 @@ async function cargarMisPedidos(){
   if(!usuarioActual) return
   var res=await sb.from('pedidos').select('*,restaurantes(nombre)').eq('cliente_id',usuarioActual.id).order('created_at',{ascending:false})
   if(res.error||!res.data||!res.data.length){ scroll.innerHTML='<div class="loading-text">Aún no tenés pedidos</div>'; return }
-  var tagC={nuevo:'tag-nuevo',preparando:'tag-preparando',camino:'tag-camino',entregado:'tag-entregado',cancelado:'tag-cancelado'}
-  var tagL={nuevo:'Esperando',preparando:'Preparando',camino:'En camino',entregado:'Entregado',cancelado:'Rechazado'}
+  var tagC={nuevo:'tag-nuevo',preparando:'tag-preparando',en_camino:'tag-camino',listo:'tag-entregado',entregado:'tag-entregado',cancelado:'tag-cancelado'}
+  var tagL={nuevo:'Esperando',preparando:'Preparando',en_camino:'En camino',listo:'Listo',entregado:'Entregado',cancelado:'Rechazado'}
   scroll.innerHTML=res.data.map(function(p){
     var estadoLabel=tagL[p.estado]||p.estado
     var items=p.items.map(function(i){ return i.qty+'× '+i.nombre }).join(', ')
