@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1384,9 +1383,12 @@ var raspaditaModalData = null
 
 async function generarRaspaditaCliente(pedidoId, clienteId){
   // verificar config del restaurante
-  if(!restoActual||!restoActual.id) return null
+  if(!restoActual||!restoActual.id){ console.log('RASP: sin restoActual'); return null }
   var config = await sb.from('raspaditas_config').select('*').eq('restaurante_id',restoActual.id).single()
-  if(!config.data||!config.data.activa||!config.data.premios||!config.data.premios.length) return null
+  console.log('RASP config:', config.data)
+  if(!config.data){ console.log('RASP: sin config'); return null }
+  if(!config.data.activa){ console.log('RASP: no activa'); return null }
+  if(!config.data.premios||!config.data.premios.length){ console.log('RASP: sin premios'); return null }
   
   var premios = config.data.premios
   var total = premios.reduce(function(s,p){ return s+p.probabilidad },0)
@@ -1495,3 +1497,4 @@ function togglePass(inputId,btn){
 </script>
 </body>
 </html>
+
