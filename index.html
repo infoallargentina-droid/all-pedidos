@@ -12,7 +12,7 @@
 <meta name="apple-touch-fullscreen" content="yes"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icon-192.png"/>
-<title>ALL — Pedidos v1.7</title>
+<title>ALL — Pedidos v1.8</title>
 <style>
   :root {
     --sat: env(safe-area-inset-top);
@@ -31,13 +31,11 @@ body{font-family:system-ui,-apple-system,sans-serif}
 html,body{height:100%;max-height:100vh;overflow:hidden}
 .vista.activa{display:flex}
 
-/* SPLASH */
 #v-splash{background:#FF4D00;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding-top:env(safe-area-inset-top)}
 .splash-logo{width:80px;height:80px;border-radius:24px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center}
 .splash-title{font-size:28px;font-weight:800;color:#fff;letter-spacing:-1px}
 .splash-sub{font-size:13px;color:rgba(255,255,255,0.7)}
 
-/* AUTH */
 #v-auth{background:#1A1A1A;flex-direction:column;overflow:hidden}
 .auth-hero{background:#1A1A1A;padding:calc(44px + env(safe-area-inset-top)) 24px 28px;display:flex;flex-direction:column;align-items:center;gap:10px;flex-shrink:0}
 .auth-logo{font-size:36px;font-weight:800;color:#fff;letter-spacing:-2px}
@@ -48,8 +46,10 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .auth-tab{flex:1;padding:10px;text-align:center;font-size:14px;font-weight:600;border-radius:10px;cursor:pointer;color:#888;transition:.2s}
 .auth-tab.active{background:#fff;color:#1A1A1A;box-shadow:0 1px 4px rgba(0,0,0,0.1)}
 .field-label{font-size:12px;font-weight:600;color:#1A1A1A;margin-bottom:8px}
+.field-label.required::after{content:' *';color:#FF4D00}
 .input{width:100%;padding:14px;font-size:15px;border-radius:12px;border:1.5px solid #eee;background:#fafafa;color:#1A1A1A;margin-bottom:14px;outline:none}
 .input:focus{border-color:#FF4D00}
+.input.error{border-color:#E24B4A;background:#FFF8F8}
 .btn-main{width:100%;padding:16px;background:#FF4D00;color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer}
 .btn-sec{width:100%;padding:14px;background:#f5f5f5;color:#1A1A1A;border:none;border-radius:14px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
 .pass-wrap{position:relative;margin-bottom:14px}
@@ -58,7 +58,6 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .msg-err{font-size:12px;padding:10px;background:#FFF0F0;border-radius:8px;color:#E24B4A;margin-bottom:12px;display:none}
 .msg-ok{font-size:12px;padding:10px;background:#E8F5E9;border-radius:8px;color:#2D6A2D;margin-bottom:12px;display:none}
 
-/* HOME */
 #v-home{background:#f5f5f5}
 .topbar-home{background:#FF4D00;padding:calc(44px + env(safe-area-inset-top)) 16px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
 .topbar-home-title{font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.5px;flex:1}
@@ -79,16 +78,9 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .resto-card-info{display:flex;gap:8px;margin-top:6px}
 .resto-card-info span{font-size:10px;color:#aaa}
 
-/* CATEGORÍAS HOME */
 .cats-home{display:flex;gap:10px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none;margin-bottom:4px}
 .cats-home::-webkit-scrollbar{display:none}
-.cat-home-btn{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;cursor:pointer;padding:4px 2px}
-.cat-home-icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;transition:.15s;border:2px solid transparent}
-.cat-home-btn.active .cat-home-icon{border-color:#FF4D00;transform:scale(1.05)}
-.cat-home-label{font-size:10px;font-weight:700;color:#555;text-align:center;white-space:nowrap}
-.cat-home-btn.active .cat-home-label{color:#FF4D00}
 
-/* MENÚ */
 #v-menu{background:#f5f5f5}
 .menu-topbar{background:#fff;padding:calc(44px + env(safe-area-inset-top)) 16px 0;border-bottom:1px solid #eee;flex-shrink:0}
 .menu-topbar-row{display:flex;align-items:center;gap:10px;padding-bottom:12px}
@@ -117,7 +109,6 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .prod-item-add{width:32px;height:32px;border-radius:50%;background:#FF4D00;color:#fff;border:none;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;line-height:1;font-weight:300}
 .prod-nodisponible{opacity:0.4;pointer-events:none}
 
-/* CARRITO */
 #v-carrito{background:#f5f5f5}
 .carrito-topbar{background:#fff;padding:calc(44px + env(safe-area-inset-top)) 16px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;flex-shrink:0}
 .carrito-scroll{flex:1;overflow-y:auto;padding:14px}
@@ -131,7 +122,6 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .carrito-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .carrito-total-val{font-size:22px;font-weight:800;color:#1A1A1A}
 
-/* CHECKOUT */
 #v-checkout{background:#f5f5f5}
 .checkout-topbar{background:#fff;padding:calc(44px + env(safe-area-inset-top)) 16px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;flex-shrink:0}
 .checkout-scroll{flex:1;overflow-y:auto;padding:14px}
@@ -160,7 +150,6 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .notas-input{width:100%;padding:12px;font-size:13px;border-radius:10px;border:1.5px solid #eee;background:#fafafa;color:#1A1A1A;outline:none;resize:none;height:70px}
 .checkout-footer{background:#fff;padding:14px 20px 20px;border-top:1px solid #eee;flex-shrink:0}
 
-/* SEGUIMIENTO */
 #v-seguimiento{background:#f5f5f5}
 .seg-topbar{background:#fff;padding:calc(44px + env(safe-area-inset-top)) 16px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;flex-shrink:0}
 .seg-scroll{flex:1;overflow-y:auto;padding:14px}
@@ -185,20 +174,16 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .seg-info-label{color:#888}
 .seg-info-val{font-weight:600;color:#1A1A1A;text-align:right;max-width:60%}
 .btn-reclamo{width:100%;padding:14px;background:#FFF0F0;color:#E24B4A;border:1.5px solid #FFD0D0;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px}
-
-/* CANCELADO CARD */
 .seg-cancelado-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;border:2px solid #FFD0D0}
 .seg-cancelado-title{font-size:13px;font-weight:700;color:#E24B4A;margin-bottom:8px}
 .seg-cancelado-motivo{font-size:14px;color:#1A1A1A;font-weight:600;line-height:1.5}
 
-/* MIS PEDIDOS */
 #v-mispedidos{background:#f5f5f5}
 .mispedidos-topbar{background:#fff;padding:calc(44px + env(safe-area-inset-top)) 16px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;flex-shrink:0}
 .pedido-hist-card{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.05)}
 .pedido-hist-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
 .pedido-hist-num{font-size:12px;font-weight:700;color:#FF4D00}
 .pedido-hist-fecha{font-size:11px;color:#aaa}
-.pedido-hist-resto{font-size:15px;font-weight:700;color:#1A1A1A;margin-bottom:3px}
 .pedido-hist-items{font-size:12px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pedido-hist-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:8px;border-top:1px solid #f5f5f5}
 .tag{font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px}
@@ -208,7 +193,6 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .tag-entregado{background:#E8F5E9;color:#2D6A2D}
 .tag-cancelado{background:#f5f5f5;color:#aaa}
 
-/* PERFIL */
 #v-perfil{background:#f5f5f5}
 .perfil-topbar{background:#FF4D00;padding:calc(44px + env(safe-area-inset-top)) 16px 24px;display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0}
 .perfil-avatar{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff}
@@ -217,12 +201,13 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .perfil-scroll{flex:1;overflow-y:auto;padding:14px}
 .perfil-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:10px}
 .perfil-card-title{font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+/* indicador de perfil incompleto */
+.perfil-incompleto-banner{background:#FFF0E5;border:1.5px solid #FFD0A0;border-radius:12px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.perfil-incompleto-texto{font-size:13px;color:#FF4D00;font-weight:600;flex:1}
 
-/* RECLAMO */
 #v-reclamo{background:#f5f5f5}
 .reclamo-topbar{background:#fff;padding:calc(44px + env(safe-area-inset-top)) 16px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;flex-shrink:0}
 
-/* NAVBAR */
 .navbar{display:flex;background:#fff;border-top:1px solid #eee;flex-shrink:0;padding-bottom:max(14px,env(safe-area-inset-bottom));padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px 4px;cursor:pointer;border:none;background:none;position:relative}
 .nav-item-icon{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:.2s}
@@ -234,13 +219,20 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .nav-dot{position:absolute;top:6px;right:calc(50% - 18px);width:8px;height:8px;background:#FF4D00;border-radius:50%;border:2px solid #fff;display:none}
 .nav-dot.show{display:block}
 
-/* MODAL DIR */
 #modal-dir{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:none;align-items:flex-end}
 #modal-dir.open{display:flex}
 .modal-body{background:#fff;border-radius:24px 24px 0 0;padding:24px 20px calc(24px + env(safe-area-inset-bottom));width:100%}
 .modal-title{font-size:18px;font-weight:700;color:#1A1A1A;margin-bottom:16px}
 
-/* ALERTA DIR */
+/* MODAL COMPLETAR PERFIL */
+#modal-completar-perfil{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;display:none;align-items:flex-end}
+#modal-completar-perfil.open{display:flex}
+.modal-completar-body{background:#fff;border-radius:24px 24px 0 0;padding:24px 20px calc(24px + env(safe-area-inset-bottom));width:100%;max-height:85vh;overflow-y:auto}
+.modal-completar-icon{font-size:40px;text-align:center;margin-bottom:8px}
+.modal-completar-titulo{font-size:20px;font-weight:800;color:#1A1A1A;text-align:center;margin-bottom:6px}
+.modal-completar-sub{font-size:13px;color:#888;text-align:center;margin-bottom:20px;line-height:1.5}
+.campo-faltante{background:#FFF4EF;border-radius:10px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:8px;font-size:13px;color:#FF4D00;font-weight:600}
+
 #alerta-dir{position:fixed;top:60px;left:12px;right:12px;background:#1A1A1A;border-radius:14px;padding:14px 16px;z-index:300;display:none;flex-direction:column;gap:10px}
 #alerta-dir.show{display:flex}
 .alerta-text{font-size:13px;color:#fff}
@@ -250,28 +242,6 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .alerta-btn-gris{background:rgba(255,255,255,0.15);color:#fff}
 
 .hidden{display:none!important}
-
-/* RASPADITA */
-#v-raspadita{background:#1A1A1A}
-.rasp-topbar{background:#1A1A1A;padding:calc(44px + env(safe-area-inset-top)) 16px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
-.rasp-scroll{flex:1;overflow-y:auto;padding:14px}
-.rasp-card{background:#fff;border-radius:20px;padding:20px;margin-bottom:14px;text-align:center}
-.rasp-card-titulo{font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:6px}
-.rasp-card-sub{font-size:13px;color:#888;margin-bottom:20px}
-.scratch-container{position:relative;width:240px;height:160px;margin:0 auto 20px;border-radius:16px;overflow:hidden;cursor:pointer;user-select:none}
-.scratch-prize{position:absolute;inset:0;background:linear-gradient(135deg,#FF4D00,#FF8C00);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;border-radius:16px}
-.scratch-prize-icon{font-size:40px}
-.scratch-prize-text{font-size:16px;font-weight:800;color:#fff;text-align:center;padding:0 12px}
-.scratch-cover{position:absolute;inset:0;border-radius:16px;background:linear-gradient(135deg,#888,#555);display:flex;align-items:center;justify-content:center;transition:.3s}
-.scratch-cover-text{font-size:14px;font-weight:700;color:#fff;text-align:center}
-.scratch-cover.revelada{opacity:0;pointer-events:none}
-.scratch-hint{font-size:12px;color:#aaa;margin-top:8px}
-.rasp-ganadora{background:linear-gradient(135deg,#FF4D00,#FF8C00);border-radius:16px;padding:16px;margin-bottom:12px;text-align:center}
-.rasp-ganadora-label{font-size:12px;color:rgba(255,255,255,0.8);margin-bottom:4px}
-.rasp-ganadora-premio{font-size:20px;font-weight:800;color:#fff}
-.rasp-empty{text-align:center;padding:40px 20px;color:#888;font-size:14px}
-.nav-badge{position:absolute;top:6px;right:calc(50% - 22px);background:#FF4D00;color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center}
-.nav-item-wrap{position:relative;display:flex;flex-direction:column;align-items:center}
 .loading-text{text-align:center;padding:32px;color:#aaa;font-size:13px}
 .version{font-size:10px;color:#ccc;text-align:center;padding:12px}
 .premio-banner{background:linear-gradient(135deg,#FF4D00,#FF8C00);border-radius:14px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;cursor:pointer}
@@ -280,10 +250,9 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .premio-banner-title{font-size:13px;font-weight:800;color:#fff}
 .premio-banner-sub{font-size:11px;color:rgba(255,255,255,0.8);margin-top:2px}
 .premio-banner-arrow{font-size:20px;color:rgba(255,255,255,0.7)}
-
-/* CUPONES tab (antes Premios) */
-.cupones-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px}
 .cupones-empty{text-align:center;padding:40px 20px;color:#888;font-size:14px}
+@keyframes popIn{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
 </style>
 </head>
 <body>
@@ -322,19 +291,22 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
     </div>
     <div id="auth-registro" class="hidden">
       <div id="err-registro" class="msg-err"></div>
-      <div class="field-label">Nombre completo</div>
+      <div style="background:#FFF4EF;border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:#FF4D00">
+        📋 Necesitás estos datos para poder hacer pedidos
+      </div>
+      <div class="field-label required">Nombre completo</div>
       <input type="text" id="r-nombre" placeholder="Ej: María García" class="input"/>
-      <div class="field-label">Teléfono</div>
+      <div class="field-label required">Teléfono celular</div>
       <input type="tel" id="r-tel" placeholder="Ej: 2914123456" class="input"/>
-      <div class="field-label">Email</div>
+      <div class="field-label required">Email</div>
       <input type="email" id="r-email" placeholder="tu@email.com" class="input"/>
       <div class="field-label">Contraseña</div>
       <div class="pass-wrap"><input type="password" id="r-pass" placeholder="Mínimo 6 caracteres" class="input"/><span class="pass-ojo" onclick="togglePass('r-pass',this)">👁</span></div>
-      <div class="field-label">Dirección de entrega</div>
+      <div class="field-label required">Dirección de entrega</div>
       <input type="text" id="r-dir" placeholder="Ej: San Martín 542, Bahía Blanca" class="input" autocomplete="off"/>
       <button class="btn-main" onclick="registro()">Crear cuenta →</button>
     </div>
-    <div class="version">ALL Pedidos v1.7</div>
+    <div class="version">ALL Pedidos v1.8</div>
   </div>
 </div>
 
@@ -349,11 +321,11 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
   </div>
   <div class="home-scroll">
     <div class="cats-home" id="cats-home"></div>
-    <div class="home-section" id="home-section-label">Todos los locales</div>
+    <div class="home-section">Todos los locales</div>
     <div class="restos-grid" id="lista-restos-home"><div class="loading-text" style="grid-column:span 2">Cargando...</div></div>
-    <div class="version">ALL Pedidos v1.7</div>
+    <div class="version">ALL Pedidos v1.8</div>
   </div>
-  <div class="navbar" id="navbar-home">
+  <div class="navbar">
     <button class="nav-item active" onclick="setNavActive3(0)">
       <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
       <div class="nav-item-label">Inicio</div>
@@ -370,6 +342,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
     <button class="nav-item" onclick="irA('v-perfil');setNavActive3(3);cargarPerfil()">
       <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
       <div class="nav-item-label">Perfil</div>
+      <div class="nav-dot" id="perfil-nav-badge"></div>
     </button>
   </div>
 </div>
@@ -423,7 +396,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
   <div class="seg-topbar">
     <button class="back-btn" onclick="irA('v-mispedidos');cargarMisPedidos()">‹</button>
     <div style="font-size:16px;font-weight:700;color:#1A1A1A;flex:1">Seguimiento</div>
-    <div id="seg-actualiza" style="font-size:10px;color:#aaa">Actualiza cada 10s</div>
+    <div style="font-size:10px;color:#aaa">Actualiza cada 10s</div>
   </div>
   <div class="seg-scroll" id="seg-scroll"></div>
 </div>
@@ -455,15 +428,13 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
   </div>
 </div>
 
-<!-- CUPONES (antes Premios) -->
+<!-- CUPONES -->
 <div id="v-cupones" class="vista" style="background:#f5f5f5">
   <div style="background:#FF4D00;padding:calc(44px + env(safe-area-inset-top)) 16px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0">
     <button class="back-btn" style="color:#fff" onclick="irA('v-home')">‹</button>
     <div style="font-size:20px;font-weight:800;color:#fff;flex:1">🎁 Mis cupones</div>
   </div>
-  <div style="flex:1;overflow-y:auto;padding:14px" id="cupones-scroll">
-    <div class="loading-text">Cargando...</div>
-  </div>
+  <div style="flex:1;overflow-y:auto;padding:14px" id="cupones-scroll"><div class="loading-text">Cargando...</div></div>
   <div class="navbar">
     <button class="nav-item" onclick="irA('v-home');setNavActive3(0)">
       <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
@@ -492,16 +463,26 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
     <div class="perfil-email-txt" id="perfil-email">–</div>
   </div>
   <div class="perfil-scroll">
+    <div id="perfil-incompleto-banner" class="perfil-incompleto-banner" style="display:none">
+      <span style="font-size:20px">⚠️</span>
+      <div class="perfil-incompleto-texto">Completá tu perfil para poder hacer pedidos</div>
+      <span style="font-size:16px;color:#FF4D00">›</span>
+    </div>
     <div class="perfil-card">
       <div class="perfil-card-title">Mis datos</div>
-      <div class="field-label">Nombre</div><input type="text" id="p-nombre" class="input" placeholder="Tu nombre"/>
-      <div class="field-label">Teléfono</div><input type="tel" id="p-tel" class="input" placeholder="Tu teléfono"/>
-      <div class="field-label">Dirección base</div><input type="text" id="p-dir" class="input" placeholder="Tu dirección habitual" autocomplete="off"/>
+      <div class="field-label required">Nombre completo</div>
+      <input type="text" id="p-nombre" class="input" placeholder="Tu nombre completo"/>
+      <div class="field-label required">Teléfono celular</div>
+      <input type="tel" id="p-tel" class="input" placeholder="Ej: 2914123456"/>
+      <div class="field-label required">Dirección base</div>
+      <input type="text" id="p-dir" class="input" placeholder="Tu dirección habitual" autocomplete="off"/>
+      <div style="font-size:11px;color:#aaa;margin-top:-8px;margin-bottom:12px">Esta es tu dirección por defecto para los pedidos</div>
       <div id="msg-perfil-ok" class="msg-ok"></div>
+      <div id="msg-perfil-err" class="msg-err"></div>
       <button class="btn-main" onclick="guardarPerfil()">Guardar cambios</button>
     </div>
     <button class="btn-sec" onclick="cerrarSesion()">Cerrar sesión</button>
-    <div class="version">ALL Pedidos v1.7</div>
+    <div class="version">ALL Pedidos v1.8</div>
   </div>
   <div class="navbar">
     <button class="nav-item" onclick="irA('v-home');setNavActive3(0)">
@@ -544,7 +525,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
   </div>
 </div>
 
-<!-- MODAL DESCUENTO PRÓXIMA COMPRA -->
+<!-- MODAL DESCUENTO -->
 <div id="modal-descuento" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:none;align-items:center;justify-content:center;padding:20px">
   <div style="background:#fff;border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center;animation:popIn .3s ease">
     <div style="font-size:48px;margin-bottom:12px">🎉</div>
@@ -554,14 +535,22 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
       <div id="modal-desc-porcentaje" style="font-size:36px;font-weight:800;color:#fff">10% OFF</div>
       <div id="modal-desc-resto" style="font-size:12px;color:rgba(255,255,255,0.8);margin-top:4px">en este local</div>
     </div>
-    <div style="font-size:12px;color:#888;margin-bottom:20px">El descuento se aplica automáticamente la próxima vez que pedís acá. Lo podés ver en la sección <strong>Cupones</strong>.</div>
+    <div style="font-size:12px;color:#888;margin-bottom:20px">El descuento se aplica automáticamente la próxima vez que pedís acá. Lo podés ver en <strong>Cupones</strong>.</div>
     <button onclick="cerrarModalDescuento()" class="btn-main">¡Genial, gracias!</button>
   </div>
 </div>
-<style>
-@keyframes popIn{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
-@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-</style>
+
+<!-- MODAL COMPLETAR PERFIL -->
+<div id="modal-completar-perfil">
+  <div class="modal-completar-body">
+    <div class="modal-completar-icon">👤</div>
+    <div class="modal-completar-titulo">Completá tu perfil</div>
+    <div class="modal-completar-sub">Para hacer un pedido necesitamos algunos datos para poder contactarte y entregarte tu pedido.</div>
+    <div id="modal-completar-campos"></div>
+    <button class="btn-main" onclick="irACompletarPerfil()" style="margin-top:8px">Completar ahora →</button>
+    <button class="btn-sec" onclick="cerrarModalCompletarPerfil()">Ahora no</button>
+  </div>
+</div>
 
 <!-- MODAL DIRECCIÓN -->
 <div id="modal-dir">
@@ -609,7 +598,6 @@ var descuentoData = null
 
 const PROPINAS = [0, 200, 400, 600, 800, 1000]
 
-// ESTADOS ACTUALIZADOS con mensajes claros para el cliente
 const ESTADOS = {
   nuevo:      { label:'Esperando confirmación', icon:'🕐', color:'#FF8C00', sub:'Tu pedido fue enviado al local, esperando que lo confirmen' },
   preparando: { label:'¡Aceptado! Preparando',  icon:'👨‍🍳', color:'#B8860B', sub:'El local aceptó tu pedido y lo está preparando' },
@@ -619,7 +607,62 @@ const ESTADOS = {
   cancelado:  { label:'Pedido rechazado',        icon:'❌',  color:'#E24B4A', sub:'El local no pudo aceptar tu pedido' }
 }
 
-// ── NAVEGACIÓN ───────────────────────────────────────────────────────────────
+// ── VERIFICACIÓN DE PERFIL ────────────────────────────────────────────────────
+function perfilCompleto(){
+  if(!perfilActual) return false
+  return !!(perfilActual.nombre && perfilActual.nombre.trim() &&
+            perfilActual.telefono && perfilActual.telefono.trim() &&
+            perfilActual.direccion_base && perfilActual.direccion_base.trim())
+}
+
+function camposFaltantes(){
+  var faltantes = []
+  if(!perfilActual || !perfilActual.nombre || !perfilActual.nombre.trim()) faltantes.push({icon:'👤', texto:'Nombre completo'})
+  if(!perfilActual || !perfilActual.telefono || !perfilActual.telefono.trim()) faltantes.push({icon:'📞', texto:'Teléfono celular'})
+  if(!perfilActual || !perfilActual.direccion_base || !perfilActual.direccion_base.trim()) faltantes.push({icon:'📍', texto:'Dirección de entrega'})
+  return faltantes
+}
+
+function actualizarBadgePerfil(){
+  var badge = document.getElementById('perfil-nav-badge')
+  var banner = document.getElementById('perfil-incompleto-banner')
+  var incompleto = !perfilCompleto()
+  if(badge) badge.classList.toggle('show', incompleto)
+  if(banner) banner.style.display = incompleto ? 'flex' : 'none'
+}
+
+function mostrarModalCompletarPerfil(){
+  var faltantes = camposFaltantes()
+  if(!faltantes.length) return false
+  var html = faltantes.map(function(f){
+    return '<div class="campo-faltante">'+f.icon+' '+f.texto+' es obligatorio</div>'
+  }).join('')
+  document.getElementById('modal-completar-campos').innerHTML = html
+  document.getElementById('modal-completar-perfil').classList.add('open')
+  return true
+}
+
+function cerrarModalCompletarPerfil(){
+  document.getElementById('modal-completar-perfil').classList.remove('open')
+}
+
+function irACompletarPerfil(){
+  cerrarModalCompletarPerfil()
+  irA('v-perfil')
+  setNavActive3(3)
+  cargarPerfil()
+  // resaltar campos faltantes
+  setTimeout(function(){
+    var faltantes = camposFaltantes()
+    faltantes.forEach(function(f){
+      if(f.texto.includes('Nombre')) document.getElementById('p-nombre').classList.add('error')
+      if(f.texto.includes('Teléfono')) document.getElementById('p-tel').classList.add('error')
+      if(f.texto.includes('Dirección')) document.getElementById('p-dir').classList.add('error')
+    })
+  }, 300)
+}
+
+// ── NAVEGACIÓN ────────────────────────────────────────────────────────────────
 function irA(vistaId){
   document.querySelectorAll('.vista').forEach(function(v){ v.classList.remove('activa') })
   document.getElementById(vistaId).classList.add('activa')
@@ -644,6 +687,7 @@ sb.auth.getSession().then(async function(res){
     cargarRestaurantes()
     detectarUbicacion()
     actualizarBadgeCupones()
+    actualizarBadgePerfil()
   } else {
     irA('v-auth')
   }
@@ -677,7 +721,7 @@ async function login(){
   usuarioActual=res.data.user
   await cargarPerfil()
   irA('v-home'); await cargarCategoriasTipos(); cargarRestaurantes()
-  actualizarBadgeCupones()
+  actualizarBadgeCupones(); actualizarBadgePerfil()
 }
 
 async function registro(){
@@ -687,8 +731,14 @@ async function registro(){
   var pass=document.getElementById('r-pass').value
   var dir=document.getElementById('r-dir').value.trim()
   var err=document.getElementById('err-registro'); err.style.display='none'
-  if(!nombre||!email||!pass){ err.style.display='block'; err.textContent='Completá nombre, email y contraseña'; return }
-  if(pass.length<6){ err.style.display='block'; err.textContent='La contraseña debe tener al menos 6 caracteres'; return }
+
+  // Validaciones obligatorias
+  if(!nombre){ err.style.display='block'; err.textContent='El nombre es obligatorio'; document.getElementById('r-nombre').classList.add('error'); return }
+  if(!tel){ err.style.display='block'; err.textContent='El teléfono es obligatorio'; document.getElementById('r-tel').classList.add('error'); return }
+  if(!email){ err.style.display='block'; err.textContent='El email es obligatorio'; document.getElementById('r-email').classList.add('error'); return }
+  if(!pass||pass.length<6){ err.style.display='block'; err.textContent='La contraseña debe tener al menos 6 caracteres'; return }
+  if(!dir){ err.style.display='block'; err.textContent='La dirección de entrega es obligatoria'; document.getElementById('r-dir').classList.add('error'); return }
+
   var res=await sb.auth.signUp({email:email,password:pass,options:{data:{nombre:nombre}}})
   if(res.error){ err.style.display='block'; err.textContent='Error: '+res.error.message; return }
   usuarioActual=res.data.user
@@ -696,6 +746,7 @@ async function registro(){
   perfilActual={nombre:nombre,telefono:tel,direccion_base:dir}
   dirEntrega=dir
   irA('v-home'); await cargarCategoriasTipos(); cargarRestaurantes()
+  actualizarBadgePerfil()
 }
 
 async function cerrarSesion(){
@@ -710,6 +761,7 @@ async function cargarPerfil(){
   var res=await sb.from('perfiles').select('*').eq('id',usuarioActual.id).single()
   if(res.data){ perfilActual=res.data; dirEntrega=res.data.direccion_base||'' }
   actualizarUIperfil()
+  actualizarBadgePerfil()
 }
 
 function actualizarUIperfil(){
@@ -719,7 +771,7 @@ function actualizarUIperfil(){
   setEl('home-avatar',iniciales); setEl('perfil-avatar',iniciales)
   setEl('perfil-nombre',nombre)
   setEl('perfil-email',usuarioActual?usuarioActual.email:'')
-  setEl('home-dir','📍 '+(dirEntrega||'Sin dirección configurada'))
+  setEl('home-dir','📍 '+(dirEntrega||'Sin dirección — completá tu perfil'))
   var pn=document.getElementById('p-nombre'); if(pn) pn.value=(perfilActual&&perfilActual.nombre)||''
   var pt=document.getElementById('p-tel'); if(pt) pt.value=(perfilActual&&perfilActual.telefono)||''
   var pd=document.getElementById('p-dir'); if(pd) pd.value=(perfilActual&&perfilActual.direccion_base)||''
@@ -729,17 +781,26 @@ async function guardarPerfil(){
   var nombre=document.getElementById('p-nombre').value.trim()
   var tel=document.getElementById('p-tel').value.trim()
   var dir=document.getElementById('p-dir').value.trim()
-  var msg=document.getElementById('msg-perfil-ok')
+  var msgOk=document.getElementById('msg-perfil-ok')
+  var msgErr=document.getElementById('msg-perfil-err')
+  msgOk.style.display='none'; msgErr.style.display='none'
+
+  // Validar obligatorios
+  var hayError = false
+  ;['p-nombre','p-tel','p-dir'].forEach(function(id){ document.getElementById(id).classList.remove('error') })
+  if(!nombre){ document.getElementById('p-nombre').classList.add('error'); hayError=true }
+  if(!tel){ document.getElementById('p-tel').classList.add('error'); hayError=true }
+  if(!dir){ document.getElementById('p-dir').classList.add('error'); hayError=true }
+  if(hayError){ msgErr.style.display='block'; msgErr.textContent='Nombre, teléfono y dirección son obligatorios'; return }
+
   await sb.from('perfiles').upsert({id:usuarioActual.id,nombre:nombre,telefono:tel,direccion_base:dir})
   perfilActual={nombre:nombre,telefono:tel,direccion_base:dir}
-  dirEntrega=dir; actualizarUIperfil()
-  msg.style.display='block'; msg.textContent='✓ Guardado'
-  setTimeout(function(){ msg.style.display='none' },2000)
+  dirEntrega=dir; actualizarUIperfil(); actualizarBadgePerfil()
+  msgOk.style.display='block'; msgOk.textContent='✓ Perfil guardado'
+  setTimeout(function(){ msgOk.style.display='none' },2000)
 }
 
 // ── RESTAURANTES ──────────────────────────────────────────────────────────────
-var todosRestos = []
-var categoriaActiva = 'todos'
 var CATS_TIPOS = [{ id:'todos', label:'Todos', emoji:'🔍', color:'#1A1A1A', bg:'#f5f5f5' }]
 
 async function cargarCategoriasTipos(){
@@ -747,11 +808,7 @@ async function cargarCategoriasTipos(){
   if(res.data && res.data.length){
     CATS_TIPOS = [{ id:'todos', label:'Todos', emoji:'🔍', color:'#1A1A1A', bg:'#f5f5f5' }]
     res.data.forEach(function(c){
-      CATS_TIPOS.push({
-        id: c.nombre.toLowerCase().replace(/[^a-z0-9]/g,'_'),
-        label: c.nombre, emoji: c.emoji||'🍽',
-        color: c.color||'#FF4D00', bg: c.color_bg||'#FFF0E5'
-      })
+      CATS_TIPOS.push({ id:c.nombre.toLowerCase().replace(/[^a-z0-9]/g,'_'), label:c.nombre, emoji:c.emoji||'🍽', color:c.color||'#FF4D00', bg:c.color_bg||'#FFF0E5' })
     })
   }
 }
@@ -764,9 +821,7 @@ async function cargarRestaurantes(){
   lista.innerHTML=res.data.map(function(r){
     var emoji=emojis[r.nombre]||'🍽'
     var ab=r.abierto!==false
-    var imgContent = r.logo_url
-      ? '<img src="'+r.logo_url+'" style="width:100%;height:100%;object-fit:cover;display:block" alt="'+r.nombre+'"/>'
-      : '<span style="font-size:52px">'+emoji+'</span>'
+    var imgContent = r.logo_url ? '<img src="'+r.logo_url+'" style="width:100%;height:100%;object-fit:cover;display:block" alt="'+r.nombre+'"/>' : '<span style="font-size:52px">'+emoji+'</span>'
     return '<div class="resto-card" onclick="abrirResto(\''+r.id+'\')">'
       +'<div class="resto-card-img">'+imgContent
       +'<span class="resto-card-badge '+(ab?'badge-abierto':'badge-cerrado')+'">'+(ab?'● Abierto':'● Cerrado')+'</span>'
@@ -774,15 +829,18 @@ async function cargarRestaurantes(){
       +'<div class="resto-card-body">'
       +'<div class="resto-card-nombre">'+r.nombre+'</div>'
       +'<div class="resto-card-cat">'+(r.categoria||'')+'</div>'
-      +'<div class="resto-card-info">'
-      +'<span>🕐 '+(r.tiempo_entrega_min||20)+'-'+(r.tiempo_entrega_max||40)+' min</span>'
-      +(r.direccion?'<span>📍 '+r.direccion+'</span>':'')
-      +'</div></div></div>'
+      +'<div class="resto-card-info"><span>🕐 '+(r.tiempo_entrega_min||20)+'-'+(r.tiempo_entrega_max||40)+' min</span>'+(r.direccion?'<span>📍 '+r.direccion+'</span>':'')+'</div>'
+      +'</div></div>'
   }).join('')
 }
 
 // ── MENÚ ──────────────────────────────────────────────────────────────────────
 async function abrirResto(restoId){
+  // Verificar perfil completo antes de mostrar el menú
+  if(!perfilCompleto()){
+    if(mostrarModalCompletarPerfil()) return
+  }
+
   irA('v-menu')
   carrito=[]; propinaSeleccionada=0; costoEnvio=0; zonaNombre=''
   actualizarFab()
@@ -791,7 +849,6 @@ async function abrirResto(restoId){
   restoActual=res.data
   document.getElementById('menu-resto-nombre').textContent=restoActual.nombre
   document.getElementById('carrito-resto-nombre').textContent=restoActual.nombre
-
   if(dirEntrega && restoActual.lat && restoActual.lng) await calcularZonaEnvio()
 
   var prods=await sb.from('productos').select('*').eq('restaurante_id',restoId).eq('disponible',true).order('categoria').order('orden')
@@ -799,11 +856,7 @@ async function abrirResto(restoId){
 
   var cats={}, ordered=[]
   var ordenCats=restoActual.categorias_menu||[]
-  prods.data.forEach(function(p){
-    var cat=p.categoria||'General'
-    if(!cats[cat]) cats[cat]=[]
-    cats[cat].push(p)
-  })
+  prods.data.forEach(function(p){ var cat=p.categoria||'General'; if(!cats[cat]) cats[cat]=[]; cats[cat].push(p) })
   ordenCats.forEach(function(c){ if(cats[c]) ordered.push(c) })
   Object.keys(cats).forEach(function(c){ if(!ordered.includes(c)) ordered.push(c) })
 
@@ -821,8 +874,7 @@ async function abrirResto(restoId){
       var imgHtml=p.imagen_url?'<img src="'+p.imagen_url+'" style="width:100%;height:100%;object-fit:cover;display:block" alt="'+p.nombre+'"/>':'🍽'
       html+='<div class="prod-item'+(p.disponible?'':' prod-nodisponible')+'" id="pitem-'+p.id+'">'
       html+='<div class="prod-item-img">'+imgHtml+'</div>'
-      html+='<div class="prod-item-info">'
-      html+='<div class="prod-item-nombre">'+p.nombre+'</div>'
+      html+='<div class="prod-item-info"><div class="prod-item-nombre">'+p.nombre+'</div>'
       if(p.descripcion) html+='<div class="prod-item-desc">'+p.descripcion+'</div>'
       html+='<div class="prod-item-precio">$'+Number(precio).toLocaleString('es-AR')
       if(tienePromo) html+='<span class="prod-item-precio-orig">$'+Number(p.precio).toLocaleString('es-AR')+'</span>'
@@ -832,24 +884,19 @@ async function abrirResto(restoId){
       html+='<button class="qty-btn" onclick="cambiarQty(\''+p.id+'\',-1)">−</button>'
       html+='<span class="qty-num" id="pnum-'+p.id+'">0</span>'
       html+='<button class="qty-btn" onclick="cambiarQty(\''+p.id+'\',1)">+</button>'
-      html+='</div>'
-      html+='</div>'
+      html+='</div></div>'
     })
   })
   document.getElementById('menu-scroll').innerHTML=html
   verificarDireccion()
 }
 
-function scrollACat(id){
-  var el=document.getElementById(id)
-  if(el) el.scrollIntoView({behavior:'smooth',block:'start'})
-}
+function scrollACat(id){ var el=document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}) }
 
 // ── CARRITO ───────────────────────────────────────────────────────────────────
 function agregarItem(prodId, nombre, precio){
   var existe=carrito.find(function(i){ return i.id===prodId })
-  if(existe){ existe.qty++ }
-  else { carrito.push({id:prodId,nombre:nombre,precio:precio,qty:1}) }
+  if(existe){ existe.qty++ } else { carrito.push({id:prodId,nombre:nombre,precio:precio,qty:1}) }
   actualizarItemUI(prodId); actualizarFab()
 }
 
@@ -864,77 +911,56 @@ function cambiarQty(prodId, delta){
 
 function actualizarItemUI(prodId){
   var item=carrito.find(function(i){ return i.id===prodId })
-  var addBtn=document.getElementById('padd-'+prodId)
-  var qtyDiv=document.getElementById('pqty-'+prodId)
-  var numEl=document.getElementById('pnum-'+prodId)
+  var addBtn=document.getElementById('padd-'+prodId), qtyDiv=document.getElementById('pqty-'+prodId), numEl=document.getElementById('pnum-'+prodId)
   if(!addBtn||!qtyDiv) return
-  if(item && item.qty>0){
-    addBtn.classList.add('hidden'); qtyDiv.classList.remove('hidden')
-    if(numEl) numEl.textContent=item.qty
-  } else {
-    addBtn.classList.remove('hidden'); qtyDiv.classList.add('hidden')
-  }
+  if(item&&item.qty>0){ addBtn.classList.add('hidden'); qtyDiv.classList.remove('hidden'); if(numEl) numEl.textContent=item.qty }
+  else { addBtn.classList.remove('hidden'); qtyDiv.classList.add('hidden') }
 }
 
 function actualizarFab(){
   var fab=document.getElementById('carrito-fab')
   var totalItems=carrito.reduce(function(s,i){ return s+i.qty },0)
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
-  if(totalItems>0){
-    fab.classList.add('visible')
-    document.getElementById('fab-items').textContent=totalItems+(totalItems===1?' item':' items')
-    document.getElementById('fab-total').textContent='$'+Number(subtotal).toLocaleString('es-AR')
-  } else {
-    fab.classList.remove('visible')
-  }
+  if(totalItems>0){ fab.classList.add('visible'); document.getElementById('fab-items').textContent=totalItems+(totalItems===1?' item':' items'); document.getElementById('fab-total').textContent='$'+Number(subtotal).toLocaleString('es-AR') }
+  else { fab.classList.remove('visible') }
 }
 
 function renderCarrito(){
   var scroll=document.getElementById('carrito-scroll')
   if(!carrito.length){ scroll.innerHTML='<div class="loading-text">Tu carrito está vacío</div>'; return }
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
-  var descuentoCredito = (aplicarCredito && descuentoData) ? Math.round(subtotal * descuentoData.porcentaje / 100) : 0
-  var comision=comisionConfig.activa ? Math.round(subtotal*comisionConfig.porcentaje/100) : 0
+  var descuentoCredito=(aplicarCredito&&descuentoData)?Math.round(subtotal*descuentoData.porcentaje/100):0
+  var comision=comisionConfig.activa?Math.round(subtotal*comisionConfig.porcentaje/100):0
   var total=Math.max(0,subtotal+costoEnvio+comision+propinaSeleccionada-descuentoCredito)
   scroll.innerHTML=carrito.map(function(item){
     var sub=item.precio*item.qty
-    return '<div class="carrito-item">'
-      +'<div class="carrito-item-info"><div class="carrito-item-nombre">'+item.nombre+'</div>'
-      +'<div class="carrito-item-precio">$'+Number(item.precio).toLocaleString('es-AR')+' c/u</div></div>'
-      +'<div class="prod-qty">'
-      +'<button class="qty-btn" onclick="cambiarQty(\''+item.id+'\',-1)">−</button>'
-      +'<span class="qty-num">'+item.qty+'</span>'
-      +'<button class="qty-btn" onclick="cambiarQty(\''+item.id+'\',1)">+</button>'
-      +'</div>'
-      +'<div class="carrito-item-sub">$'+Number(sub).toLocaleString('es-AR')+'</div>'
-      +'</div>'
+    return '<div class="carrito-item"><div class="carrito-item-info"><div class="carrito-item-nombre">'+item.nombre+'</div><div class="carrito-item-precio">$'+Number(item.precio).toLocaleString('es-AR')+' c/u</div></div>'
+      +'<div class="prod-qty"><button class="qty-btn" onclick="cambiarQty(\''+item.id+'\',-1)">−</button><span class="qty-num">'+item.qty+'</span><button class="qty-btn" onclick="cambiarQty(\''+item.id+'\',1)">+</button></div>'
+      +'<div class="carrito-item-sub">$'+Number(sub).toLocaleString('es-AR')+'</div></div>'
   }).join('')
   document.getElementById('carrito-subtotal-val').textContent='$'+Number(subtotal).toLocaleString('es-AR')
   document.getElementById('carrito-total').textContent='$'+Number(total).toLocaleString('es-AR')
 }
 
-// ── ZONAS DE ENVÍO ────────────────────────────────────────────────────────────
+// ── ZONAS ─────────────────────────────────────────────────────────────────────
 async function calcularZonaEnvio(){
   if(!restoActual||!restoActual.lat||!restoActual.lng||!dirEntrega) return
   try {
-    var geoUrl='https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(dirEntrega)+'&format=json&limit=1'
-    var geoRes=await fetch(geoUrl,{headers:{'User-Agent':'ALL-Pedidos/1.0'}})
+    var geoRes=await fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(dirEntrega)+'&format=json&limit=1',{headers:{'User-Agent':'ALL-Pedidos/1.0'}})
     var geoData=await geoRes.json()
     if(!geoData||!geoData.length) return
-    var clienteLat=parseFloat(geoData[0].lat), clienteLng=parseFloat(geoData[0].lon)
-    var distKm=haversine(restoActual.lat,restoActual.lng,clienteLat,clienteLng)
+    var distKm=haversine(restoActual.lat,restoActual.lng,parseFloat(geoData[0].lat),parseFloat(geoData[0].lon))
     var zonas=await sb.from('zonas_envio').select('*').eq('restaurante_id',restoActual.id).order('orden')
     if(zonas.data&&zonas.data.length){
-      var zonaEncontrada=null
-      for(var z of zonas.data){ if(distKm<=z.radio_km){ zonaEncontrada=z; break } }
-      if(zonaEncontrada){ costoEnvio=zonaEncontrada.precio; zonaNombre=zonaEncontrada.nombre+' ('+distKm.toFixed(1)+' km)' }
+      var z=null; for(var i=0;i<zonas.data.length;i++){ if(distKm<=zonas.data[i].radio_km){ z=zonas.data[i]; break } }
+      if(z){ costoEnvio=z.precio; zonaNombre=z.nombre+' ('+distKm.toFixed(1)+' km)' }
       else { costoEnvio=0; zonaNombre='Fuera de zona de entrega' }
     }
   } catch(e){ console.log('Geo error:',e) }
 }
 
 function haversine(lat1,lng1,lat2,lng2){
-  var R=6371, dLat=(lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180
+  var R=6371,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180
   var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2)
   return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))
 }
@@ -942,10 +968,10 @@ function haversine(lat1,lng1,lat2,lng2){
 // ── CHECKOUT ──────────────────────────────────────────────────────────────────
 async function renderCheckout(){
   descuentoData = await verificarDescuentoDisponible()
-  var creditoDesc = descuentoData ? descuentoData.porcentaje + '% OFF en ' + (restoActual ? restoActual.nombre : 'este local') : null
+  var creditoDesc = descuentoData ? descuentoData.porcentaje+'% OFF en '+(restoActual?restoActual.nombre:'este local') : null
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
-  var descuentoCredito = (aplicarCredito && descuentoData) ? Math.round(subtotal * descuentoData.porcentaje / 100) : 0
-  var comision=comisionConfig.activa ? Math.round(subtotal*comisionConfig.porcentaje/100) : 0
+  var descuentoCredito=(aplicarCredito&&descuentoData)?Math.round(subtotal*descuentoData.porcentaje/100):0
+  var comision=comisionConfig.activa?Math.round(subtotal*comisionConfig.porcentaje/100):0
   var total=Math.max(0,subtotal+costoEnvio+comision+propinaSeleccionada-descuentoCredito)
   var html=''
 
@@ -958,44 +984,35 @@ async function renderCheckout(){
   }
 
   html+='<div class="checkout-section"><div class="checkout-section-title">📍 Dirección de entrega</div>'
-  html+='<div class="dir-row"><div class="dir-text">'+(dirEntrega||'Sin dirección')+'</div>'
-  html+='<div class="dir-change" onclick="abrirModalDir()">Cambiar</div></div>'
+  html+='<div class="dir-row"><div class="dir-text">'+(dirEntrega||'Sin dirección')+'</div><div class="dir-change" onclick="abrirModalDir()">Cambiar</div></div>'
   if(zonaNombre) html+='<div class="zona-badge">🚗 '+zonaNombre+'</div>'
   html+='</div>'
 
   html+='<div class="checkout-section"><div class="checkout-section-title">💳 Método de pago</div>'
   html+='<div class="pago-opt'+(metodoPago==='efectivo'?' selected':'')+'" onclick="seleccionarPago(\'efectivo\')">'
-  html+='<div class="pago-opt-icon">💵</div><div class="pago-opt-info"><div class="pago-opt-label">Efectivo</div><div class="pago-opt-sub">Pagás al recibir</div></div>'
-  html+='<div class="pago-check">'+(metodoPago==='efectivo'?'✓':'')+'</div></div>'
+  html+='<div class="pago-opt-icon">💵</div><div class="pago-opt-info"><div class="pago-opt-label">Efectivo</div><div class="pago-opt-sub">Pagás al recibir</div></div><div class="pago-check">'+(metodoPago==='efectivo'?'✓':'')+'</div></div>'
   html+='<div class="pago-opt'+(metodoPago==='transferencia'?' selected':'')+'" onclick="seleccionarPago(\'transferencia\')">'
-  html+='<div class="pago-opt-icon">🏦</div><div class="pago-opt-info"><div class="pago-opt-label">Transferencia</div><div class="pago-opt-sub">Subí el comprobante</div></div>'
-  html+='<div class="pago-check">'+(metodoPago==='transferencia'?'✓':'')+'</div></div>'
+  html+='<div class="pago-opt-icon">🏦</div><div class="pago-opt-info"><div class="pago-opt-label">Transferencia</div><div class="pago-opt-sub">Subí el comprobante</div></div><div class="pago-check">'+(metodoPago==='transferencia'?'✓':'')+'</div></div>'
   if(metodoPago==='transferencia'){
     html+='<div style="margin-top:10px;padding:14px;background:#f5f5f5;border-radius:12px;border:1.5px dashed #ddd;text-align:center;cursor:pointer" onclick="document.getElementById(\'ticket-input\').click()">📎 '+(ticketUrl?'✓ Comprobante cargado':'Subir comprobante')+'</div>'
     if(ticketUrl) html+='<img src="'+ticketUrl+'" style="width:100%;border-radius:10px;margin-top:8px"/>'
   }
   html+='</div>'
 
-  html+='<div class="checkout-section"><div class="checkout-section-title">🙌 Propina para el cadete (opcional)</div>'
-  html+='<div class="propina-chips">'
-  PROPINAS.forEach(function(p){
-    html+='<div class="propina-chip'+(propinaSeleccionada===p?' selected':'')+'" onclick="seleccionarPropina('+p+')">'+(p===0?'Sin propina':'$'+p)+'</div>'
-  })
+  html+='<div class="checkout-section"><div class="checkout-section-title">🙌 Propina para el cadete (opcional)</div><div class="propina-chips">'
+  PROPINAS.forEach(function(p){ html+='<div class="propina-chip'+(propinaSeleccionada===p?' selected':'')+'" onclick="seleccionarPropina('+p+')">'+(p===0?'Sin propina':'$'+p)+'</div>' })
   html+='</div></div>'
 
   html+='<div class="checkout-section"><div class="checkout-section-title">📝 Notas (opcional)</div>'
   html+='<textarea id="checkout-notas" class="notas-input" placeholder="Ej: Sin cebolla, tocar timbre..."></textarea></div>'
 
   html+='<div class="checkout-section"><div class="checkout-section-title">🧾 Resumen</div>'
-  carrito.forEach(function(item){
-    html+='<div class="resumen-row"><span>'+item.qty+'× '+item.nombre+'</span><span>$'+Number(item.precio*item.qty).toLocaleString('es-AR')+'</span></div>'
-  })
+  carrito.forEach(function(item){ html+='<div class="resumen-row"><span>'+item.qty+'× '+item.nombre+'</span><span>$'+Number(item.precio*item.qty).toLocaleString('es-AR')+'</span></div>' })
   if(descuentoCredito>0) html+='<div class="resumen-row" style="color:#2D6A2D"><span>🎁 Descuento ('+creditoDesc+')</span><span>-$'+Number(descuentoCredito).toLocaleString('es-AR')+'</span></div>'
   html+='<div class="resumen-row envio"><span>🚗 Envío'+(zonaNombre?' ('+zonaNombre+')':'')+'</span><span>'+(costoEnvio>0?'$'+Number(costoEnvio).toLocaleString('es-AR'):'A calcular')+'</span></div>'
   if(comisionConfig.activa) html+='<div class="resumen-row comision"><span>⚙️ Comisión ('+comisionConfig.porcentaje+'%)</span><span>$'+Number(comision).toLocaleString('es-AR')+'</span></div>'
   if(propinaSeleccionada>0) html+='<div class="resumen-row propina"><span>🙌 Propina cadete</span><span>$'+Number(propinaSeleccionada).toLocaleString('es-AR')+'</span></div>'
   html+='<div class="resumen-row total"><span>Total</span><span>$'+Number(total).toLocaleString('es-AR')+'</span></div></div>'
-
   document.getElementById('checkout-scroll').innerHTML=html
 }
 
@@ -1006,14 +1023,19 @@ async function subirTicket(input){
   var file=input.files[0]; if(!file) return
   var ext=file.name.split('.').pop()
   var up=await sb.storage.from('productos').upload('tickets/'+Date.now()+'.'+ext,file,{upsert:true})
-  if(!up.error){
-    ticketUrl=sb.storage.from('productos').getPublicUrl('tickets/'+Date.now()+'.'+ext).data.publicUrl
-    renderCheckout()
-  }
+  if(!up.error){ ticketUrl=sb.storage.from('productos').getPublicUrl('tickets/'+Date.now()+'.'+ext).data.publicUrl; renderCheckout() }
 }
 
 async function confirmarPedido(){
   var err=document.getElementById('err-checkout'); err.style.display='none'
+
+  // Verificar perfil completo
+  if(!perfilCompleto()){
+    err.style.display='block'; err.textContent='Completá tu perfil (nombre, teléfono y dirección) antes de hacer un pedido'
+    setTimeout(function(){ irACompletarPerfil() }, 1500)
+    return
+  }
+
   if(!dirEntrega){ err.style.display='block'; err.textContent='Ingresá una dirección de entrega'; return }
   if(!metodoPago){ err.style.display='block'; err.textContent='Seleccioná un método de pago'; return }
   if(metodoPago==='transferencia'&&!ticketUrl){ err.style.display='block'; err.textContent='Subí el comprobante de transferencia'; return }
@@ -1021,36 +1043,25 @@ async function confirmarPedido(){
   if(zonaNombre==='Fuera de zona de entrega'){ err.style.display='block'; err.textContent='😔 Por el momento no llegamos a tu dirección.'; return }
 
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
-  var descuentoCredito = (aplicarCredito && descuentoData) ? Math.round(subtotal * descuentoData.porcentaje / 100) : 0
+  var descuentoCredito=(aplicarCredito&&descuentoData)?Math.round(subtotal*descuentoData.porcentaje/100):0
   var comision=comisionConfig.activa?Math.round(subtotal*comisionConfig.porcentaje/100):0
   var total=subtotal+costoEnvio+comision+propinaSeleccionada-descuentoCredito
   var notas=document.getElementById('checkout-notas')
 
   var btn=document.getElementById('btn-confirmar'); btn.textContent='Procesando...'
   var res=await sb.from('pedidos').insert([{
-    cliente_id:usuarioActual.id,
-    restaurante_id:restoActual.id,
-    items:carrito,
-    descuento_credito:descuentoCredito,
-    total:total,
-    subtotal:subtotal,
-    costo_envio:costoEnvio,
-    comision:comision,
-    propina:propinaSeleccionada,
-    estado:'nuevo',
-    direccion_entrega:dirEntrega,
-    metodo_pago:metodoPago,
-    ticket_url:ticketUrl||null,
-    notas:notas?notas.value:''
+    cliente_id:usuarioActual.id, restaurante_id:restoActual.id, items:carrito,
+    descuento_credito:descuentoCredito, total:total, subtotal:subtotal,
+    costo_envio:costoEnvio, comision:comision, propina:propinaSeleccionada,
+    estado:'nuevo', direccion_entrega:dirEntrega, metodo_pago:metodoPago,
+    ticket_url:ticketUrl||null, notas:notas?notas.value:''
   }]).select().single()
   btn.textContent='Confirmar pedido ✓'
   if(res.error){ err.style.display='block'; err.textContent='Error: '+res.error.message; return }
 
   pedidoActivoId=res.data.id
   carrito=[]; metodoPago=null; ticketUrl=null; propinaSeleccionada=0
-
   if(aplicarCredito){ await usarDescuento(); aplicarCredito=false; descuentoData=null }
-
   await verificarYOtorgarDescuento(res.data.id, usuarioActual.id, restoActual.id)
   irA('v-seguimiento'); cargarSeguimiento(pedidoActivoId)
 }
@@ -1065,65 +1076,40 @@ async function cargarSeguimiento(pedidoId){
 async function renderSeguimiento(pedidoId){
   var res=await sb.from('pedidos').select('*,restaurantes(nombre)').eq('id',pedidoId).single()
   if(res.error||!res.data) return
-  var p=res.data
-  var estado=ESTADOS[p.estado]||ESTADOS.nuevo
-  var pasos=['nuevo','preparando','en_camino','entregado']
-  var idxActual=pasos.indexOf(p.estado)
+  var p=res.data, estado=ESTADOS[p.estado]||ESTADOS.nuevo
+  var pasos=['nuevo','preparando','en_camino','entregado'], idxActual=pasos.indexOf(p.estado)
   var html=''
-
-  // CARD DE ESTADO PRINCIPAL
   html+='<div class="seg-estado-card" style="background:'+estado.color+'">'
   html+='<div class="seg-estado-icon">'+estado.icon+'</div>'
   html+='<div class="seg-estado-label">'+estado.label+'</div>'
-
-  // Si fue cancelado, mostrar motivo
-  if(p.estado === 'cancelado'){
-    var motivo = p.motivo_cancelacion || 'El local no pudo aceptar tu pedido'
-    html+='<div class="seg-estado-sub">'+motivo+'</div>'
-    html+='</div>'
-    // Card con detalle del rechazo
-    html+='<div class="seg-cancelado-card">'
-    html+='<div class="seg-cancelado-title">❌ Motivo del rechazo</div>'
+  if(p.estado==='cancelado'){
+    var motivo=p.motivo_cancelacion||'El local no pudo aceptar tu pedido'
+    html+='<div class="seg-estado-sub">'+motivo+'</div></div>'
+    html+='<div class="seg-cancelado-card"><div class="seg-cancelado-title">❌ Motivo del rechazo</div>'
     html+='<div class="seg-cancelado-motivo">'+motivo+'</div>'
-    html+='<div style="font-size:12px;color:#888;margin-top:8px">Podés hacer otro pedido o elegir otro local.</div>'
-    html+='</div>'
-    // Botón volver a pedir
+    html+='<div style="font-size:12px;color:#888;margin-top:8px">Podés hacer otro pedido o elegir otro local.</div></div>'
     html+='<button class="btn-main" onclick="irA(\'v-home\')" style="margin-bottom:12px">🏠 Volver al inicio</button>'
   } else {
-    html+='<div class="seg-estado-sub">'+estado.sub+'</div>'
-    html+='</div>'
-
-    // PASOS
+    html+='<div class="seg-estado-sub">'+estado.sub+'</div></div>'
     html+='<div class="seg-steps">'
     pasos.forEach(function(paso,i){
-      var done=i<idxActual, active=i===idxActual
-      var e=ESTADOS[paso]
-      html+='<div class="seg-step">'
-      html+='<div class="seg-step-dot '+(done?'done':active?'active':'')+'">'+e.icon+'</div>'
-      html+='<div class="seg-step-info"><div class="seg-step-label '+(done?'done':active?'active':'')+'">'+e.label+'</div></div>'
-      html+='</div>'
+      var done=i<idxActual, active=i===idxActual, e=ESTADOS[paso]
+      html+='<div class="seg-step"><div class="seg-step-dot '+(done?'done':active?'active':'')+'">'+e.icon+'</div>'
+      html+='<div class="seg-step-info"><div class="seg-step-label '+(done?'done':active?'active':'')+'">'+e.label+'</div></div></div>'
       if(i<pasos.length-1) html+='<div class="seg-step-line '+(done?'done':'')+'"></div>'
     })
     html+='</div>'
   }
-
-  // INFO DEL PEDIDO
   html+='<div class="seg-info-card"><div class="seg-info-title">Detalle del pedido</div>'
   if(p.restaurantes) html+='<div class="seg-info-row"><span class="seg-info-label">Local</span><span class="seg-info-val">'+p.restaurantes.nombre+'</span></div>'
-  p.items.forEach(function(item){
-    html+='<div class="seg-info-row"><span class="seg-info-label">'+item.qty+'× '+item.nombre+'</span><span class="seg-info-val">$'+Number(item.precio*item.qty).toLocaleString('es-AR')+'</span></div>'
-  })
+  p.items.forEach(function(item){ html+='<div class="seg-info-row"><span class="seg-info-label">'+item.qty+'× '+item.nombre+'</span><span class="seg-info-val">$'+Number(item.precio*item.qty).toLocaleString('es-AR')+'</span></div>' })
   html+='<div class="seg-info-row"><span class="seg-info-label">🚗 Envío</span><span class="seg-info-val">$'+Number(p.costo_envio||0).toLocaleString('es-AR')+'</span></div>'
   if(p.comision>0) html+='<div class="seg-info-row"><span class="seg-info-label">⚙️ Comisión</span><span class="seg-info-val">$'+Number(p.comision).toLocaleString('es-AR')+'</span></div>'
   if(p.propina>0) html+='<div class="seg-info-row"><span class="seg-info-label">🙌 Propina</span><span class="seg-info-val">$'+Number(p.propina).toLocaleString('es-AR')+'</span></div>'
   html+='<div class="seg-info-row" style="font-weight:700"><span class="seg-info-label">Total</span><span class="seg-info-val" style="color:#FF4D00">$'+Number(p.total).toLocaleString('es-AR')+'</span></div>'
   html+='<div class="seg-info-row"><span class="seg-info-label">Pago</span><span class="seg-info-val">'+p.metodo_pago+'</span></div>'
-  html+='<div class="seg-info-row"><span class="seg-info-label">Dirección</span><span class="seg-info-val">'+p.direccion_entrega+'</span></div>'
-  html+='</div>'
-
-  if(p.estado==='entregado'){
-    html+='<button class="btn-reclamo" onclick="pedidoActivoId=\''+p.id+'\';irA(\'v-reclamo\')">⚠️ Hacer un reclamo</button>'
-  }
+  html+='<div class="seg-info-row"><span class="seg-info-label">Dirección</span><span class="seg-info-val">'+p.direccion_entrega+'</span></div></div>'
+  if(p.estado==='entregado') html+='<button class="btn-reclamo" onclick="pedidoActivoId=\''+p.id+'\';irA(\'v-reclamo\')">⚠️ Hacer un reclamo</button>'
   document.getElementById('seg-scroll').innerHTML=html
 }
 
@@ -1137,72 +1123,52 @@ async function cargarMisPedidos(){
   var tagC={nuevo:'tag-nuevo',preparando:'tag-preparando',en_camino:'tag-camino',listo:'tag-entregado',entregado:'tag-entregado',cancelado:'tag-cancelado'}
   var tagL={nuevo:'Esperando',preparando:'Preparando',en_camino:'En camino',listo:'Listo',entregado:'Entregado',cancelado:'Rechazado'}
   scroll.innerHTML=res.data.map(function(p){
-    var estadoLabel=tagL[p.estado]||p.estado
     var items=p.items.map(function(i){ return i.qty+'× '+i.nombre }).join(', ')
     var fecha=new Date(p.created_at).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Argentina/Buenos_Aires'})
     return '<div class="pedido-hist-card" onclick="pedidoActivoId=\''+p.id+'\';irA(\'v-seguimiento\');cargarSeguimiento(\''+p.id+'\')">'
       +'<div class="pedido-hist-head"><span class="pedido-hist-num">'+(p.restaurantes?p.restaurantes.nombre:'Pedido')+'</span><span class="pedido-hist-fecha">'+fecha+'</span></div>'
       +'<div class="pedido-hist-items">'+items+'</div>'
       +'<div class="pedido-hist-footer"><span style="font-size:15px;font-weight:700;color:#1A1A1A">$'+Number(p.total).toLocaleString('es-AR')+'</span>'
-      +'<span class="tag '+(tagC[p.estado]||'tag-nuevo')+'">'+estadoLabel+'</span>'
-      +'</div></div>'
+      +'<span class="tag '+(tagC[p.estado]||'tag-nuevo')+'">'+(tagL[p.estado]||p.estado)+'</span></div></div>'
   }).join('')
 }
 
 // ── CUPONES ───────────────────────────────────────────────────────────────────
 async function cargarCupones(){
   if(!usuarioActual) return
-  var scroll = document.getElementById('cupones-scroll')
-  scroll.innerHTML = '<div class="loading-text">Cargando...</div>'
-
-  var res = await sb.from('perfiles').select('descuentos_pendientes').eq('id', usuarioActual.id).single()
-  var descuentos = (res.data && res.data.descuentos_pendientes) ? res.data.descuentos_pendientes : {}
-  var restoIds = Object.keys(descuentos)
-
-  if(!restoIds.length){
-    scroll.innerHTML = '<div class="cupones-empty">🎟️<br><br>No tenés cupones disponibles.<br>Completá un pedido y ganá descuentos para tu próxima compra.</div>'
-    return
-  }
-
-  // traer nombres de restaurantes
-  var restosRes = await sb.from('restaurantes').select('id,nombre,logo_url').in('id', restoIds)
-  var restosMap = {}
-  if(restosRes.data) restosRes.data.forEach(function(r){ restosMap[r.id] = r })
-
-  var html = ''
-  restoIds.forEach(function(restoId){
-    var d = descuentos[restoId]
-    var r = restosMap[restoId] || {}
-    var logoHtml = r.logo_url
-      ? '<img src="'+r.logo_url+'" style="width:48px;height:48px;border-radius:12px;object-fit:cover;flex-shrink:0"/>'
-      : '<div style="width:48px;height:48px;border-radius:12px;background:#FFF4EF;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🍽</div>'
-    html += '<div style="background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;border:2px solid #FFE8DC">'
-    html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">'
-    html += logoHtml
-    html += '<div style="flex:1"><div style="font-size:15px;font-weight:700;color:#1A1A1A">'+(r.nombre||'Local')+'</div>'
-    html += '<div style="font-size:12px;color:#888;margin-top:2px">Válido para tu próximo pedido</div></div>'
-    html += '<div style="background:linear-gradient(135deg,#FF4D00,#FF8C00);border-radius:12px;padding:8px 14px;text-align:center">'
-    html += '<div style="font-size:20px;font-weight:800;color:#fff">'+d.porcentaje+'%</div>'
-    html += '<div style="font-size:10px;color:rgba(255,255,255,0.8)">OFF</div></div>'
-    html += '</div>'
-    html += '<button onclick="irARestoConCupon(\''+restoId+'\')" style="width:100%;padding:12px;background:#FF4D00;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer">Usar ahora →</button>'
-    html += '</div>'
-  })
-  scroll.innerHTML = html
+  var scroll=document.getElementById('cupones-scroll')
+  scroll.innerHTML='<div class="loading-text">Cargando...</div>'
+  var res=await sb.from('perfiles').select('descuentos_pendientes').eq('id',usuarioActual.id).single()
+  var descuentos=(res.data&&res.data.descuentos_pendientes)?res.data.descuentos_pendientes:{}
+  var restoIds=Object.keys(descuentos)
+  if(!restoIds.length){ scroll.innerHTML='<div class="cupones-empty">🎟️<br><br>No tenés cupones disponibles.<br>Completá un pedido y ganá descuentos para tu próxima compra.</div>'; return }
+  var restosRes=await sb.from('restaurantes').select('id,nombre,logo_url').in('id',restoIds)
+  var restosMap={}
+  if(restosRes.data) restosRes.data.forEach(function(r){ restosMap[r.id]=r })
+  scroll.innerHTML=restoIds.map(function(restoId){
+    var d=descuentos[restoId], r=restosMap[restoId]||{}
+    var logoHtml=r.logo_url?'<img src="'+r.logo_url+'" style="width:48px;height:48px;border-radius:12px;object-fit:cover;flex-shrink:0"/>'
+      :'<div style="width:48px;height:48px;border-radius:12px;background:#FFF4EF;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🍽</div>'
+    return '<div style="background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;border:2px solid #FFE8DC">'
+      +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">'+logoHtml
+      +'<div style="flex:1"><div style="font-size:15px;font-weight:700;color:#1A1A1A">'+(r.nombre||'Local')+'</div>'
+      +'<div style="font-size:12px;color:#888;margin-top:2px">Válido para tu próximo pedido</div></div>'
+      +'<div style="background:linear-gradient(135deg,#FF4D00,#FF8C00);border-radius:12px;padding:8px 14px;text-align:center">'
+      +'<div style="font-size:20px;font-weight:800;color:#fff">'+d.porcentaje+'%</div>'
+      +'<div style="font-size:10px;color:rgba(255,255,255,0.8)">OFF</div></div></div>'
+      +'<button onclick="irARestoConCupon(\''+restoId+'\')" style="width:100%;padding:12px;background:#FF4D00;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer">Usar ahora →</button>'
+      +'</div>'
+  }).join('')
 }
 
-async function irARestoConCupon(restoId){
-  irA('v-home')
-  await abrirResto(restoId)
-}
+async function irARestoConCupon(restoId){ irA('v-home'); await abrirResto(restoId) }
 
 async function actualizarBadgeCupones(){
   if(!usuarioActual) return
-  var res = await sb.from('perfiles').select('descuentos_pendientes').eq('id', usuarioActual.id).single()
-  var descuentos = (res.data && res.data.descuentos_pendientes) ? res.data.descuentos_pendientes : {}
-  var cantidad = Object.keys(descuentos).length
-  var badge = document.getElementById('cupones-nav-badge')
-  if(badge) badge.classList.toggle('show', cantidad > 0)
+  var res=await sb.from('perfiles').select('descuentos_pendientes').eq('id',usuarioActual.id).single()
+  var descuentos=(res.data&&res.data.descuentos_pendientes)?res.data.descuentos_pendientes:{}
+  var badge=document.getElementById('cupones-nav-badge')
+  if(badge) badge.classList.toggle('show',Object.keys(descuentos).length>0)
 }
 
 // ── RECLAMO ───────────────────────────────────────────────────────────────────
@@ -1254,112 +1220,99 @@ function verificarDireccion(){
 }
 function cerrarAlertaDir(){ document.getElementById('alerta-dir').classList.remove('show') }
 
-// ── DESCUENTO PRÓXIMA COMPRA ──────────────────────────────────────────────────
+// ── DESCUENTOS ────────────────────────────────────────────────────────────────
 async function verificarYOtorgarDescuento(pedidoId, clienteId, restauranteId){
-  var config = await sb.from('raspaditas_config').select('*').eq('restaurante_id', restauranteId).single()
-  if(!config.data || !config.data.activa) return
-  var porcentaje = config.data.descuento_porcentaje || 10
-  var descuentos = {}
-  var perfRes = await sb.from('perfiles').select('descuentos_pendientes').eq('id', clienteId).single()
-  if(perfRes.data && perfRes.data.descuentos_pendientes) descuentos = perfRes.data.descuentos_pendientes
-  descuentos[restauranteId] = { porcentaje: porcentaje, pedido_origen: pedidoId }
-  await sb.from('perfiles').update({ descuentos_pendientes: descuentos }).eq('id', clienteId)
-  document.getElementById('modal-desc-porcentaje').textContent = porcentaje + '% OFF'
-  document.getElementById('modal-desc-resto').textContent = 'en ' + (restoActual ? restoActual.nombre : 'este local')
-  document.getElementById('modal-descuento').style.display = 'flex'
+  var config=await sb.from('raspaditas_config').select('*').eq('restaurante_id',restauranteId).single()
+  if(!config.data||!config.data.activa) return
+  var porcentaje=config.data.descuento_porcentaje||10
+  var descuentos={}
+  var perfRes=await sb.from('perfiles').select('descuentos_pendientes').eq('id',clienteId).single()
+  if(perfRes.data&&perfRes.data.descuentos_pendientes) descuentos=perfRes.data.descuentos_pendientes
+  descuentos[restauranteId]={porcentaje:porcentaje,pedido_origen:pedidoId}
+  await sb.from('perfiles').update({descuentos_pendientes:descuentos}).eq('id',clienteId)
+  document.getElementById('modal-desc-porcentaje').textContent=porcentaje+'% OFF'
+  document.getElementById('modal-desc-resto').textContent='en '+(restoActual?restoActual.nombre:'este local')
+  document.getElementById('modal-descuento').style.display='flex'
   actualizarBadgeCupones()
 }
 
-function cerrarModalDescuento(){
-  document.getElementById('modal-descuento').style.display = 'none'
-}
+function cerrarModalDescuento(){ document.getElementById('modal-descuento').style.display='none' }
 
 async function verificarDescuentoDisponible(){
-  if(!usuarioActual || !restoActual) return null
-  var res = await sb.from('perfiles').select('descuentos_pendientes').eq('id', usuarioActual.id).single()
-  if(!res.data || !res.data.descuentos_pendientes) return null
-  return res.data.descuentos_pendientes[restoActual.id] || null
+  if(!usuarioActual||!restoActual) return null
+  var res=await sb.from('perfiles').select('descuentos_pendientes').eq('id',usuarioActual.id).single()
+  if(!res.data||!res.data.descuentos_pendientes) return null
+  return res.data.descuentos_pendientes[restoActual.id]||null
 }
 
 async function usarDescuento(){
-  if(!usuarioActual || !restoActual) return
-  var perfRes = await sb.from('perfiles').select('descuentos_pendientes').eq('id', usuarioActual.id).single()
-  if(!perfRes.data || !perfRes.data.descuentos_pendientes) return
-  var descuentos = perfRes.data.descuentos_pendientes
+  if(!usuarioActual||!restoActual) return
+  var perfRes=await sb.from('perfiles').select('descuentos_pendientes').eq('id',usuarioActual.id).single()
+  if(!perfRes.data||!perfRes.data.descuentos_pendientes) return
+  var descuentos=perfRes.data.descuentos_pendientes
   delete descuentos[restoActual.id]
-  await sb.from('perfiles').update({ descuentos_pendientes: descuentos }).eq('id', usuarioActual.id)
+  await sb.from('perfiles').update({descuentos_pendientes:descuentos}).eq('id',usuarioActual.id)
   actualizarBadgeCupones()
 }
 
-function toggleAplicarCredito(){
-  aplicarCredito = !aplicarCredito
-  renderCheckout()
-}
+function toggleAplicarCredito(){ aplicarCredito=!aplicarCredito; renderCheckout() }
 
-// ── GOOGLE MAPS AUTOCOMPLETE ─────────────────────────────────────────────────
-var autocompletes = {}
+// ── GOOGLE MAPS ───────────────────────────────────────────────────────────────
+var autocompletes={}
 function initAutocomplete(){
-  if(typeof google === 'undefined' || !google.maps || !google.maps.places){ setTimeout(initAutocomplete, 500); return }
-  var campos = [
-    { id: 'r-dir', callback: function(place){ dirEntrega = place.formatted_address || place.name } },
-    { id: 'modal-dir-input', callback: function(place){ } },
-    { id: 'p-dir', callback: function(place){ } }
+  if(typeof google==='undefined'||!google.maps||!google.maps.places){ setTimeout(initAutocomplete,500); return }
+  var campos=[
+    {id:'r-dir',callback:function(place){ dirEntrega=place.formatted_address||place.name }},
+    {id:'modal-dir-input',callback:function(place){}},
+    {id:'p-dir',callback:function(place){}}
   ]
   campos.forEach(function(campo){
-    var input = document.getElementById(campo.id)
-    if(!input || autocompletes[campo.id]) return
-    var ac = new google.maps.places.Autocomplete(input, { componentRestrictions: { country: 'ar' }, fields: ['formatted_address','name','geometry'] })
-    autocompletes[campo.id] = ac
-    ac.addListener('place_changed', function(){
-      var place = ac.getPlace()
-      if(!place || !place.formatted_address) return
-      input.value = place.formatted_address
+    var input=document.getElementById(campo.id)
+    if(!input||autocompletes[campo.id]) return
+    var ac=new google.maps.places.Autocomplete(input,{componentRestrictions:{country:'ar'},fields:['formatted_address','name','geometry']})
+    autocompletes[campo.id]=ac
+    ac.addListener('place_changed',function(){
+      var place=ac.getPlace()
+      if(!place||!place.formatted_address) return
+      input.value=place.formatted_address
       campo.callback(place)
-      if((campo.id === 'modal-dir-input' || campo.id === 'r-dir') && place.geometry && place.geometry.location){
-        window._clienteLat = place.geometry.location.lat()
-        window._clienteLng = place.geometry.location.lng()
+      if((campo.id==='modal-dir-input'||campo.id==='r-dir')&&place.geometry&&place.geometry.location){
+        window._clienteLat=place.geometry.location.lat(); window._clienteLng=place.geometry.location.lng()
       }
     })
   })
 }
-window.initAutocomplete = initAutocomplete
-document.addEventListener('DOMContentLoaded', function(){ setTimeout(initAutocomplete, 1000) })
-var _origAbrirModalDir = abrirModalDir
-abrirModalDir = function(){ _origAbrirModalDir(); setTimeout(initAutocomplete, 200) }
+window.initAutocomplete=initAutocomplete
+document.addEventListener('DOMContentLoaded',function(){ setTimeout(initAutocomplete,1000) })
+var _origAbrirModalDir=abrirModalDir
+abrirModalDir=function(){ _origAbrirModalDir(); setTimeout(initAutocomplete,200) }
 
 // ── GEOLOCALIZACIÓN ───────────────────────────────────────────────────────────
 async function detectarUbicacion(){
-  if(!navigator.geolocation) return
-  if(dirEntrega && dirEntrega.length > 5) return
+  if(!navigator.geolocation||dirEntrega&&dirEntrega.length>5) return
   navigator.geolocation.getCurrentPosition(async function(pos){
     try {
-      var url = 'https://nominatim.openstreetmap.org/reverse?lat='+pos.coords.latitude+'&lon='+pos.coords.longitude+'&format=json&addressdetails=1'
-      var res = await fetch(url, {headers:{'User-Agent':'ALL-Pedidos/1.0'}})
-      var data = await res.json()
-      if(data && data.address){
-        var addr = data.address
-        var calle = addr.road || addr.pedestrian || ''
-        var numero = addr.house_number || ''
-        var ciudad = addr.city || addr.town || addr.village || ''
-        var direc = (calle + (numero?' '+numero:'') + (ciudad?', '+ciudad:'')).trim()
-        if(direc){ dirEntrega = direc; actualizarUIperfil(); mostrarToast('📍 Ubicación detectada') }
+      var res=await fetch('https://nominatim.openstreetmap.org/reverse?lat='+pos.coords.latitude+'&lon='+pos.coords.longitude+'&format=json&addressdetails=1',{headers:{'User-Agent':'ALL-Pedidos/1.0'}})
+      var data=await res.json()
+      if(data&&data.address){
+        var addr=data.address
+        var direc=((addr.road||addr.pedestrian||'')+(addr.house_number?' '+addr.house_number:'')+((addr.city||addr.town||addr.village||'')?', '+(addr.city||addr.town||addr.village||''):'')).trim()
+        if(direc){ dirEntrega=direc; actualizarUIperfil(); mostrarToast('📍 Ubicación detectada') }
       }
-    } catch(e){ console.log('Geo error:', e) }
-  }, function(err){ console.log('Geolocation denied:', err) }, { timeout: 10000, maximumAge: 300000 })
+    } catch(e){}
+  },function(){},{timeout:10000,maximumAge:300000})
 }
 
 function mostrarToast(msg){
-  var toast = document.createElement('div')
-  toast.style.cssText = 'position:fixed;bottom:80px;left:12px;right:12px;background:#1A1A1A;color:#fff;border-radius:12px;padding:12px 16px;font-size:13px;z-index:400;text-align:center;animation:slideUp .3s ease'
-  toast.textContent = msg
-  document.body.appendChild(toast)
-  setTimeout(function(){ toast.remove() }, 3000)
+  var toast=document.createElement('div')
+  toast.style.cssText='position:fixed;bottom:80px;left:12px;right:12px;background:#1A1A1A;color:#fff;border-radius:12px;padding:12px 16px;font-size:13px;z-index:400;text-align:center;animation:slideUp .3s ease'
+  toast.textContent=msg; document.body.appendChild(toast)
+  setTimeout(function(){ toast.remove() },3000)
 }
 
 function togglePass(inputId,btn){
   var input=document.getElementById(inputId)
-  if(input.type==='password'){ input.type='text'; btn.textContent='🙈' }
-  else { input.type='password'; btn.textContent='👁' }
+  if(input.type==='password'){ input.type='text'; btn.textContent='🙈' } else { input.type='password'; btn.textContent='👁' }
 }
 </script>
 </body>
