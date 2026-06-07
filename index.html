@@ -1051,7 +1051,11 @@ async function confirmarPedido(){
   if(!metodoPago){ err.style.display='block'; err.textContent='Seleccioná un método de pago'; return }
   if(metodoPago==='transferencia'&&!ticketUrl){ err.style.display='block'; err.textContent='Subí el comprobante de transferencia'; return }
   if(!carrito.length){ err.style.display='block'; err.textContent='Tu carrito está vacío'; return }
-  if(zonaNombre==='Fuera de zona de entrega'){ err.style.display='block'; err.textContent='Tu dirección está fuera de la zona de entrega'; return }
+  if(zonaNombre==='Fuera de zona de entrega'){
+    err.style.display='block'
+    err.textContent='😔 Por el momento no llegamos a tu dirección. Estamos trabajando para ampliar nuestra zona de cobertura. ¡Muy pronto llegaremos!'
+    return
+  }
 
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
   // calcular descuento disponible
