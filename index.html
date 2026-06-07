@@ -12,7 +12,7 @@
 <meta name="apple-touch-fullscreen" content="yes"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icon-192.png"/>
-<title>ALL — Pedidos v1.6</title>
+<title>ALL — Pedidos v1.7</title>
 <style>
   :root {
     --sat: env(safe-area-inset-top);
@@ -334,7 +334,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
       <input type="text" id="r-dir" placeholder="Ej: San Martín 542, Bahía Blanca" class="input" autocomplete="off"/>
       <button class="btn-main" onclick="registro()">Crear cuenta →</button>
     </div>
-    <div class="version">ALL Pedidos v1.6</div>
+    <div class="version">ALL Pedidos v1.7</div>
   </div>
 </div>
 
@@ -351,7 +351,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
     <div class="cats-home" id="cats-home"></div>
     <div class="home-section" id="home-section-label">Todos los locales</div>
     <div class="restos-grid" id="lista-restos-home"><div class="loading-text" style="grid-column:span 2">Cargando...</div></div>
-    <div class="version">ALL Pedidos v1.6</div>
+    <div class="version">ALL Pedidos v1.7</div>
   </div>
   <div class="navbar" id="navbar-home">
     <button class="nav-item active" onclick="setNavActive3(0)">
@@ -501,7 +501,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
       <button class="btn-main" onclick="guardarPerfil()">Guardar cambios</button>
     </div>
     <button class="btn-sec" onclick="cerrarSesion()">Cerrar sesión</button>
-    <div class="version">ALL Pedidos v1.6</div>
+    <div class="version">ALL Pedidos v1.7</div>
   </div>
   <div class="navbar">
     <button class="nav-item" onclick="irA('v-home');setNavActive3(0)">
@@ -1139,7 +1139,7 @@ async function cargarMisPedidos(){
   scroll.innerHTML=res.data.map(function(p){
     var estadoLabel=tagL[p.estado]||p.estado
     var items=p.items.map(function(i){ return i.qty+'× '+i.nombre }).join(', ')
-    var fecha=new Date(p.created_at).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})
+    var fecha=new Date(p.created_at).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'America/Argentina/Buenos_Aires'})
     return '<div class="pedido-hist-card" onclick="pedidoActivoId=\''+p.id+'\';irA(\'v-seguimiento\');cargarSeguimiento(\''+p.id+'\')">'
       +'<div class="pedido-hist-head"><span class="pedido-hist-num">'+(p.restaurantes?p.restaurantes.nombre:'Pedido')+'</span><span class="pedido-hist-fecha">'+fecha+'</span></div>'
       +'<div class="pedido-hist-items">'+items+'</div>'
