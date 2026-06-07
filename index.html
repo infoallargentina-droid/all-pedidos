@@ -520,39 +520,23 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
   </div>
 </div>
 
-<!-- MODAL RASPADITA INMEDIATA -->
-<div id="modal-raspadita" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;display:none;align-items:center;justify-content:center;flex-direction:column;padding:20px">
-  <div style="background:#fff;border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center">
-    <div style="font-size:13px;font-weight:600;color:#FF4D00;margin-bottom:6px">🎉 ¡Pedido confirmado!</div>
-    <div style="font-size:20px;font-weight:800;color:#1A1A1A;margin-bottom:4px">Tu raspadita</div>
-    <div style="font-size:12px;color:#888;margin-bottom:20px">Tocá para revelar tu premio</div>
-    
-    <!-- Scratch card -->
-    <div id="modal-scratch-container" style="position:relative;width:220px;height:150px;margin:0 auto 16px;border-radius:16px;overflow:hidden;cursor:pointer" onclick="rasparModal()">
-      <div id="modal-scratch-prize" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;border-radius:16px">
-        <div id="modal-prize-icon" style="font-size:40px">🎁</div>
-        <div id="modal-prize-text" style="font-size:15px;font-weight:800;color:#fff;padding:0 12px"></div>
-      </div>
-      <div id="modal-scratch-cover" style="position:absolute;inset:0;border-radius:16px;background:linear-gradient(135deg,#555,#333);display:flex;align-items:center;justify-content:center;transition:opacity 0.8s">
-        <div style="font-size:13px;font-weight:700;color:#fff;text-align:center">🤞 Tocá para<br>revelar</div>
-      </div>
+<!-- MODAL DESCUENTO PRÓXIMA COMPRA -->
+<div id="modal-descuento" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:none;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center;animation:popIn .3s ease">
+    <div style="font-size:48px;margin-bottom:12px">🎉</div>
+    <div style="font-size:22px;font-weight:800;color:#1A1A1A;margin-bottom:8px">¡Pedido confirmado!</div>
+    <div style="background:linear-gradient(135deg,#FF4D00,#FF8C00);border-radius:16px;padding:20px;margin:16px 0">
+      <div style="font-size:12px;color:rgba(255,255,255,0.8);margin-bottom:4px">Premio para tu próxima compra</div>
+      <div id="modal-desc-porcentaje" style="font-size:36px;font-weight:800;color:#fff">10% OFF</div>
+      <div id="modal-desc-resto" style="font-size:12px;color:rgba(255,255,255,0.8);margin-top:4px">en este local</div>
     </div>
-
-    <div id="modal-prize-result" style="display:none;margin-bottom:16px">
-      <div id="modal-prize-ganadora" style="background:linear-gradient(135deg,#FF4D00,#FF8C00);border-radius:14px;padding:14px;margin-bottom:10px;display:none">
-        <div style="font-size:11px;color:rgba(255,255,255,0.8);margin-bottom:4px">🎉 ¡Ganaste!</div>
-        <div id="modal-prize-nombre" style="font-size:18px;font-weight:800;color:#fff"></div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.8);margin-top:6px">Se aplicará automáticamente en tu próximo pedido</div>
-      </div>
-      <div id="modal-prize-nada" style="background:#f5f5f5;border-radius:14px;padding:14px;margin-bottom:10px;display:none">
-        <div style="font-size:14px;color:#888">😅 Esta vez no fue...<br>¡Seguí pidiendo!</div>
-      </div>
-      <button onclick="cerrarRaspaditaModal()" class="btn-main">Ver seguimiento del pedido</button>
-    </div>
-    
-    <div id="modal-scratch-hint" style="font-size:11px;color:#aaa">Tocá la tarjeta para raspar</div>
+    <div style="font-size:12px;color:#888;margin-bottom:20px">El descuento se aplica automáticamente la próxima vez que pedís acá.</div>
+    <button onclick="cerrarModalDescuento()" class="btn-main">¡Genial, gracias!</button>
   </div>
 </div>
+<style>
+@keyframes popIn{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
+</style>
 
 <!-- MODAL DIRECCIÓN -->
 <div id="modal-dir">
@@ -881,15 +865,10 @@ function actualizarFab(){
   var fab=document.getElementById('carrito-fab')
   var totalItems=carrito.reduce(function(s,i){ return s+i.qty },0)
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
-  // calcular descuento por crédito
+  // calcular descuento disponible
   var descuentoCredito = 0
-  if(aplicarCredito && creditoDesc){
-    // si el premio es un % descuento
-    var matchPct = creditoDesc.match(/(\d+)\s*%/)
-    if(matchPct) descuentoCredito = Math.round(subtotal * parseInt(matchPct[1]) / 100)
-    // si es monto fijo
-    var matchMonto = creditoDesc.match(/\$\s*([\d.]+)/)
-    if(matchMonto && !matchPct) descuentoCredito = parseFloat(matchMonto[1].replace('.',''))
+  if(aplicarCredito && descuentoData){
+    descuentoCredito = Math.round(subtotal * descuentoData.porcentaje / 100)
   }
   if(totalItems>0){
     fab.classList.add('visible')
@@ -904,15 +883,10 @@ function renderCarrito(){
   var scroll=document.getElementById('carrito-scroll')
   if(!carrito.length){ scroll.innerHTML='<div class="loading-text">Tu carrito está vacío</div>'; return }
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
-  // calcular descuento por crédito
+  // calcular descuento disponible
   var descuentoCredito = 0
-  if(aplicarCredito && creditoDesc){
-    // si el premio es un % descuento
-    var matchPct = creditoDesc.match(/(\d+)\s*%/)
-    if(matchPct) descuentoCredito = Math.round(subtotal * parseInt(matchPct[1]) / 100)
-    // si es monto fijo
-    var matchMonto = creditoDesc.match(/\$\s*([\d.]+)/)
-    if(matchMonto && !matchPct) descuentoCredito = parseFloat(matchMonto[1].replace('.',''))
+  if(aplicarCredito && descuentoData){
+    descuentoCredito = Math.round(subtotal * descuentoData.porcentaje / 100)
   }
   var comision=comisionConfig.activa ? Math.round(subtotal*comisionConfig.porcentaje/100) : 0
   var total=Math.max(0,subtotal+costoEnvio+comision+propinaSeleccionada-descuentoCredito)
@@ -976,19 +950,14 @@ function haversine(lat1,lng1,lat2,lng2){
 
 // ── CHECKOUT ──────────────────────────────────────────────────────────────────
 async function renderCheckout(){
-  // verificar crédito pendiente
-  var creditoData = await verificarCreditoPendiente()
-  var creditoDesc = creditoData ? creditoData.credito_pendiente : null
+  // verificar descuento disponible para este restaurante
+  var descuentoData = await verificarDescuentoDisponible()
+  var creditoDesc = descuentoData ? descuentoData.porcentaje + '% OFF en este local' : null
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
-  // calcular descuento por crédito
+  // calcular descuento disponible
   var descuentoCredito = 0
-  if(aplicarCredito && creditoDesc){
-    // si el premio es un % descuento
-    var matchPct = creditoDesc.match(/(\d+)\s*%/)
-    if(matchPct) descuentoCredito = Math.round(subtotal * parseInt(matchPct[1]) / 100)
-    // si es monto fijo
-    var matchMonto = creditoDesc.match(/\$\s*([\d.]+)/)
-    if(matchMonto && !matchPct) descuentoCredito = parseFloat(matchMonto[1].replace('.',''))
+  if(aplicarCredito && descuentoData){
+    descuentoCredito = Math.round(subtotal * descuentoData.porcentaje / 100)
   }
   var comision=comisionConfig.activa ? Math.round(subtotal*comisionConfig.porcentaje/100) : 0
   var total=Math.max(0,subtotal+costoEnvio+comision+propinaSeleccionada-descuentoCredito)
@@ -999,8 +968,8 @@ async function renderCheckout(){
     html+='<div class="premio-banner" onclick="toggleAplicarCredito()">'
     html+='<div class="premio-banner-icon">🎁</div>'
     html+='<div class="premio-banner-info">'
-    html+='<div class="premio-banner-title">Premio disponible: '+creditoDesc+'</div>'
-    html+='<div class="premio-banner-sub">'+(aplicarCredito?'✓ Aplicado a este pedido':'Tocá para aplicarlo')+'</div>'
+    html+='<div class="premio-banner-title">🎁 Tenés '+creditoDesc+'</div>'
+    html+='<div class="premio-banner-sub">'+(aplicarCredito?'✓ Descuento aplicado':'Tocá para aplicar el descuento')+'</div>'
     html+='</div>'
     html+='<div class="premio-banner-arrow">'+(aplicarCredito?'✓':'›')+'</div>'
     html+='</div>'
@@ -1082,15 +1051,10 @@ async function confirmarPedido(){
   if(zonaNombre==='Fuera de zona de entrega'){ err.style.display='block'; err.textContent='Tu dirección está fuera de la zona de entrega'; return }
 
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
-  // calcular descuento por crédito
+  // calcular descuento disponible
   var descuentoCredito = 0
-  if(aplicarCredito && creditoDesc){
-    // si el premio es un % descuento
-    var matchPct = creditoDesc.match(/(\d+)\s*%/)
-    if(matchPct) descuentoCredito = Math.round(subtotal * parseInt(matchPct[1]) / 100)
-    // si es monto fijo
-    var matchMonto = creditoDesc.match(/\$\s*([\d.]+)/)
-    if(matchMonto && !matchPct) descuentoCredito = parseFloat(matchMonto[1].replace('.',''))
+  if(aplicarCredito && descuentoData){
+    descuentoCredito = Math.round(subtotal * descuentoData.porcentaje / 100)
   }
   var comision=comisionConfig.activa?Math.round(subtotal*comisionConfig.porcentaje/100):0
   var total=subtotal+costoEnvio+comision+propinaSeleccionada
@@ -1120,19 +1084,14 @@ async function confirmarPedido(){
   var pedidoId=res.data.id
   var clienteId=usuarioActual.id
   carrito=[]; metodoPago=null; ticketUrl=null; propinaSeleccionada=0
-  // limpiar crédito si se usó
+  // limpiar descuento si se usó
   if(aplicarCredito){
-    await sb.from('perfiles').update({credito_pendiente:null,credito_raspadita_id:null}).eq('id',usuarioActual.id)
+    await usarDescuento()
     aplicarCredito=false
   }
-  // generar raspadita al confirmar
-  var rasp = await generarRaspaditaCliente(pedidoId, clienteId)
-  if(rasp){
-    // mostrar raspadita antes del seguimiento
-    await mostrarRaspaditaInmediata(rasp)
-  } else {
-    irA('v-seguimiento'); cargarSeguimiento(pedidoActivoId)
-  }
+  // verificar y otorgar descuento próxima compra
+  await verificarYOtorgarDescuento(pedidoId, clienteId, restoActual.id)
+  irA('v-seguimiento'); cargarSeguimiento(pedidoActivoId)
 }
 
 // ── SEGUIMIENTO ───────────────────────────────────────────────────────────────
@@ -1305,6 +1264,49 @@ var _origAbrirModalDir = abrirModalDir
 abrirModalDir = function(){
   _origAbrirModalDir()
   setTimeout(initAutocomplete, 200)
+}
+
+// ── DESCUENTO PRÓXIMA COMPRA ─────────────────────────────────────────────────
+async function verificarYOtorgarDescuento(pedidoId, clienteId, restauranteId){
+  // buscar config de descuento del restaurante
+  var config = await sb.from('raspaditas_config').select('*').eq('restaurante_id', restauranteId).single()
+  if(!config.data || !config.data.activa) return
+  
+  var porcentaje = config.data.descuento_porcentaje || 10
+  
+  // guardar descuento en perfil del cliente para este restaurante
+  var descuentos = {}
+  var perfRes = await sb.from('perfiles').select('descuentos_pendientes').eq('id', clienteId).single()
+  if(perfRes.data && perfRes.data.descuentos_pendientes){
+    descuentos = perfRes.data.descuentos_pendientes
+  }
+  descuentos[restauranteId] = { porcentaje: porcentaje, pedido_origen: pedidoId }
+  await sb.from('perfiles').update({ descuentos_pendientes: descuentos }).eq('id', clienteId)
+  
+  // mostrar modal
+  document.getElementById('modal-desc-porcentaje').textContent = porcentaje + '% OFF'
+  document.getElementById('modal-desc-resto').textContent = 'en ' + (restoActual ? restoActual.nombre : 'este local')
+  document.getElementById('modal-descuento').style.display = 'flex'
+}
+
+function cerrarModalDescuento(){
+  document.getElementById('modal-descuento').style.display = 'none'
+}
+
+async function verificarDescuentoDisponible(){
+  if(!usuarioActual || !restoActual) return null
+  var res = await sb.from('perfiles').select('descuentos_pendientes').eq('id', usuarioActual.id).single()
+  if(!res.data || !res.data.descuentos_pendientes) return null
+  return res.data.descuentos_pendientes[restoActual.id] || null
+}
+
+async function usarDescuento(){
+  if(!usuarioActual || !restoActual) return
+  var perfRes = await sb.from('perfiles').select('descuentos_pendientes').eq('id', usuarioActual.id).single()
+  if(!perfRes.data || !perfRes.data.descuentos_pendientes) return
+  var descuentos = perfRes.data.descuentos_pendientes
+  delete descuentos[restoActual.id]
+  await sb.from('perfiles').update({ descuentos_pendientes: descuentos }).eq('id', usuarioActual.id)
 }
 
 // ── RASPADITAS ────────────────────────────────────────────────────────────────
@@ -1497,4 +1499,3 @@ function togglePass(inputId,btn){
 </script>
 </body>
 </html>
-
