@@ -9,13 +9,11 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="ALL Pedidos"/>
 <meta name="theme-color" content="#FF4D00"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-touch-fullscreen" content="yes"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icon-192.png"/>
-<title>ALL — Pedidos v1.4</title>
+<title>ALL — Pedidos v1.5</title>
 <style>
-  /* PWA full screen fixes */
   :root {
     --sat: env(safe-area-inset-top);
     --sab: env(safe-area-inset-bottom);
@@ -169,7 +167,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .seg-estado-card{border-radius:18px;padding:20px;margin-bottom:14px;text-align:center}
 .seg-estado-icon{font-size:52px;margin-bottom:8px}
 .seg-estado-label{font-size:22px;font-weight:800;color:#fff}
-.seg-estado-sub{font-size:13px;color:rgba(255,255,255,0.85);margin-top:4px}
+.seg-estado-sub{font-size:13px;color:rgba(255,255,255,0.9);margin-top:6px;line-height:1.5;padding:0 8px}
 .seg-steps{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px}
 .seg-step{display:flex;align-items:center;gap:12px;padding:6px 0}
 .seg-step-dot{width:30px;height:30px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
@@ -187,6 +185,11 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .seg-info-label{color:#888}
 .seg-info-val{font-weight:600;color:#1A1A1A;text-align:right;max-width:60%}
 .btn-reclamo{width:100%;padding:14px;background:#FFF0F0;color:#E24B4A;border:1.5px solid #FFD0D0;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px}
+
+/* CANCELADO CARD */
+.seg-cancelado-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;border:2px solid #FFD0D0}
+.seg-cancelado-title{font-size:13px;font-weight:700;color:#E24B4A;margin-bottom:8px}
+.seg-cancelado-motivo{font-size:14px;color:#1A1A1A;font-weight:600;line-height:1.5}
 
 /* MIS PEDIDOS */
 #v-mispedidos{background:#f5f5f5}
@@ -277,6 +280,10 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .premio-banner-title{font-size:13px;font-weight:800;color:#fff}
 .premio-banner-sub{font-size:11px;color:rgba(255,255,255,0.8);margin-top:2px}
 .premio-banner-arrow{font-size:20px;color:rgba(255,255,255,0.7)}
+
+/* CUPONES tab (antes Premios) */
+.cupones-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px}
+.cupones-empty{text-align:center;padding:40px 20px;color:#888;font-size:14px}
 </style>
 </head>
 <body>
@@ -327,7 +334,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
       <input type="text" id="r-dir" placeholder="Ej: San Martín 542, Bahía Blanca" class="input" autocomplete="off"/>
       <button class="btn-main" onclick="registro()">Crear cuenta →</button>
     </div>
-    <div class="version">ALL Pedidos v1.4</div>
+    <div class="version">ALL Pedidos v1.5</div>
   </div>
 </div>
 
@@ -338,13 +345,13 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
       <div class="topbar-home-title">¿Qué querés pedir?</div>
       <div id="home-dir" style="font-size:11px;color:rgba(255,255,255,0.8);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📍 Cargando...</div>
     </div>
-    <div class="topbar-avatar" id="home-avatar" onclick="irA('v-perfil');setNavActive3(2)">?</div>
+    <div class="topbar-avatar" id="home-avatar" onclick="irA('v-perfil');setNavActive3(3);cargarPerfil()">?</div>
   </div>
   <div class="home-scroll">
     <div class="cats-home" id="cats-home"></div>
     <div class="home-section" id="home-section-label">Todos los locales</div>
     <div class="restos-grid" id="lista-restos-home"><div class="loading-text" style="grid-column:span 2">Cargando...</div></div>
-    <div class="version">ALL Pedidos v1.4</div>
+    <div class="version">ALL Pedidos v1.5</div>
   </div>
   <div class="navbar" id="navbar-home">
     <button class="nav-item active" onclick="setNavActive3(0)">
@@ -355,10 +362,10 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
       <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
       <div class="nav-item-label">Pedidos</div>
     </button>
-    <button class="nav-item" onclick="irA('v-raspadita');setNavActive3(2);cargarRaspaditas()">
-      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/><path d="M7 10l2 2 4-4"/></svg></div>
-      <div class="nav-item-label">Premios</div>
-      <div class="nav-dot" id="rasp-nav-badge"></div>
+    <button class="nav-item" onclick="irA('v-cupones');setNavActive3(2);cargarCupones()">
+      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 6v12M6 12h.01M18 12h.01"/></svg></div>
+      <div class="nav-item-label">Cupones</div>
+      <div class="nav-dot" id="cupones-nav-badge"></div>
     </button>
     <button class="nav-item" onclick="irA('v-perfil');setNavActive3(3);cargarPerfil()">
       <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
@@ -437,9 +444,38 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
       <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
       <div class="nav-item-label">Pedidos</div>
     </button>
-    <button class="nav-item" onclick="irA('v-raspadita');setNavActive3(2);cargarRaspaditas()">
-      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/><path d="M7 10l2 2 4-4"/></svg></div>
-      <div class="nav-item-label">Premios</div>
+    <button class="nav-item" onclick="irA('v-cupones');setNavActive3(2);cargarCupones()">
+      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 6v12M6 12h.01M18 12h.01"/></svg></div>
+      <div class="nav-item-label">Cupones</div>
+    </button>
+    <button class="nav-item" onclick="irA('v-perfil');setNavActive3(3);cargarPerfil()">
+      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <div class="nav-item-label">Perfil</div>
+    </button>
+  </div>
+</div>
+
+<!-- CUPONES (antes Premios) -->
+<div id="v-cupones" class="vista" style="background:#f5f5f5">
+  <div style="background:#FF4D00;padding:calc(44px + env(safe-area-inset-top)) 16px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0">
+    <button class="back-btn" style="color:#fff" onclick="irA('v-home')">‹</button>
+    <div style="font-size:20px;font-weight:800;color:#fff;flex:1">🎁 Mis cupones</div>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:14px" id="cupones-scroll">
+    <div class="loading-text">Cargando...</div>
+  </div>
+  <div class="navbar">
+    <button class="nav-item" onclick="irA('v-home');setNavActive3(0)">
+      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <div class="nav-item-label">Inicio</div>
+    </button>
+    <button class="nav-item" onclick="irA('v-mispedidos');setNavActive3(1);cargarMisPedidos()">
+      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+      <div class="nav-item-label">Pedidos</div>
+    </button>
+    <button class="nav-item active">
+      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 6v12M6 12h.01M18 12h.01"/></svg></div>
+      <div class="nav-item-label">Cupones</div>
     </button>
     <button class="nav-item" onclick="irA('v-perfil');setNavActive3(3);cargarPerfil()">
       <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
@@ -465,7 +501,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
       <button class="btn-main" onclick="guardarPerfil()">Guardar cambios</button>
     </div>
     <button class="btn-sec" onclick="cerrarSesion()">Cerrar sesión</button>
-    <div class="version">ALL Pedidos v1.4</div>
+    <div class="version">ALL Pedidos v1.5</div>
   </div>
   <div class="navbar">
     <button class="nav-item" onclick="irA('v-home');setNavActive3(0)">
@@ -476,9 +512,9 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
       <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
       <div class="nav-item-label">Pedidos</div>
     </button>
-    <button class="nav-item" onclick="irA('v-raspadita');setNavActive3(2);cargarRaspaditas()">
-      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/><path d="M7 10l2 2 4-4"/></svg></div>
-      <div class="nav-item-label">Premios</div>
+    <button class="nav-item" onclick="irA('v-cupones');setNavActive3(2);cargarCupones()">
+      <div class="nav-item-icon"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 6v12M6 12h.01M18 12h.01"/></svg></div>
+      <div class="nav-item-label">Cupones</div>
     </button>
     <button class="nav-item active">
       <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
@@ -508,18 +544,6 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
   </div>
 </div>
 
-<!-- RASPADITA -->
-<div id="v-raspadita" class="vista">
-  <div class="rasp-topbar">
-    <button class="back-btn" style="color:#fff" onclick="irA('v-home')">‹</button>
-    <div style="font-size:18px;font-weight:800;color:#fff;flex:1">🎰 Mis raspaditas</div>
-    <div id="rasp-count-badge" style="background:#FF4D00;color:#fff;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;display:none"></div>
-  </div>
-  <div class="rasp-scroll" id="rasp-scroll">
-    <div class="loading-text" style="color:#888">Cargando...</div>
-  </div>
-</div>
-
 <!-- MODAL DESCUENTO PRÓXIMA COMPRA -->
 <div id="modal-descuento" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:none;align-items:center;justify-content:center;padding:20px">
   <div style="background:#fff;border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center;animation:popIn .3s ease">
@@ -530,7 +554,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
       <div id="modal-desc-porcentaje" style="font-size:36px;font-weight:800;color:#fff">10% OFF</div>
       <div id="modal-desc-resto" style="font-size:12px;color:rgba(255,255,255,0.8);margin-top:4px">en este local</div>
     </div>
-    <div style="font-size:12px;color:#888;margin-bottom:20px">El descuento se aplica automáticamente la próxima vez que pedís acá.</div>
+    <div style="font-size:12px;color:#888;margin-bottom:20px">El descuento se aplica automáticamente la próxima vez que pedís acá. Lo podés ver en la sección <strong>Cupones</strong>.</div>
     <button onclick="cerrarModalDescuento()" class="btn-main">¡Genial, gracias!</button>
   </div>
 </div>
@@ -580,14 +604,18 @@ var zonaNombre = ''
 var comisionConfig = { activa: false, porcentaje: 0 }
 var pedidoActivoId = null
 var segInterval = null
+var aplicarCredito = false
+var descuentoData = null
 
 const PROPINAS = [0, 200, 400, 600, 800, 1000]
+
+// ESTADOS ACTUALIZADOS con mensajes claros para el cliente
 const ESTADOS = {
-  nuevo:      { label:'Nuevo pedido',  icon:'🆕', color:'#FF4D00', sub:'Tu pedido fue recibido' },
-  preparando: { label:'Preparando',    icon:'👨‍🍳', color:'#B8860B', sub:'Están preparando tu pedido' },
-  camino:     { label:'En camino',     icon:'🏍',  color:'#1565C0', sub:'Tu pedido está en camino' },
-  entregado:  { label:'Entregado',     icon:'✅',  color:'#2D6A2D', sub:'¡Tu pedido llegó!' },
-  cancelado:  { label:'Cancelado',     icon:'❌',  color:'#888',    sub:'El pedido fue cancelado' }
+  nuevo:      { label:'Esperando confirmación', icon:'🕐', color:'#FF8C00', sub:'Tu pedido fue enviado al local, esperando que lo confirmen' },
+  preparando: { label:'¡Aceptado! Preparando',  icon:'👨‍🍳', color:'#B8860B', sub:'El local aceptó tu pedido y lo está preparando' },
+  camino:     { label:'En camino',               icon:'🏍',  color:'#1565C0', sub:'Tu pedido salió del local y está en camino' },
+  entregado:  { label:'¡Entregado!',             icon:'✅',  color:'#2D6A2D', sub:'Tu pedido llegó. ¡Buen provecho!' },
+  cancelado:  { label:'Pedido rechazado',        icon:'❌',  color:'#E24B4A', sub:'El local no pudo aceptar tu pedido' }
 }
 
 // ── NAVEGACIÓN ───────────────────────────────────────────────────────────────
@@ -613,8 +641,8 @@ sb.auth.getSession().then(async function(res){
     irA('v-home')
     await cargarCategoriasTipos()
     cargarRestaurantes()
-    // detectar ubicación automáticamente
     detectarUbicacion()
+    actualizarBadgeCupones()
   } else {
     irA('v-auth')
   }
@@ -648,6 +676,7 @@ async function login(){
   usuarioActual=res.data.user
   await cargarPerfil()
   irA('v-home'); await cargarCategoriasTipos(); cargarRestaurantes()
+  actualizarBadgeCupones()
 }
 
 async function registro(){
@@ -683,7 +712,7 @@ async function cargarPerfil(){
 }
 
 function actualizarUIperfil(){
-  var nombre = (perfilActual&&perfilActual.nombre)||( usuarioActual&&usuarioActual.email.split('@')[0] )||'?'
+  var nombre = (perfilActual&&perfilActual.nombre)||(usuarioActual&&usuarioActual.email.split('@')[0])||'?'
   var iniciales = nombre.substring(0,2).toUpperCase()
   var setEl = function(id,val){ var e=document.getElementById(id); if(e) e.textContent=val }
   setEl('home-avatar',iniciales); setEl('perfil-avatar',iniciales)
@@ -710,11 +739,7 @@ async function guardarPerfil(){
 // ── RESTAURANTES ──────────────────────────────────────────────────────────────
 var todosRestos = []
 var categoriaActiva = 'todos'
-
-// Categorías default — se reemplazan con las de Supabase
-var CATS_TIPOS = [
-  { id:'todos', label:'Todos', emoji:'🔍', color:'#1A1A1A', bg:'#f5f5f5' }
-]
+var CATS_TIPOS = [{ id:'todos', label:'Todos', emoji:'🔍', color:'#1A1A1A', bg:'#f5f5f5' }]
 
 async function cargarCategoriasTipos(){
   var res = await sb.from('categorias_locales').select('*').eq('activa',true).order('orden')
@@ -723,10 +748,8 @@ async function cargarCategoriasTipos(){
     res.data.forEach(function(c){
       CATS_TIPOS.push({
         id: c.nombre.toLowerCase().replace(/[^a-z0-9]/g,'_'),
-        label: c.nombre,
-        emoji: c.emoji||'🍽',
-        color: c.color||'#FF4D00',
-        bg: c.color_bg||'#FFF0E5'
+        label: c.nombre, emoji: c.emoji||'🍽',
+        color: c.color||'#FF4D00', bg: c.color_bg||'#FFF0E5'
       })
     })
   }
@@ -737,18 +760,15 @@ async function cargarRestaurantes(){
   var res=await sb.from('restaurantes').select('*').order('nombre')
   if(res.error||!res.data){ lista.innerHTML='<div class="loading-text">Error cargando</div>'; return }
   var emojis={'El Bodegón NKT':'🦞',"Colantonio's":'🍕','Kusama Sushi':'🍣'}
-  var tipos={restaurante:'🍽 Restaurante',kiosco:'🏪 Kiosco',despensa:'🛒 Despensa',market:'🏬 Market'}
   lista.innerHTML=res.data.map(function(r){
     var emoji=emojis[r.nombre]||'🍽'
     var ab=r.abierto!==false
-    var tipo=tipos[r.tipo||'restaurante']||'🍽 Local'
     var imgContent = r.logo_url
       ? '<img src="'+r.logo_url+'" style="width:100%;height:100%;object-fit:cover;display:block" alt="'+r.nombre+'"/>'
       : '<span style="font-size:52px">'+emoji+'</span>'
     return '<div class="resto-card" onclick="abrirResto(\''+r.id+'\')">'
       +'<div class="resto-card-img">'+imgContent
       +'<span class="resto-card-badge '+(ab?'badge-abierto':'badge-cerrado')+'">'+(ab?'● Abierto':'● Cerrado')+'</span>'
-      +'<span class="badge-tipo">'+tipo+'</span>'
       +'</div>'
       +'<div class="resto-card-body">'
       +'<div class="resto-card-nombre">'+r.nombre+'</div>'
@@ -771,10 +791,7 @@ async function abrirResto(restoId){
   document.getElementById('menu-resto-nombre').textContent=restoActual.nombre
   document.getElementById('carrito-resto-nombre').textContent=restoActual.nombre
 
-  // calcular zona de envío si hay dirección
-  if(dirEntrega && restoActual.lat && restoActual.lng){
-    await calcularZonaEnvio()
-  }
+  if(dirEntrega && restoActual.lat && restoActual.lng) await calcularZonaEnvio()
 
   var prods=await sb.from('productos').select('*').eq('restaurante_id',restoId).eq('disponible',true).order('categoria').order('orden')
   if(prods.error||!prods.data){ document.getElementById('menu-scroll').innerHTML='<div class="loading-text">Error cargando menú</div>'; return }
@@ -790,7 +807,7 @@ async function abrirResto(restoId){
   Object.keys(cats).forEach(function(c){ if(!ordered.includes(c)) ordered.push(c) })
 
   document.getElementById('cat-tabs-menu').innerHTML=ordered.map(function(c){
-    return '<div class="cat-tab" onclick="scrollACat(\'mcat-'+c.replace(/[^a-z0-9]/gi,'_')+'\')" >'+c+'</div>'
+    return '<div class="cat-tab" onclick="scrollACat(\'mcat-'+c.replace(/[^a-z0-9]/gi,'_')+'\')">'+c+'</div>'
   }).join('')
 
   var hoy=new Date().toISOString().split('T')[0]
@@ -819,7 +836,6 @@ async function abrirResto(restoId){
     })
   })
   document.getElementById('menu-scroll').innerHTML=html
-
   verificarDireccion()
 }
 
@@ -833,8 +849,7 @@ function agregarItem(prodId, nombre, precio){
   var existe=carrito.find(function(i){ return i.id===prodId })
   if(existe){ existe.qty++ }
   else { carrito.push({id:prodId,nombre:nombre,precio:precio,qty:1}) }
-  actualizarItemUI(prodId)
-  actualizarFab()
+  actualizarItemUI(prodId); actualizarFab()
 }
 
 function cambiarQty(prodId, delta){
@@ -842,9 +857,7 @@ function cambiarQty(prodId, delta){
   if(!item) return
   item.qty+=delta
   if(item.qty<=0) carrito=carrito.filter(function(i){ return i.id!==prodId })
-  actualizarItemUI(prodId)
-  actualizarFab()
-  // si carrito abierto, re-render
+  actualizarItemUI(prodId); actualizarFab()
   if(document.getElementById('v-carrito').classList.contains('activa')) renderCarrito()
 }
 
@@ -855,12 +868,10 @@ function actualizarItemUI(prodId){
   var numEl=document.getElementById('pnum-'+prodId)
   if(!addBtn||!qtyDiv) return
   if(item && item.qty>0){
-    addBtn.classList.add('hidden')
-    qtyDiv.classList.remove('hidden')
+    addBtn.classList.add('hidden'); qtyDiv.classList.remove('hidden')
     if(numEl) numEl.textContent=item.qty
   } else {
-    addBtn.classList.remove('hidden')
-    qtyDiv.classList.add('hidden')
+    addBtn.classList.remove('hidden'); qtyDiv.classList.add('hidden')
   }
 }
 
@@ -868,11 +879,6 @@ function actualizarFab(){
   var fab=document.getElementById('carrito-fab')
   var totalItems=carrito.reduce(function(s,i){ return s+i.qty },0)
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
-  // calcular descuento disponible
-  var descuentoCredito = 0
-  if(aplicarCredito && descuentoData){
-    descuentoCredito = Math.round(subtotal * descuentoData.porcentaje / 100)
-  }
   if(totalItems>0){
     fab.classList.add('visible')
     document.getElementById('fab-items').textContent=totalItems+(totalItems===1?' item':' items')
@@ -886,21 +892,14 @@ function renderCarrito(){
   var scroll=document.getElementById('carrito-scroll')
   if(!carrito.length){ scroll.innerHTML='<div class="loading-text">Tu carrito está vacío</div>'; return }
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
-  // calcular descuento disponible
-  var descuentoCredito = 0
-  if(aplicarCredito && descuentoData){
-    descuentoCredito = Math.round(subtotal * descuentoData.porcentaje / 100)
-  }
+  var descuentoCredito = (aplicarCredito && descuentoData) ? Math.round(subtotal * descuentoData.porcentaje / 100) : 0
   var comision=comisionConfig.activa ? Math.round(subtotal*comisionConfig.porcentaje/100) : 0
   var total=Math.max(0,subtotal+costoEnvio+comision+propinaSeleccionada-descuentoCredito)
-
   scroll.innerHTML=carrito.map(function(item){
     var sub=item.precio*item.qty
     return '<div class="carrito-item">'
-      +'<div class="carrito-item-info">'
-      +'<div class="carrito-item-nombre">'+item.nombre+'</div>'
-      +'<div class="carrito-item-precio">$'+Number(item.precio).toLocaleString('es-AR')+' c/u</div>'
-      +'</div>'
+      +'<div class="carrito-item-info"><div class="carrito-item-nombre">'+item.nombre+'</div>'
+      +'<div class="carrito-item-precio">$'+Number(item.precio).toLocaleString('es-AR')+' c/u</div></div>'
       +'<div class="prod-qty">'
       +'<button class="qty-btn" onclick="cambiarQty(\''+item.id+'\',-1)">−</button>'
       +'<span class="qty-num">'+item.qty+'</span>'
@@ -909,7 +908,6 @@ function renderCarrito(){
       +'<div class="carrito-item-sub">$'+Number(sub).toLocaleString('es-AR')+'</div>'
       +'</div>'
   }).join('')
-
   document.getElementById('carrito-subtotal-val').textContent='$'+Number(subtotal).toLocaleString('es-AR')
   document.getElementById('carrito-total').textContent='$'+Number(total).toLocaleString('es-AR')
 }
@@ -917,78 +915,54 @@ function renderCarrito(){
 // ── ZONAS DE ENVÍO ────────────────────────────────────────────────────────────
 async function calcularZonaEnvio(){
   if(!restoActual||!restoActual.lat||!restoActual.lng||!dirEntrega) return
-  // geocodificar dirección del cliente
   try {
     var geoUrl='https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(dirEntrega)+'&format=json&limit=1'
     var geoRes=await fetch(geoUrl,{headers:{'User-Agent':'ALL-Pedidos/1.0'}})
     var geoData=await geoRes.json()
     if(!geoData||!geoData.length) return
-    var clienteLat=parseFloat(geoData[0].lat)
-    var clienteLng=parseFloat(geoData[0].lon)
+    var clienteLat=parseFloat(geoData[0].lat), clienteLng=parseFloat(geoData[0].lon)
     var distKm=haversine(restoActual.lat,restoActual.lng,clienteLat,clienteLng)
-
     var zonas=await sb.from('zonas_envio').select('*').eq('restaurante_id',restoActual.id).order('orden')
     if(zonas.data&&zonas.data.length){
       var zonaEncontrada=null
-      for(var z of zonas.data){
-        if(distKm<=z.radio_km){ zonaEncontrada=z; break }
-      }
-      if(zonaEncontrada){
-        costoEnvio=zonaEncontrada.precio
-        zonaNombre=zonaEncontrada.nombre+' ('+distKm.toFixed(1)+' km)'
-      } else {
-        costoEnvio=0; zonaNombre='Fuera de zona de entrega'
-      }
+      for(var z of zonas.data){ if(distKm<=z.radio_km){ zonaEncontrada=z; break } }
+      if(zonaEncontrada){ costoEnvio=zonaEncontrada.precio; zonaNombre=zonaEncontrada.nombre+' ('+distKm.toFixed(1)+' km)' }
+      else { costoEnvio=0; zonaNombre='Fuera de zona de entrega' }
     }
   } catch(e){ console.log('Geo error:',e) }
 }
 
 function haversine(lat1,lng1,lat2,lng2){
-  var R=6371
-  var dLat=(lat2-lat1)*Math.PI/180
-  var dLng=(lng2-lng1)*Math.PI/180
+  var R=6371, dLat=(lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180
   var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2)
   return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))
 }
 
 // ── CHECKOUT ──────────────────────────────────────────────────────────────────
 async function renderCheckout(){
-  // verificar descuento disponible para este restaurante
-  var descuentoData = await verificarDescuentoDisponible()
-  var creditoDesc = descuentoData ? descuentoData.porcentaje + '% OFF en este local' : null
+  descuentoData = await verificarDescuentoDisponible()
+  var creditoDesc = descuentoData ? descuentoData.porcentaje + '% OFF en ' + (restoActual ? restoActual.nombre : 'este local') : null
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
-  // calcular descuento disponible
-  var descuentoCredito = 0
-  if(aplicarCredito && descuentoData){
-    descuentoCredito = Math.round(subtotal * descuentoData.porcentaje / 100)
-  }
+  var descuentoCredito = (aplicarCredito && descuentoData) ? Math.round(subtotal * descuentoData.porcentaje / 100) : 0
   var comision=comisionConfig.activa ? Math.round(subtotal*comisionConfig.porcentaje/100) : 0
   var total=Math.max(0,subtotal+costoEnvio+comision+propinaSeleccionada-descuentoCredito)
   var html=''
 
-  // banner premio disponible
   if(creditoDesc){
     html+='<div class="premio-banner" onclick="toggleAplicarCredito()">'
     html+='<div class="premio-banner-icon">🎁</div>'
-    html+='<div class="premio-banner-info">'
-    html+='<div class="premio-banner-title">🎁 Tenés '+creditoDesc+'</div>'
-    html+='<div class="premio-banner-sub">'+(aplicarCredito?'✓ Descuento aplicado':'Tocá para aplicar el descuento')+'</div>'
-    html+='</div>'
-    html+='<div class="premio-banner-arrow">'+(aplicarCredito?'✓':'›')+'</div>'
-    html+='</div>'
+    html+='<div class="premio-banner-info"><div class="premio-banner-title">Tenés '+creditoDesc+'</div>'
+    html+='<div class="premio-banner-sub">'+(aplicarCredito?'✓ Descuento aplicado':'Tocá para aplicar el descuento')+'</div></div>'
+    html+='<div class="premio-banner-arrow">'+(aplicarCredito?'✓':'›')+'</div></div>'
   }
 
-  // dirección
-  html+='<div class="checkout-section">'
-  html+='<div class="checkout-section-title">📍 Dirección de entrega</div>'
+  html+='<div class="checkout-section"><div class="checkout-section-title">📍 Dirección de entrega</div>'
   html+='<div class="dir-row"><div class="dir-text">'+(dirEntrega||'Sin dirección')+'</div>'
   html+='<div class="dir-change" onclick="abrirModalDir()">Cambiar</div></div>'
   if(zonaNombre) html+='<div class="zona-badge">🚗 '+zonaNombre+'</div>'
   html+='</div>'
 
-  // pago
-  html+='<div class="checkout-section">'
-  html+='<div class="checkout-section-title">💳 Método de pago</div>'
+  html+='<div class="checkout-section"><div class="checkout-section-title">💳 Método de pago</div>'
   html+='<div class="pago-opt'+(metodoPago==='efectivo'?' selected':'')+'" onclick="seleccionarPago(\'efectivo\')">'
   html+='<div class="pago-opt-icon">💵</div><div class="pago-opt-info"><div class="pago-opt-label">Efectivo</div><div class="pago-opt-sub">Pagás al recibir</div></div>'
   html+='<div class="pago-check">'+(metodoPago==='efectivo'?'✓':'')+'</div></div>'
@@ -996,38 +970,30 @@ async function renderCheckout(){
   html+='<div class="pago-opt-icon">🏦</div><div class="pago-opt-info"><div class="pago-opt-label">Transferencia</div><div class="pago-opt-sub">Subí el comprobante</div></div>'
   html+='<div class="pago-check">'+(metodoPago==='transferencia'?'✓':'')+'</div></div>'
   if(metodoPago==='transferencia'){
-    html+='<div style="margin-top:10px;padding:14px;background:#f5f5f5;border-radius:12px;border:1.5px dashed #ddd;text-align:center;cursor:pointer" onclick="document.getElementById(\'ticket-input\').click()">📎 '+(ticketUrl?'✓ Comprobante cargado — tocar para cambiar':'Subir comprobante de transferencia')+'</div>'
+    html+='<div style="margin-top:10px;padding:14px;background:#f5f5f5;border-radius:12px;border:1.5px dashed #ddd;text-align:center;cursor:pointer" onclick="document.getElementById(\'ticket-input\').click()">📎 '+(ticketUrl?'✓ Comprobante cargado':'Subir comprobante')+'</div>'
     if(ticketUrl) html+='<img src="'+ticketUrl+'" style="width:100%;border-radius:10px;margin-top:8px"/>'
   }
   html+='</div>'
 
-  // propina
-  html+='<div class="checkout-section">'
-  html+='<div class="checkout-section-title">🙌 Propina para el cadete (opcional)</div>'
+  html+='<div class="checkout-section"><div class="checkout-section-title">🙌 Propina para el cadete (opcional)</div>'
   html+='<div class="propina-chips">'
   PROPINAS.forEach(function(p){
     html+='<div class="propina-chip'+(propinaSeleccionada===p?' selected':'')+'" onclick="seleccionarPropina('+p+')">'+(p===0?'Sin propina':'$'+p)+'</div>'
   })
   html+='</div></div>'
 
-  // notas
-  html+='<div class="checkout-section">'
-  html+='<div class="checkout-section-title">📝 Notas (opcional)</div>'
-  html+='<textarea id="checkout-notas" class="notas-input" placeholder="Ej: Sin cebolla, tocar timbre..."></textarea>'
-  html+='</div>'
+  html+='<div class="checkout-section"><div class="checkout-section-title">📝 Notas (opcional)</div>'
+  html+='<textarea id="checkout-notas" class="notas-input" placeholder="Ej: Sin cebolla, tocar timbre..."></textarea></div>'
 
-  // resumen
-  html+='<div class="checkout-section">'
-  html+='<div class="checkout-section-title">🧾 Resumen</div>'
+  html+='<div class="checkout-section"><div class="checkout-section-title">🧾 Resumen</div>'
   carrito.forEach(function(item){
     html+='<div class="resumen-row"><span>'+item.qty+'× '+item.nombre+'</span><span>$'+Number(item.precio*item.qty).toLocaleString('es-AR')+'</span></div>'
   })
-  if(descuentoCredito>0) html+='<div class="resumen-row" style="color:#2D6A2D"><span>🎁 Premio: '+creditoDesc+'</span><span>-$'+Number(descuentoCredito).toLocaleString('es-AR')+'</span></div>'
+  if(descuentoCredito>0) html+='<div class="resumen-row" style="color:#2D6A2D"><span>🎁 Descuento ('+creditoDesc+')</span><span>-$'+Number(descuentoCredito).toLocaleString('es-AR')+'</span></div>'
   html+='<div class="resumen-row envio"><span>🚗 Envío'+(zonaNombre?' ('+zonaNombre+')':'')+'</span><span>'+(costoEnvio>0?'$'+Number(costoEnvio).toLocaleString('es-AR'):'A calcular')+'</span></div>'
-  if(comisionConfig.activa) html+='<div class="resumen-row comision"><span>⚙️ Comisión de servicio ('+comisionConfig.porcentaje+'%)</span><span>$'+Number(comision).toLocaleString('es-AR')+'</span></div>'
+  if(comisionConfig.activa) html+='<div class="resumen-row comision"><span>⚙️ Comisión ('+comisionConfig.porcentaje+'%)</span><span>$'+Number(comision).toLocaleString('es-AR')+'</span></div>'
   if(propinaSeleccionada>0) html+='<div class="resumen-row propina"><span>🙌 Propina cadete</span><span>$'+Number(propinaSeleccionada).toLocaleString('es-AR')+'</span></div>'
-  html+='<div class="resumen-row total"><span>Total</span><span>$'+Number(total).toLocaleString('es-AR')+'</span></div>'
-  html+='</div>'
+  html+='<div class="resumen-row total"><span>Total</span><span>$'+Number(total).toLocaleString('es-AR')+'</span></div></div>'
 
   document.getElementById('checkout-scroll').innerHTML=html
 }
@@ -1051,20 +1017,12 @@ async function confirmarPedido(){
   if(!metodoPago){ err.style.display='block'; err.textContent='Seleccioná un método de pago'; return }
   if(metodoPago==='transferencia'&&!ticketUrl){ err.style.display='block'; err.textContent='Subí el comprobante de transferencia'; return }
   if(!carrito.length){ err.style.display='block'; err.textContent='Tu carrito está vacío'; return }
-  if(zonaNombre==='Fuera de zona de entrega'){
-    err.style.display='block'
-    err.textContent='😔 Por el momento no llegamos a tu dirección. Estamos trabajando para ampliar nuestra zona de cobertura. ¡Muy pronto llegaremos!'
-    return
-  }
+  if(zonaNombre==='Fuera de zona de entrega'){ err.style.display='block'; err.textContent='😔 Por el momento no llegamos a tu dirección.'; return }
 
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
-  // calcular descuento disponible
-  var descuentoCredito = 0
-  if(aplicarCredito && descuentoData){
-    descuentoCredito = Math.round(subtotal * descuentoData.porcentaje / 100)
-  }
+  var descuentoCredito = (aplicarCredito && descuentoData) ? Math.round(subtotal * descuentoData.porcentaje / 100) : 0
   var comision=comisionConfig.activa?Math.round(subtotal*comisionConfig.porcentaje/100):0
-  var total=subtotal+costoEnvio+comision+propinaSeleccionada
+  var total=subtotal+costoEnvio+comision+propinaSeleccionada-descuentoCredito
   var notas=document.getElementById('checkout-notas')
 
   var btn=document.getElementById('btn-confirmar'); btn.textContent='Procesando...'
@@ -1088,16 +1046,11 @@ async function confirmarPedido(){
   if(res.error){ err.style.display='block'; err.textContent='Error: '+res.error.message; return }
 
   pedidoActivoId=res.data.id
-  var pedidoId=res.data.id
-  var clienteId=usuarioActual.id
   carrito=[]; metodoPago=null; ticketUrl=null; propinaSeleccionada=0
-  // limpiar descuento si se usó
-  if(aplicarCredito){
-    await usarDescuento()
-    aplicarCredito=false
-  }
-  // verificar y otorgar descuento próxima compra
-  await verificarYOtorgarDescuento(pedidoId, clienteId, restoActual.id)
+
+  if(aplicarCredito){ await usarDescuento(); aplicarCredito=false; descuentoData=null }
+
+  await verificarYOtorgarDescuento(res.data.id, usuarioActual.id, restoActual.id)
   irA('v-seguimiento'); cargarSeguimiento(pedidoActivoId)
 }
 
@@ -1117,23 +1070,43 @@ async function renderSeguimiento(pedidoId){
   var idxActual=pasos.indexOf(p.estado)
   var html=''
 
+  // CARD DE ESTADO PRINCIPAL
   html+='<div class="seg-estado-card" style="background:'+estado.color+'">'
   html+='<div class="seg-estado-icon">'+estado.icon+'</div>'
   html+='<div class="seg-estado-label">'+estado.label+'</div>'
-  html+='<div class="seg-estado-sub">'+estado.sub+'</div></div>'
 
-  html+='<div class="seg-steps">'
-  pasos.forEach(function(paso,i){
-    var done=i<idxActual, active=i===idxActual
-    var e=ESTADOS[paso]
-    html+='<div class="seg-step">'
-    html+='<div class="seg-step-dot '+(done?'done':active?'active':'')+'">'+e.icon+'</div>'
-    html+='<div class="seg-step-info"><div class="seg-step-label '+(done?'done':active?'active':'')+'">'+e.label+'</div></div>'
+  // Si fue cancelado, mostrar motivo
+  if(p.estado === 'cancelado'){
+    var motivo = p.motivo_cancelacion || 'El local no pudo aceptar tu pedido'
+    html+='<div class="seg-estado-sub">'+motivo+'</div>'
     html+='</div>'
-    if(i<pasos.length-1) html+='<div class="seg-step-line '+(done?'done':'')+'"></div>'
-  })
-  html+='</div>'
+    // Card con detalle del rechazo
+    html+='<div class="seg-cancelado-card">'
+    html+='<div class="seg-cancelado-title">❌ Motivo del rechazo</div>'
+    html+='<div class="seg-cancelado-motivo">'+motivo+'</div>'
+    html+='<div style="font-size:12px;color:#888;margin-top:8px">Podés hacer otro pedido o elegir otro local.</div>'
+    html+='</div>'
+    // Botón volver a pedir
+    html+='<button class="btn-main" onclick="irA(\'v-home\')" style="margin-bottom:12px">🏠 Volver al inicio</button>'
+  } else {
+    html+='<div class="seg-estado-sub">'+estado.sub+'</div>'
+    html+='</div>'
 
+    // PASOS
+    html+='<div class="seg-steps">'
+    pasos.forEach(function(paso,i){
+      var done=i<idxActual, active=i===idxActual
+      var e=ESTADOS[paso]
+      html+='<div class="seg-step">'
+      html+='<div class="seg-step-dot '+(done?'done':active?'active':'')+'">'+e.icon+'</div>'
+      html+='<div class="seg-step-info"><div class="seg-step-label '+(done?'done':active?'active':'')+'">'+e.label+'</div></div>'
+      html+='</div>'
+      if(i<pasos.length-1) html+='<div class="seg-step-line '+(done?'done':'')+'"></div>'
+    })
+    html+='</div>'
+  }
+
+  // INFO DEL PEDIDO
   html+='<div class="seg-info-card"><div class="seg-info-title">Detalle del pedido</div>'
   if(p.restaurantes) html+='<div class="seg-info-row"><span class="seg-info-label">Local</span><span class="seg-info-val">'+p.restaurantes.nombre+'</span></div>'
   p.items.forEach(function(item){
@@ -1161,8 +1134,9 @@ async function cargarMisPedidos(){
   var res=await sb.from('pedidos').select('*,restaurantes(nombre)').eq('cliente_id',usuarioActual.id).order('created_at',{ascending:false})
   if(res.error||!res.data||!res.data.length){ scroll.innerHTML='<div class="loading-text">Aún no tenés pedidos</div>'; return }
   var tagC={nuevo:'tag-nuevo',preparando:'tag-preparando',camino:'tag-camino',entregado:'tag-entregado',cancelado:'tag-cancelado'}
+  var tagL={nuevo:'Esperando',preparando:'Preparando',camino:'En camino',entregado:'Entregado',cancelado:'Rechazado'}
   scroll.innerHTML=res.data.map(function(p){
-    var estadoLabel=ESTADOS[p.estado]?ESTADOS[p.estado].label:p.estado
+    var estadoLabel=tagL[p.estado]||p.estado
     var items=p.items.map(function(i){ return i.qty+'× '+i.nombre }).join(', ')
     var fecha=new Date(p.created_at).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})
     return '<div class="pedido-hist-card" onclick="pedidoActivoId=\''+p.id+'\';irA(\'v-seguimiento\');cargarSeguimiento(\''+p.id+'\')">'
@@ -1172,6 +1146,62 @@ async function cargarMisPedidos(){
       +'<span class="tag '+(tagC[p.estado]||'tag-nuevo')+'">'+estadoLabel+'</span>'
       +'</div></div>'
   }).join('')
+}
+
+// ── CUPONES ───────────────────────────────────────────────────────────────────
+async function cargarCupones(){
+  if(!usuarioActual) return
+  var scroll = document.getElementById('cupones-scroll')
+  scroll.innerHTML = '<div class="loading-text">Cargando...</div>'
+
+  var res = await sb.from('perfiles').select('descuentos_pendientes').eq('id', usuarioActual.id).single()
+  var descuentos = (res.data && res.data.descuentos_pendientes) ? res.data.descuentos_pendientes : {}
+  var restoIds = Object.keys(descuentos)
+
+  if(!restoIds.length){
+    scroll.innerHTML = '<div class="cupones-empty">🎟️<br><br>No tenés cupones disponibles.<br>Completá un pedido y ganá descuentos para tu próxima compra.</div>'
+    return
+  }
+
+  // traer nombres de restaurantes
+  var restosRes = await sb.from('restaurantes').select('id,nombre,logo_url').in('id', restoIds)
+  var restosMap = {}
+  if(restosRes.data) restosRes.data.forEach(function(r){ restosMap[r.id] = r })
+
+  var html = ''
+  restoIds.forEach(function(restoId){
+    var d = descuentos[restoId]
+    var r = restosMap[restoId] || {}
+    var logoHtml = r.logo_url
+      ? '<img src="'+r.logo_url+'" style="width:48px;height:48px;border-radius:12px;object-fit:cover;flex-shrink:0"/>'
+      : '<div style="width:48px;height:48px;border-radius:12px;background:#FFF4EF;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🍽</div>'
+    html += '<div style="background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;border:2px solid #FFE8DC">'
+    html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">'
+    html += logoHtml
+    html += '<div style="flex:1"><div style="font-size:15px;font-weight:700;color:#1A1A1A">'+(r.nombre||'Local')+'</div>'
+    html += '<div style="font-size:12px;color:#888;margin-top:2px">Válido para tu próximo pedido</div></div>'
+    html += '<div style="background:linear-gradient(135deg,#FF4D00,#FF8C00);border-radius:12px;padding:8px 14px;text-align:center">'
+    html += '<div style="font-size:20px;font-weight:800;color:#fff">'+d.porcentaje+'%</div>'
+    html += '<div style="font-size:10px;color:rgba(255,255,255,0.8)">OFF</div></div>'
+    html += '</div>'
+    html += '<button onclick="irARestoConCupon(\''+restoId+'\')" style="width:100%;padding:12px;background:#FF4D00;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer">Usar ahora →</button>'
+    html += '</div>'
+  })
+  scroll.innerHTML = html
+}
+
+async function irARestoConCupon(restoId){
+  irA('v-home')
+  await abrirResto(restoId)
+}
+
+async function actualizarBadgeCupones(){
+  if(!usuarioActual) return
+  var res = await sb.from('perfiles').select('descuentos_pendientes').eq('id', usuarioActual.id).single()
+  var descuentos = (res.data && res.data.descuentos_pendientes) ? res.data.descuentos_pendientes : {}
+  var cantidad = Object.keys(descuentos).length
+  var badge = document.getElementById('cupones-nav-badge')
+  if(badge) badge.classList.toggle('show', cantidad > 0)
 }
 
 // ── RECLAMO ───────────────────────────────────────────────────────────────────
@@ -1223,77 +1253,20 @@ function verificarDireccion(){
 }
 function cerrarAlertaDir(){ document.getElementById('alerta-dir').classList.remove('show') }
 
-// ── UTILS ─────────────────────────────────────────────────────────────────────
-// ── GOOGLE MAPS AUTOCOMPLETE ─────────────────────────────────────────────────
-var autocompletes = {}
-
-function initAutocomplete(){
-  if(typeof google === 'undefined' || !google.maps || !google.maps.places) {
-    setTimeout(initAutocomplete, 500); return
-  }
-  var campos = [
-    { id: 'r-dir',          callback: function(place){ dirEntrega = place.formatted_address || place.name } },
-    { id: 'modal-dir-input',callback: function(place){ /* se aplica al confirmar */ } },
-    { id: 'p-dir',          callback: function(place){ /* se aplica al guardar */ } }
-  ]
-  campos.forEach(function(campo){
-    var input = document.getElementById(campo.id)
-    if(!input || autocompletes[campo.id]) return
-    var ac = new google.maps.places.Autocomplete(input, {
-      componentRestrictions: { country: 'ar' },
-      fields: ['formatted_address','name','geometry']
-    })
-    autocompletes[campo.id] = ac
-    ac.addListener('place_changed', function(){
-      var place = ac.getPlace()
-      if(!place || !place.formatted_address) return
-      input.value = place.formatted_address
-      campo.callback(place)
-      // guardar lat/lng del cliente si viene del modal o registro
-      if(campo.id === 'modal-dir-input' || campo.id === 'r-dir'){
-        if(place.geometry && place.geometry.location){
-          window._clienteLat = place.geometry.location.lat()
-          window._clienteLng = place.geometry.location.lng()
-        }
-      }
-    })
-  })
-}
-
-// inicializar cuando google maps cargue
-window.initAutocomplete = initAutocomplete
-document.addEventListener('DOMContentLoaded', function(){
-  setTimeout(initAutocomplete, 1000)
-})
-
-// re-inicializar al abrir modal dirección
-var _origAbrirModalDir = abrirModalDir
-abrirModalDir = function(){
-  _origAbrirModalDir()
-  setTimeout(initAutocomplete, 200)
-}
-
-// ── DESCUENTO PRÓXIMA COMPRA ─────────────────────────────────────────────────
+// ── DESCUENTO PRÓXIMA COMPRA ──────────────────────────────────────────────────
 async function verificarYOtorgarDescuento(pedidoId, clienteId, restauranteId){
-  // buscar config de descuento del restaurante
   var config = await sb.from('raspaditas_config').select('*').eq('restaurante_id', restauranteId).single()
   if(!config.data || !config.data.activa) return
-  
   var porcentaje = config.data.descuento_porcentaje || 10
-  
-  // guardar descuento en perfil del cliente para este restaurante
   var descuentos = {}
   var perfRes = await sb.from('perfiles').select('descuentos_pendientes').eq('id', clienteId).single()
-  if(perfRes.data && perfRes.data.descuentos_pendientes){
-    descuentos = perfRes.data.descuentos_pendientes
-  }
+  if(perfRes.data && perfRes.data.descuentos_pendientes) descuentos = perfRes.data.descuentos_pendientes
   descuentos[restauranteId] = { porcentaje: porcentaje, pedido_origen: pedidoId }
   await sb.from('perfiles').update({ descuentos_pendientes: descuentos }).eq('id', clienteId)
-  
-  // mostrar modal
   document.getElementById('modal-desc-porcentaje').textContent = porcentaje + '% OFF'
   document.getElementById('modal-desc-resto').textContent = 'en ' + (restoActual ? restoActual.nombre : 'este local')
   document.getElementById('modal-descuento').style.display = 'flex'
+  actualizarBadgeCupones()
 }
 
 function cerrarModalDescuento(){
@@ -1314,183 +1287,7 @@ async function usarDescuento(){
   var descuentos = perfRes.data.descuentos_pendientes
   delete descuentos[restoActual.id]
   await sb.from('perfiles').update({ descuentos_pendientes: descuentos }).eq('id', usuarioActual.id)
-}
-
-// ── RASPADITAS ────────────────────────────────────────────────────────────────
-async function cargarRaspaditas(){
-  if(!usuarioActual) return
-  var scroll = document.getElementById('rasp-scroll')
-  scroll.innerHTML = '<div class="loading-text" style="color:#aaa">Cargando...</div>'
-  var res = await sb.from('raspaditas').select('*,restaurantes(nombre)').eq('cliente_id',usuarioActual.id).order('created_at',{ascending:false})
-  if(res.error||!res.data||!res.data.length){
-    scroll.innerHTML = '<div class="rasp-empty">🎰<br><br>Aún no tenés raspaditas.<br>Hacé un pedido y recibirás una al completarlo.</div>'
-    return
-  }
-  var pendientes = res.data.filter(function(r){ return !r.revelada }).length
-  var badge = document.getElementById('rasp-nav-badge')
-  if(badge){ badge.classList.toggle('show', pendientes>0) }
-  var countBadge = document.getElementById('rasp-count-badge')
-  if(countBadge){ countBadge.style.display = pendientes>0 ? 'block':'none'; countBadge.textContent = pendientes+' nueva'+(pendientes>1?'s':'') }
-
-  scroll.innerHTML = res.data.map(function(r){
-    var restoNombre = r.restaurantes ? r.restaurantes.nombre : 'Local'
-    var fecha = new Date(r.created_at).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})
-    if(r.revelada){
-      // ya revelada
-      return '<div class="rasp-card">'
-        +'<div class="rasp-card-titulo">'+restoNombre+'</div>'
-        +'<div class="rasp-card-sub">'+fecha+'</div>'
-        +(r.ganada
-          ? '<div class="rasp-ganadora"><div class="rasp-ganadora-label">🎉 ¡Ganaste!</div><div class="rasp-ganadora-premio">'+r.premio+'</div></div>'
-          : '<div style="padding:16px;background:#f5f5f5;border-radius:12px;color:#888;font-size:13px">😅 Esta vez no fue — ¡Seguí pidiendo!</div>'
-        )+'</div>'
-    } else {
-      // sin revelar — mostrar raspadita interactiva
-      return '<div class="rasp-card">'
-        +'<div class="rasp-card-titulo">🎰 Raspadita de '+restoNombre+'</div>'
-        +'<div class="rasp-card-sub">'+fecha+' · Tocá para raspar</div>'
-        +'<div class="scratch-container" id="scratch-'+r.id+'" data-id="'+r.id+'" data-premio="'+r.premio+'" data-ganada="'+r.ganada+'" onclick="revelarRaspadita(this.dataset.id,this.dataset.premio,this.dataset.ganada===\'true\')">'
-        +'<div class="scratch-prize">'
-        +(r.ganada ? '<div class="scratch-prize-icon">🎁</div><div class="scratch-prize-text">'+r.premio+'</div>' : '<div class="scratch-prize-icon">😅</div><div class="scratch-prize-text">¡Seguí intentando!</div>')
-        +'</div>'
-        +'<div class="scratch-cover" id="cover-'+r.id+'">'
-        +'<div class="scratch-cover-text">🤞 Tocá para<br>revelar tu premio</div>'
-        +'</div></div>'
-        +'<div class="scratch-hint">¡Tocá la tarjeta para ver tu premio!</div>'
-        +'</div>'
-    }
-  }).join('')
-}
-
-async function revelarRaspadita(raspaditaId, premio, ganada){
-  var cover = document.getElementById('cover-'+raspaditaId)
-  if(!cover) return
-  // animación
-  cover.style.transition = 'opacity 0.8s ease'
-  cover.style.opacity = '0'
-  setTimeout(async function(){
-    cover.classList.add('revelada')
-    await sb.from('raspaditas').update({revelada:true}).eq('id',raspaditaId)
-    // recargar para actualizar badge
-    setTimeout(function(){ cargarRaspaditas() }, 1500)
-  }, 800)
-}
-
-function instalarApp(){
-  if(deferredPrompt){
-    deferredPrompt.prompt()
-    deferredPrompt.userChoice.then(function(r){
-      deferredPrompt = null
-      var btn = document.getElementById('btn-instalar-app')
-      if(btn) btn.style.display = 'none'
-    })
-  }
-}
-
-// ── RASPADITA INMEDIATA AL CONFIRMAR ─────────────────────────────────────────
-var raspaditaModalData = null
-
-async function generarRaspaditaCliente(pedidoId, clienteId){
-  // verificar config del restaurante
-  if(!restoActual||!restoActual.id){ console.log('RASP: sin restoActual'); return null }
-  var config = await sb.from('raspaditas_config').select('*').eq('restaurante_id',restoActual.id).single()
-  console.log('RASP config:', config.data)
-  if(!config.data){ console.log('RASP: sin config'); return null }
-  if(!config.data.activa){ console.log('RASP: no activa'); return null }
-  if(!config.data.premios||!config.data.premios.length){ console.log('RASP: sin premios'); return null }
-  
-  var premios = config.data.premios
-  var total = premios.reduce(function(s,p){ return s+p.probabilidad },0)
-  var rand = Math.random()*total
-  var acum = 0; var ganado = null
-  for(var i=0;i<premios.length;i++){
-    acum += premios[i].probabilidad
-    if(rand <= acum){ ganado = premios[i]; break }
-  }
-  if(!ganado) ganado = premios[premios.length-1]
-  
-  var esGanadora = !ganado.nombre.toLowerCase().includes('sin premio') && !ganado.nombre.toLowerCase().includes('nada')
-  
-  var res = await sb.from('raspaditas').insert([{
-    pedido_id:pedidoId,
-    cliente_id:clienteId,
-    restaurante_id:restoActual.id,
-    premio:ganado.nombre,
-    ganada:esGanadora,
-    revelada:false
-  }]).select().single()
-  
-  if(res.error) return null
-  return res.data
-}
-
-async function mostrarRaspaditaInmediata(raspadita){
-  raspaditaModalData = raspadita
-  // configurar prize
-  var prizeDiv = document.getElementById('modal-scratch-prize')
-  if(raspadita.ganada){
-    prizeDiv.style.background = 'linear-gradient(135deg,#FF4D00,#FF8C00)'
-    document.getElementById('modal-prize-icon').textContent = '🎁'
-    document.getElementById('modal-prize-text').textContent = raspadita.premio
-    document.getElementById('modal-prize-text').style.color = '#fff'
-  } else {
-    prizeDiv.style.background = 'linear-gradient(135deg,#888,#555)'
-    document.getElementById('modal-prize-icon').textContent = '😅'
-    document.getElementById('modal-prize-text').textContent = '¡Seguí intentando!'
-    document.getElementById('modal-prize-text').style.color = '#fff'
-  }
-  document.getElementById('modal-prize-result').style.display = 'none'
-  document.getElementById('modal-scratch-hint').style.display = 'block'
-  var cover = document.getElementById('modal-scratch-cover')
-  cover.style.opacity = '1'
-  cover.style.display = 'flex'
-  document.getElementById('modal-raspadita').style.display = 'flex'
-}
-
-async function rasparModal(){
-  if(!raspaditaModalData) return
-  var cover = document.getElementById('modal-scratch-cover')
-  cover.style.opacity = '0'
-  setTimeout(async function(){
-    cover.style.display = 'none'
-    document.getElementById('modal-scratch-hint').style.display = 'none'
-    document.getElementById('modal-prize-result').style.display = 'block'
-    
-    if(raspaditaModalData.ganada){
-      document.getElementById('modal-prize-ganadora').style.display = 'block'
-      document.getElementById('modal-prize-nada').style.display = 'none'
-      document.getElementById('modal-prize-nombre').textContent = raspaditaModalData.premio
-      // guardar crédito pendiente
-      await sb.from('raspaditas').update({revelada:true}).eq('id',raspaditaModalData.id)
-      // guardar en perfil del usuario como credito pendiente
-      await sb.from('perfiles').update({
-        credito_pendiente: raspaditaModalData.premio,
-        credito_raspadita_id: raspaditaModalData.id
-      }).eq('id',usuarioActual.id)
-    } else {
-      document.getElementById('modal-prize-ganadora').style.display = 'none'
-      document.getElementById('modal-prize-nada').style.display = 'block'
-      await sb.from('raspaditas').update({revelada:true}).eq('id',raspaditaModalData.id)
-    }
-  }, 800)
-}
-
-async function cerrarRaspaditaModal(){
-  document.getElementById('modal-raspadita').style.display = 'none'
-  irA('v-seguimiento')
-  cargarSeguimiento(pedidoActivoId)
-  // recargar perfil para actualizar crédito
-  await cargarPerfil()
-}
-
-// ── CRÉDITO PREMIO EN CHECKOUT ─────────────────────────────────────────────
-var aplicarCredito = false
-
-async function verificarCreditoPendiente(){
-  if(!usuarioActual) return null
-  var res = await sb.from('perfiles').select('credito_pendiente,credito_raspadita_id').eq('id',usuarioActual.id).single()
-  if(res.data && res.data.credito_pendiente) return res.data
-  return null
+  actualizarBadgeCupones()
 }
 
 function toggleAplicarCredito(){
@@ -1498,39 +1295,56 @@ function toggleAplicarCredito(){
   renderCheckout()
 }
 
+// ── GOOGLE MAPS AUTOCOMPLETE ─────────────────────────────────────────────────
+var autocompletes = {}
+function initAutocomplete(){
+  if(typeof google === 'undefined' || !google.maps || !google.maps.places){ setTimeout(initAutocomplete, 500); return }
+  var campos = [
+    { id: 'r-dir', callback: function(place){ dirEntrega = place.formatted_address || place.name } },
+    { id: 'modal-dir-input', callback: function(place){ } },
+    { id: 'p-dir', callback: function(place){ } }
+  ]
+  campos.forEach(function(campo){
+    var input = document.getElementById(campo.id)
+    if(!input || autocompletes[campo.id]) return
+    var ac = new google.maps.places.Autocomplete(input, { componentRestrictions: { country: 'ar' }, fields: ['formatted_address','name','geometry'] })
+    autocompletes[campo.id] = ac
+    ac.addListener('place_changed', function(){
+      var place = ac.getPlace()
+      if(!place || !place.formatted_address) return
+      input.value = place.formatted_address
+      campo.callback(place)
+      if((campo.id === 'modal-dir-input' || campo.id === 'r-dir') && place.geometry && place.geometry.location){
+        window._clienteLat = place.geometry.location.lat()
+        window._clienteLng = place.geometry.location.lng()
+      }
+    })
+  })
+}
+window.initAutocomplete = initAutocomplete
+document.addEventListener('DOMContentLoaded', function(){ setTimeout(initAutocomplete, 1000) })
+var _origAbrirModalDir = abrirModalDir
+abrirModalDir = function(){ _origAbrirModalDir(); setTimeout(initAutocomplete, 200) }
+
 // ── GEOLOCALIZACIÓN ───────────────────────────────────────────────────────────
 async function detectarUbicacion(){
   if(!navigator.geolocation) return
-  // solo detectar si no tiene dirección configurada
   if(dirEntrega && dirEntrega.length > 5) return
   navigator.geolocation.getCurrentPosition(async function(pos){
-    var lat = pos.coords.latitude
-    var lng = pos.coords.longitude
-    // geocodificación inversa con Nominatim
     try {
-      var url = 'https://nominatim.openstreetmap.org/reverse?lat='+lat+'&lon='+lng+'&format=json&addressdetails=1'
+      var url = 'https://nominatim.openstreetmap.org/reverse?lat='+pos.coords.latitude+'&lon='+pos.coords.longitude+'&format=json&addressdetails=1'
       var res = await fetch(url, {headers:{'User-Agent':'ALL-Pedidos/1.0'}})
       var data = await res.json()
-      if(data && data.display_name){
-        // construir dirección legible
+      if(data && data.address){
         var addr = data.address
         var calle = addr.road || addr.pedestrian || ''
         var numero = addr.house_number || ''
         var ciudad = addr.city || addr.town || addr.village || ''
         var direc = (calle + (numero?' '+numero:'') + (ciudad?', '+ciudad:'')).trim()
-        if(direc){
-          dirEntrega = direc
-          window._clienteLat = lat
-          window._clienteLng = lng
-          actualizarUIperfil()
-          // mostrar toast
-          mostrarToast('📍 Ubicación detectada: '+direc.substring(0,40)+(direc.length>40?'...':''))
-        }
+        if(direc){ dirEntrega = direc; actualizarUIperfil(); mostrarToast('📍 Ubicación detectada') }
       }
     } catch(e){ console.log('Geo error:', e) }
-  }, function(err){
-    console.log('Geolocation denied:', err)
-  }, { timeout: 10000, maximumAge: 300000 })
+  }, function(err){ console.log('Geolocation denied:', err) }, { timeout: 10000, maximumAge: 300000 })
 }
 
 function mostrarToast(msg){
