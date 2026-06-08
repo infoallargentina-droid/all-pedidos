@@ -12,7 +12,7 @@
 <meta name="apple-touch-fullscreen" content="yes"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icon-192.png"/>
-<title>ALL — Pedidos v1.8</title>
+<title>ALL — Pedidos v2.0</title>
 <style>
   :root {
     --sat: env(safe-area-inset-top);
@@ -250,6 +250,15 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .premio-banner-title{font-size:13px;font-weight:800;color:#fff}
 .premio-banner-sub{font-size:11px;color:rgba(255,255,255,0.8);margin-top:2px}
 .premio-banner-arrow{font-size:20px;color:rgba(255,255,255,0.7)}
+/* TIPO ENTREGA */
+.entrega-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
+.entrega-opt{border:2px solid #eee;border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:.15s;background:#fafafa}
+.entrega-opt.selected{border-color:#FF4D00;background:#FFF4EF}
+.entrega-opt-icon{font-size:28px;margin-bottom:6px}
+.entrega-opt-label{font-size:13px;font-weight:700;color:#1A1A1A}
+.entrega-opt-sub{font-size:11px;color:#888;margin-top:3px;line-height:1.3}
+.entrega-opt.selected .entrega-opt-label{color:#FF4D00}
+
 .cupones-empty{text-align:center;padding:40px 20px;color:#888;font-size:14px}
 @keyframes popIn{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
 @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
@@ -306,7 +315,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
       <input type="text" id="r-dir" placeholder="Ej: San Martín 542, Bahía Blanca" class="input" autocomplete="off"/>
       <button class="btn-main" onclick="registro()">Crear cuenta →</button>
     </div>
-    <div class="version">ALL Pedidos v1.8</div>
+    <div class="version">ALL Pedidos v2.0</div>
   </div>
 </div>
 
@@ -323,7 +332,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
     <div class="cats-home" id="cats-home"></div>
     <div class="home-section">Todos los locales</div>
     <div class="restos-grid" id="lista-restos-home"><div class="loading-text" style="grid-column:span 2">Cargando...</div></div>
-    <div class="version">ALL Pedidos v1.8</div>
+    <div class="version">ALL Pedidos v2.0</div>
   </div>
   <div class="navbar">
     <button class="nav-item active" onclick="setNavActive3(0)">
@@ -482,7 +491,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
       <button class="btn-main" onclick="guardarPerfil()">Guardar cambios</button>
     </div>
     <button class="btn-sec" onclick="cerrarSesion()">Cerrar sesión</button>
-    <div class="version">ALL Pedidos v1.8</div>
+    <div class="version">ALL Pedidos v2.0</div>
   </div>
   <div class="navbar">
     <button class="nav-item" onclick="irA('v-home');setNavActive3(0)">
@@ -526,17 +535,37 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 </div>
 
 <!-- MODAL DESCUENTO -->
+<!-- MODAL PEDIDO CONFIRMADO -->
+<div id="modal-confirmado" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:none;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center;animation:popIn .3s ease">
+    <div style="font-size:64px;margin-bottom:8px">🎉</div>
+    <div style="font-size:24px;font-weight:800;color:#1A1A1A;margin-bottom:8px">¡Pedido confirmado!</div>
+    <div style="font-size:14px;color:#888;margin-bottom:8px">Tu pedido fue enviado al local.<br>Esperá la confirmación del encargado.</div>
+    <div style="background:#FFF4EF;border-radius:14px;padding:14px;margin:16px 0;text-align:left">
+      <div id="modal-confirmado-items" style="font-size:13px;color:#555;line-height:1.8"></div>
+      <div style="border-top:1px solid #FFE8DC;margin-top:8px;padding-top:8px;display:flex;justify-content:space-between">
+        <span style="font-size:14px;font-weight:700;color:#1A1A1A">Total</span>
+        <span id="modal-confirmado-total" style="font-size:14px;font-weight:800;color:#FF4D00"></span>
+      </div>
+    </div>
+    <button onclick="cerrarModalConfirmado()" class="btn-main">¡Genial, ver seguimiento!</button>
+  </div>
+</div>
+
+<!-- MODAL BONO DESCUENTO -->
 <div id="modal-descuento" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:none;align-items:center;justify-content:center;padding:20px">
   <div style="background:#fff;border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center;animation:popIn .3s ease">
-    <div style="font-size:48px;margin-bottom:12px">🎉</div>
-    <div style="font-size:22px;font-weight:800;color:#1A1A1A;margin-bottom:8px">¡Pedido confirmado!</div>
-    <div style="background:linear-gradient(135deg,#FF4D00,#FF8C00);border-radius:16px;padding:20px;margin:16px 0">
-      <div style="font-size:12px;color:rgba(255,255,255,0.8);margin-bottom:4px">Premio para tu próxima compra</div>
-      <div id="modal-desc-porcentaje" style="font-size:36px;font-weight:800;color:#fff">10% OFF</div>
-      <div id="modal-desc-resto" style="font-size:12px;color:rgba(255,255,255,0.8);margin-top:4px">en este local</div>
+    <div style="font-size:48px;margin-bottom:12px">🎁</div>
+    <div style="font-size:22px;font-weight:800;color:#1A1A1A;margin-bottom:4px">¡Ganaste un bono!</div>
+    <div style="font-size:13px;color:#888;margin-bottom:16px">Por tu compra te regalamos un descuento para la próxima</div>
+    <div style="background:linear-gradient(135deg,#FF4D00,#FF8C00);border-radius:16px;padding:24px 20px;margin:0 0 16px">
+      <div style="font-size:13px;color:rgba(255,255,255,0.8);margin-bottom:4px">Descuento para tu próxima compra</div>
+      <div id="modal-desc-porcentaje" style="font-size:48px;font-weight:800;color:#fff;line-height:1">10%</div>
+      <div style="font-size:16px;font-weight:700;color:#fff;margin-top:2px">OFF</div>
+      <div id="modal-desc-resto" style="font-size:12px;color:rgba(255,255,255,0.8);margin-top:6px">en este local</div>
     </div>
-    <div style="font-size:12px;color:#888;margin-bottom:20px">El descuento se aplica automáticamente la próxima vez que pedís acá. Lo podés ver en <strong>Cupones</strong>.</div>
-    <button onclick="cerrarModalDescuento()" class="btn-main">¡Genial, gracias!</button>
+    <div style="font-size:12px;color:#888;margin-bottom:20px">Se aplica automáticamente la próxima vez que pedís. Lo encontrás en <strong>Cupones</strong> 🎟️</div>
+    <button onclick="cerrarModalDescuento()" class="btn-main">¡Excelente, gracias!</button>
   </div>
 </div>
 
@@ -590,11 +619,13 @@ var dirEntrega = ''
 var propinaSeleccionada = 0
 var costoEnvio = 0
 var zonaNombre = ''
+var tipoEntrega = 'delivery' // 'delivery' o 'retiro'
 var comisionConfig = { activa: false, porcentaje: 0 }
 var pedidoActivoId = null
 var segInterval = null
 var aplicarCredito = false
 var descuentoData = null
+var bonoPendiente = false
 
 const PROPINAS = [0, 200, 400, 600, 800, 1000]
 
@@ -842,7 +873,7 @@ async function abrirResto(restoId){
   }
 
   irA('v-menu')
-  carrito=[]; propinaSeleccionada=0; costoEnvio=0; zonaNombre=''
+  carrito=[]; propinaSeleccionada=0; costoEnvio=0; zonaNombre=''; tipoEntrega='delivery'
   actualizarFab()
   var res=await sb.from('restaurantes').select('*').eq('id',restoId).single()
   if(res.error||!res.data) return
@@ -972,7 +1003,9 @@ async function renderCheckout(){
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
   var descuentoCredito=(aplicarCredito&&descuentoData)?Math.round(subtotal*descuentoData.porcentaje/100):0
   var comision=comisionConfig.activa?Math.round(subtotal*comisionConfig.porcentaje/100):0
-  var total=Math.max(0,subtotal+costoEnvio+comision+propinaSeleccionada-descuentoCredito)
+  var envioCalc = tipoEntrega==='retiro' ? 0 : costoEnvio
+  var propinaCalc = tipoEntrega==='retiro' ? 0 : propinaSeleccionada
+  var total=Math.max(0,subtotal+envioCalc+comision+propinaCalc-descuentoCredito)
   var html=''
 
   if(creditoDesc){
@@ -983,10 +1016,33 @@ async function renderCheckout(){
     html+='<div class="premio-banner-arrow">'+(aplicarCredito?'✓':'›')+'</div></div>'
   }
 
-  html+='<div class="checkout-section"><div class="checkout-section-title">📍 Dirección de entrega</div>'
-  html+='<div class="dir-row"><div class="dir-text">'+(dirEntrega||'Sin dirección')+'</div><div class="dir-change" onclick="abrirModalDir()">Cambiar</div></div>'
-  if(zonaNombre) html+='<div class="zona-badge">🚗 '+zonaNombre+'</div>'
+  // SELECTOR TIPO ENTREGA
+  html+='<div class="checkout-section">'
+  html+='<div class="checkout-section-title">🚀 ¿Cómo recibís tu pedido?</div>'
+  html+='<div class="entrega-opts">'
+  html+='<div class="entrega-opt'+(tipoEntrega==='delivery'?' selected':'')+'" onclick="seleccionarEntrega(\'delivery\')">'
+  html+='<div class="entrega-opt-icon">🏍</div>'
+  html+='<div class="entrega-opt-label">Delivery</div>'
+  html+='<div class="entrega-opt-sub">Te lo llevamos a tu domicilio</div>'
   html+='</div>'
+  html+='<div class="entrega-opt'+(tipoEntrega==='retiro'?' selected':'')+'" onclick="seleccionarEntrega(\'retiro\')">'
+  html+='<div class="entrega-opt-icon">🏃</div>'
+  html+='<div class="entrega-opt-label">Retiro yo</div>'
+  html+='<div class="entrega-opt-sub">Paso a buscarlo al local</div>'
+  html+='</div>'
+  html+='</div>'
+  if(tipoEntrega==='retiro' && restoActual && restoActual.direccion){
+    html+='<div style="background:#E8F5E9;border-radius:10px;padding:10px 12px;margin-top:8px;font-size:12px;color:#2D6A2D;font-weight:600">📍 Retirás en: '+restoActual.direccion+'</div>'
+  }
+  html+='</div>'
+
+  // DIRECCIÓN — solo si es delivery
+  if(tipoEntrega==='delivery'){
+    html+='<div class="checkout-section"><div class="checkout-section-title">📍 Dirección de entrega</div>'
+    html+='<div class="dir-row"><div class="dir-text">'+(dirEntrega||'Sin dirección')+'</div><div class="dir-change" onclick="abrirModalDir()">Cambiar</div></div>'
+    if(zonaNombre) html+='<div class="zona-badge">🚗 '+zonaNombre+'</div>'
+    html+='</div>'
+  }
 
   html+='<div class="checkout-section"><div class="checkout-section-title">💳 Método de pago</div>'
   html+='<div class="pago-opt'+(metodoPago==='efectivo'?' selected':'')+'" onclick="seleccionarPago(\'efectivo\')">'
@@ -999,9 +1055,11 @@ async function renderCheckout(){
   }
   html+='</div>'
 
-  html+='<div class="checkout-section"><div class="checkout-section-title">🙌 Propina para el cadete (opcional)</div><div class="propina-chips">'
-  PROPINAS.forEach(function(p){ html+='<div class="propina-chip'+(propinaSeleccionada===p?' selected':'')+'" onclick="seleccionarPropina('+p+')">'+(p===0?'Sin propina':'$'+p)+'</div>' })
-  html+='</div></div>'
+  if(tipoEntrega==='delivery'){
+    html+='<div class="checkout-section"><div class="checkout-section-title">🙌 Propina para el cadete (opcional)</div><div class="propina-chips">'
+    PROPINAS.forEach(function(p){ html+='<div class="propina-chip'+(propinaSeleccionada===p?' selected':'')+'" onclick="seleccionarPropina('+p+')">'+(p===0?'Sin propina':'$'+p)+'</div>' })
+    html+='</div></div>'
+  }
 
   html+='<div class="checkout-section"><div class="checkout-section-title">📝 Notas (opcional)</div>'
   html+='<textarea id="checkout-notas" class="notas-input" placeholder="Ej: Sin cebolla, tocar timbre..."></textarea></div>'
@@ -1009,7 +1067,11 @@ async function renderCheckout(){
   html+='<div class="checkout-section"><div class="checkout-section-title">🧾 Resumen</div>'
   carrito.forEach(function(item){ html+='<div class="resumen-row"><span>'+item.qty+'× '+item.nombre+'</span><span>$'+Number(item.precio*item.qty).toLocaleString('es-AR')+'</span></div>' })
   if(descuentoCredito>0) html+='<div class="resumen-row" style="color:#2D6A2D"><span>🎁 Descuento ('+creditoDesc+')</span><span>-$'+Number(descuentoCredito).toLocaleString('es-AR')+'</span></div>'
-  html+='<div class="resumen-row envio"><span>🚗 Envío'+(zonaNombre?' ('+zonaNombre+')':'')+'</span><span>'+(costoEnvio>0?'$'+Number(costoEnvio).toLocaleString('es-AR'):'A calcular')+'</span></div>'
+  if(tipoEntrega==='delivery'){
+    html+='<div class="resumen-row envio"><span>🚗 Envío'+(zonaNombre?' ('+zonaNombre+')':'')+'</span><span>'+(costoEnvio>0?'$'+Number(costoEnvio).toLocaleString('es-AR'):'A calcular')+'</span></div>'
+  } else {
+    html+='<div class="resumen-row" style="color:#2D6A2D"><span>🏃 Retiro en local</span><span>Sin costo de envío</span></div>'
+  }
   if(comisionConfig.activa) html+='<div class="resumen-row comision"><span>⚙️ Comisión ('+comisionConfig.porcentaje+'%)</span><span>$'+Number(comision).toLocaleString('es-AR')+'</span></div>'
   if(propinaSeleccionada>0) html+='<div class="resumen-row propina"><span>🙌 Propina cadete</span><span>$'+Number(propinaSeleccionada).toLocaleString('es-AR')+'</span></div>'
   html+='<div class="resumen-row total"><span>Total</span><span>$'+Number(total).toLocaleString('es-AR')+'</span></div></div>'
@@ -1018,6 +1080,11 @@ async function renderCheckout(){
 
 function seleccionarPago(m){ metodoPago=m; renderCheckout() }
 function seleccionarPropina(p){ propinaSeleccionada=p; renderCheckout() }
+function seleccionarEntrega(tipo){
+  tipoEntrega=tipo
+  if(tipo==='retiro'){ costoEnvio=0; propinaSeleccionada=0 }
+  renderCheckout()
+}
 
 async function subirTicket(input){
   var file=input.files[0]; if(!file) return
@@ -1036,25 +1103,34 @@ async function confirmarPedido(){
     return
   }
 
-  if(!dirEntrega){ err.style.display='block'; err.textContent='Ingresá una dirección de entrega'; return }
+  // Dirección solo obligatoria en delivery
+  if(tipoEntrega==='delivery'){
+    if(!dirEntrega){ err.style.display='block'; err.textContent='Ingresá una dirección de entrega'; return }
+    if(zonaNombre==='Fuera de zona de entrega'){ err.style.display='block'; err.textContent='😔 Por el momento no llegamos a tu dirección.'; return }
+  }
+
   if(!metodoPago){ err.style.display='block'; err.textContent='Seleccioná un método de pago'; return }
   if(metodoPago==='transferencia'&&!ticketUrl){ err.style.display='block'; err.textContent='Subí el comprobante de transferencia'; return }
   if(!carrito.length){ err.style.display='block'; err.textContent='Tu carrito está vacío'; return }
-  if(zonaNombre==='Fuera de zona de entrega'){ err.style.display='block'; err.textContent='😔 Por el momento no llegamos a tu dirección.'; return }
+
+  var costoEnvioFinal = tipoEntrega==='retiro' ? 0 : costoEnvio
+  var propinaFinal = tipoEntrega==='retiro' ? 0 : propinaSeleccionada
+  var dirFinal = tipoEntrega==='retiro' ? ('Retiro en local: '+(restoActual.direccion||restoActual.nombre)) : dirEntrega
 
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
   var descuentoCredito=(aplicarCredito&&descuentoData)?Math.round(subtotal*descuentoData.porcentaje/100):0
   var comision=comisionConfig.activa?Math.round(subtotal*comisionConfig.porcentaje/100):0
-  var total=subtotal+costoEnvio+comision+propinaSeleccionada-descuentoCredito
+  var total=subtotal+costoEnvioFinal+comision+propinaFinal-descuentoCredito
   var notas=document.getElementById('checkout-notas')
 
   var btn=document.getElementById('btn-confirmar'); btn.textContent='Procesando...'
   var res=await sb.from('pedidos').insert([{
     cliente_id:usuarioActual.id, restaurante_id:restoActual.id, items:carrito,
     descuento_credito:descuentoCredito, total:total, subtotal:subtotal,
-    costo_envio:costoEnvio, comision:comision, propina:propinaSeleccionada,
-    estado:'nuevo', direccion_entrega:dirEntrega, metodo_pago:metodoPago,
-    ticket_url:ticketUrl||null, notas:notas?notas.value:''
+    costo_envio:costoEnvioFinal, comision:comision, propina:propinaFinal,
+    estado:'nuevo', direccion_entrega:dirFinal, metodo_pago:metodoPago,
+    ticket_url:ticketUrl||null, notas:notas?notas.value:'',
+    tipo_entrega:tipoEntrega
   }]).select().single()
   btn.textContent='Confirmar pedido ✓'
   if(res.error){ err.style.display='block'; err.textContent='Error: '+res.error.message; return }
@@ -1062,9 +1138,17 @@ async function confirmarPedido(){
   pedidoActivoId=res.data.id
   carrito=[]; metodoPago=null; ticketUrl=null; propinaSeleccionada=0
   if(aplicarCredito){ await usarDescuento(); aplicarCredito=false; descuentoData=null }
+
+  // Guardar el bono pero NO mostrarlo todavía
   await verificarYOtorgarDescuento(res.data.id, usuarioActual.id, restoActual.id)
-  allNuevoPedido()
-  setTimeout(function(){ irA('v-seguimiento'); cargarSeguimiento(pedidoActivoId) }, 2000)
+
+  // Mostrar pantalla de pedido confirmado
+  var itemsHtml = (res.data.items||[]).map(function(i){ return i.qty+'× '+i.nombre }).join('<br>')
+  document.getElementById('modal-confirmado-items').innerHTML = itemsHtml
+  document.getElementById('modal-confirmado-total').textContent = '$'+Number(res.data.total).toLocaleString('es-AR')
+  document.getElementById('modal-confirmado').style.display = 'flex'
+
+  if(typeof allNuevoPedido === 'function') allNuevoPedido()
 }
 
 // ── SEGUIMIENTO ───────────────────────────────────────────────────────────────
@@ -1109,7 +1193,7 @@ async function renderSeguimiento(pedidoId){
   if(p.propina>0) html+='<div class="seg-info-row"><span class="seg-info-label">🙌 Propina</span><span class="seg-info-val">$'+Number(p.propina).toLocaleString('es-AR')+'</span></div>'
   html+='<div class="seg-info-row" style="font-weight:700"><span class="seg-info-label">Total</span><span class="seg-info-val" style="color:#FF4D00">$'+Number(p.total).toLocaleString('es-AR')+'</span></div>'
   html+='<div class="seg-info-row"><span class="seg-info-label">Pago</span><span class="seg-info-val">'+p.metodo_pago+'</span></div>'
-  html+='<div class="seg-info-row"><span class="seg-info-label">Dirección</span><span class="seg-info-val">'+p.direccion_entrega+'</span></div></div>'
+  html+='<div class="seg-info-row"><span class="seg-info-label">'+(p.tipo_entrega==='retiro'?'🏃 Retiro':'📍 Dirección')+'</span><span class="seg-info-val">'+p.direccion_entrega+'</span></div></div>'
   if(p.estado==='entregado') html+='<button class="btn-reclamo" onclick="pedidoActivoId=\''+p.id+'\';irA(\'v-reclamo\')">⚠️ Hacer un reclamo</button>'
   document.getElementById('seg-scroll').innerHTML=html
 }
@@ -1231,13 +1315,28 @@ async function verificarYOtorgarDescuento(pedidoId, clienteId, restauranteId){
   if(perfRes.data&&perfRes.data.descuentos_pendientes) descuentos=perfRes.data.descuentos_pendientes
   descuentos[restauranteId]={porcentaje:porcentaje,pedido_origen:pedidoId}
   await sb.from('perfiles').update({descuentos_pendientes:descuentos}).eq('id',clienteId)
-  document.getElementById('modal-desc-porcentaje').textContent=porcentaje+'% OFF'
+  document.getElementById('modal-desc-porcentaje').textContent=porcentaje+'%'
   document.getElementById('modal-desc-resto').textContent='en '+(restoActual?restoActual.nombre:'este local')
-  document.getElementById('modal-descuento').style.display='flex'
+  // NO mostrar todavía — se muestra después del modal de confirmación
+  bonoPendiente = true
   actualizarBadgeCupones()
 }
 
-function cerrarModalDescuento(){ document.getElementById('modal-descuento').style.display='none' }
+function cerrarModalConfirmado(){
+  document.getElementById('modal-confirmado').style.display='none'
+  // Si hay bono pendiente para mostrar, mostrarlo ahora
+  if(bonoPendiente){
+    bonoPendiente = false
+    document.getElementById('modal-descuento').style.display='flex'
+  } else {
+    irA('v-seguimiento'); cargarSeguimiento(pedidoActivoId)
+  }
+}
+
+function cerrarModalDescuento(){
+  document.getElementById('modal-descuento').style.display='none'
+  irA('v-seguimiento'); cargarSeguimiento(pedidoActivoId)
+}
 
 async function verificarDescuentoDisponible(){
   if(!usuarioActual||!restoActual) return null
