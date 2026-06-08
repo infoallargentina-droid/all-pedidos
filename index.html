@@ -536,7 +536,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 
 <!-- MODAL DESCUENTO -->
 <!-- MODAL PEDIDO CONFIRMADO -->
-<div id="modal-confirmado" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:none;align-items:center;justify-content:center;padding:20px">
+<div id="modal-confirmado" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px">
   <div style="background:#fff;border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center;animation:popIn .3s ease">
     <div style="font-size:64px;margin-bottom:8px">🎉</div>
     <div style="font-size:24px;font-weight:800;color:#1A1A1A;margin-bottom:8px">¡Pedido confirmado!</div>
@@ -553,7 +553,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 </div>
 
 <!-- MODAL BONO DESCUENTO -->
-<div id="modal-descuento" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:none;align-items:center;justify-content:center;padding:20px">
+<div id="modal-descuento" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px">
   <div style="background:#fff;border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center;animation:popIn .3s ease">
     <div style="font-size:48px;margin-bottom:12px">🎁</div>
     <div style="font-size:22px;font-weight:800;color:#1A1A1A;margin-bottom:4px">¡Ganaste un bono!</div>
@@ -1142,13 +1142,16 @@ async function confirmarPedido(){
   // Guardar el bono pero NO mostrarlo todavía
   await verificarYOtorgarDescuento(res.data.id, usuarioActual.id, restoActual.id)
 
-  // Mostrar pantalla de pedido confirmado
+  // Mostrar animación primero, luego el modal
+  if(typeof allNuevoPedido === 'function') allNuevoPedido()
+
+  // Mostrar pantalla de pedido confirmado después de la animación (2.5s)
   var itemsHtml = (res.data.items||[]).map(function(i){ return i.qty+'× '+i.nombre }).join('<br>')
   document.getElementById('modal-confirmado-items').innerHTML = itemsHtml
   document.getElementById('modal-confirmado-total').textContent = '$'+Number(res.data.total).toLocaleString('es-AR')
-  document.getElementById('modal-confirmado').style.display = 'flex'
-
-  if(typeof allNuevoPedido === 'function') allNuevoPedido()
+  setTimeout(function(){
+    document.getElementById('modal-confirmado').style.display = 'flex'
+  }, 2500)
 }
 
 // ── SEGUIMIENTO ───────────────────────────────────────────────────────────────
