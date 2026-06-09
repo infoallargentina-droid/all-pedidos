@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,16 +13,11 @@
 <meta name="apple-touch-fullscreen" content="yes"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icon-192.png"/>
-<title>ALL — Pedidos v2.0</title>
-<style>
-  :root {
-    --sat: env(safe-area-inset-top);
-    --sab: env(safe-area-inset-bottom);
-    --sal: env(safe-area-inset-left);
-    --sar: env(safe-area-inset-right);
-  }
-</style>
+<title>ALL — Pedidos v2.1</title>
+<style>:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom);--sal:env(safe-area-inset-left);--sar:env(safe-area-inset-right)}</style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDp2PL3VtFDvetuzLh1gJkbiWsjHNQl1wU&libraries=places&language=es" async defer></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -175,6 +171,15 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .seg-info-val{font-weight:600;color:#1A1A1A;text-align:right;max-width:60%}
 .btn-reclamo{width:100%;padding:14px;background:#FFF0F0;color:#E24B4A;border:1.5px solid #FFD0D0;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px}
 .seg-cancelado-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;border:2px solid #FFD0D0}
+/* MAPA CADETE */
+.mapa-seguimiento-wrap{background:#fff;border-radius:14px;overflow:hidden;margin-bottom:12px;border:1px solid #eee}
+.mapa-seguimiento-header{padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #f5f5f5;background:#1A1A1A}
+.mapa-seguimiento-header-txt{font-size:13px;font-weight:700;color:#fff}
+.mapa-seguimiento-sub{font-size:11px;color:rgba(255,255,255,0.5);margin-top:1px}
+#mapa-seguimiento-cliente{width:100%;height:240px}
+.cadete-info-strip{padding:10px 14px;display:flex;align-items:center;gap:10px;background:#FFF4EF}
+.cadete-info-nombre{font-size:13px;font-weight:700;color:#1A1A1A}
+.cadete-info-sub{font-size:11px;color:#888}
 .seg-cancelado-title{font-size:13px;font-weight:700;color:#E24B4A;margin-bottom:8px}
 .seg-cancelado-motivo{font-size:14px;color:#1A1A1A;font-weight:600;line-height:1.5}
 
@@ -315,7 +320,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
       <input type="text" id="r-dir" placeholder="Ej: San Martín 542, Bahía Blanca" class="input" autocomplete="off"/>
       <button class="btn-main" onclick="registro()">Crear cuenta →</button>
     </div>
-    <div class="version">ALL Pedidos v2.0</div>
+    <div class="version">ALL Pedidos v2.1</div>
   </div>
 </div>
 
@@ -332,7 +337,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
     <div class="cats-home" id="cats-home"></div>
     <div class="home-section">Todos los locales</div>
     <div class="restos-grid" id="lista-restos-home"><div class="loading-text" style="grid-column:span 2">Cargando...</div></div>
-    <div class="version">ALL Pedidos v2.0</div>
+    <div class="version">ALL Pedidos v2.1</div>
   </div>
   <div class="navbar">
     <button class="nav-item active" onclick="setNavActive3(0)">
@@ -491,7 +496,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
       <button class="btn-main" onclick="guardarPerfil()">Guardar cambios</button>
     </div>
     <button class="btn-sec" onclick="cerrarSesion()">Cerrar sesión</button>
-    <div class="version">ALL Pedidos v2.0</div>
+    <div class="version">ALL Pedidos v2.1</div>
   </div>
   <div class="navbar">
     <button class="nav-item" onclick="irA('v-home');setNavActive3(0)">
@@ -1158,7 +1163,14 @@ async function confirmarPedido(){
 async function cargarSeguimiento(pedidoId){
   if(segInterval) clearInterval(segInterval)
   await renderSeguimiento(pedidoId)
-  segInterval=setInterval(function(){ renderSeguimiento(pedidoId) },10000)
+  segInterval=setInterval(async function(){
+    await renderSeguimiento(pedidoId)
+    // Si hay mapa activo, actualizar ubicación del cadete sin re-renderizar todo
+    var res = await sb.from('pedidos').select('estado,cadete_id').eq('id',pedidoId).single()
+    if(res.data && res.data.estado==='en_camino' && res.data.cadete_id && mapaSegCliente){
+      actualizarUbicacionCadete(res.data.cadete_id)
+    }
+  }, 5000)
 }
 
 async function renderSeguimiento(pedidoId){
@@ -1188,6 +1200,24 @@ async function renderSeguimiento(pedidoId){
     })
     html+='</div>'
   }
+
+  // MAPA EN TIEMPO REAL — solo cuando está en camino
+  if(p.estado==='en_camino'){
+    html+='<div class="mapa-seguimiento-wrap">'
+    html+='<div class="mapa-seguimiento-header">'
+    html+='<div class="seg-estado-icon" style="font-size:24px">🏍</div>'
+    html+='<div><div class="mapa-seguimiento-header-txt">Tu cadete está en camino</div>'
+    html+='<div class="mapa-seguimiento-sub">Ubicación actualizada en tiempo real</div></div></div>'
+    if(p.cadete_nombre){
+      html+='<div class="cadete-info-strip">'
+      html+='<div style="width:36px;height:36px;border-radius:50%;background:#1A1A1A;display:flex;align-items:center;justify-content:center;font-size:18px">🏍</div>'
+      html+='<div><div class="cadete-info-nombre">'+p.cadete_nombre+'</div>'
+      html+='<div class="cadete-info-sub">Tu cadete</div></div></div>'
+    }
+    html+='<div id="mapa-seguimiento-cliente" style="width:100%;height:240px"></div>'
+    html+='</div>'
+  }
+
   html+='<div class="seg-info-card"><div class="seg-info-title">Detalle del pedido</div>'
   if(p.restaurantes) html+='<div class="seg-info-row"><span class="seg-info-label">Local</span><span class="seg-info-val">'+p.restaurantes.nombre+'</span></div>'
   p.items.forEach(function(item){ html+='<div class="seg-info-row"><span class="seg-info-label">'+item.qty+'× '+item.nombre+'</span><span class="seg-info-val">$'+Number(item.precio*item.qty).toLocaleString('es-AR')+'</span></div>' })
@@ -1198,8 +1228,77 @@ async function renderSeguimiento(pedidoId){
   html+='<div class="seg-info-row"><span class="seg-info-label">Pago</span><span class="seg-info-val">'+p.metodo_pago+'</span></div>'
   html+='<div class="seg-info-row"><span class="seg-info-label">'+(p.tipo_entrega==='retiro'?'🏃 Retiro':'📍 Dirección')+'</span><span class="seg-info-val">'+p.direccion_entrega+'</span></div></div>'
   if(p.estado==='entregado') html+='<button class="btn-reclamo" onclick="pedidoActivoId=\''+p.id+'\';irA(\'v-reclamo\')">⚠️ Hacer un reclamo</button>'
+
   document.getElementById('seg-scroll').innerHTML=html
+
+  // Inicializar mapa si está en camino
+  if(p.estado==='en_camino' && p.cadete_id){
+    setTimeout(function(){ iniciarMapaSeguimiento(p) }, 200)
+  }
 }
+
+// ── MAPA SEGUIMIENTO CLIENTE ──────────────────────────────────────────────────
+var mapaSegCliente = null
+var marcadorCadeteCliente = null
+var marcadorClienteDestino = null
+
+function iniciarMapaSeguimiento(pedido){
+  var el = document.getElementById('mapa-seguimiento-cliente')
+  if(!el) return
+  if(mapaSegCliente){ mapaSegCliente.remove(); mapaSegCliente=null }
+
+  mapaSegCliente = L.map('mapa-seguimiento-cliente', {zoomControl:false, attributionControl:false})
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapaSegCliente)
+
+  // Marcador destino (casa del cliente)
+  geocodificarDir(pedido.direccion_entrega, function(lat, lng){
+    if(!lat||!lng) return
+    marcadorClienteDestino = L.marker([lat,lng], {
+      icon: L.divIcon({
+        html:'<div style="background:#FF4D00;color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 8px rgba(0,0,0,0.3)">🏠</div>',
+        iconSize:[36,36], iconAnchor:[18,18], className:''
+      })
+    }).addTo(mapaSegCliente)
+    mapaSegCliente.setView([lat,lng], 14)
+  })
+
+  // Cargar ubicación del cadete
+  actualizarUbicacionCadete(pedido.cadete_id)
+}
+
+async function actualizarUbicacionCadete(cadeteId){
+  var res = await sb.from('cadete_ubicaciones').select('lat,lng,updated_at').eq('cadete_id', cadeteId).single()
+  if(res.error||!res.data||!res.data.lat) return
+  var lat = parseFloat(res.data.lat)
+  var lng = parseFloat(res.data.lng)
+  if(!mapaSegCliente) return
+  if(marcadorCadeteCliente){
+    marcadorCadeteCliente.setLatLng([lat,lng])
+  } else {
+    marcadorCadeteCliente = L.marker([lat,lng], {
+      icon: L.divIcon({
+        html:'<div style="background:#1A1A1A;color:#fff;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 2px 8px rgba(0,0,0,0.4)">🏍</div>',
+        iconSize:[40,40], iconAnchor:[20,20], className:''
+      })
+    }).addTo(mapaSegCliente)
+  }
+  // Centrar entre cadete y destino
+  if(marcadorClienteDestino){
+    var grupo = L.featureGroup([marcadorCadeteCliente, marcadorClienteDestino])
+    mapaSegCliente.fitBounds(grupo.getBounds().pad(0.25))
+  } else {
+    mapaSegCliente.setView([lat,lng], 15)
+  }
+}
+
+function geocodificarDir(dir, cb){
+  fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(dir)+'&format=json&limit=1',{headers:{'User-Agent':'ALL-Pedidos/1.0'}})
+    .then(function(r){ return r.json() })
+    .then(function(data){ if(data&&data.length) cb(parseFloat(data[0].lat),parseFloat(data[0].lon)); else cb(null,null) })
+    .catch(function(){ cb(null,null) })
+}
+
+
 
 // ── MIS PEDIDOS ───────────────────────────────────────────────────────────────
 async function cargarMisPedidos(){
