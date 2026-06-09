@@ -1164,12 +1164,15 @@ async function cargarSeguimiento(pedidoId){
   if(segInterval) clearInterval(segInterval)
   await renderSeguimiento(pedidoId)
   segInterval=setInterval(async function(){
-    await renderSeguimiento(pedidoId)
-    // Si hay mapa activo, actualizar ubicación del cadete sin re-renderizar todo
-    var res = await sb.from('pedidos').select('estado,cadete_id').eq('id',pedidoId).single()
-    if(res.data && res.data.estado==='en_camino' && res.data.cadete_id && mapaSegCliente){
-      actualizarUbicacionCadete(res.data.cadete_id)
+    // Si hay mapa activo, solo actualizar marcador sin re-renderizar
+    if(mapaSegCliente){
+      var res = await sb.from('pedidos').select('estado,cadete_id').eq('id',pedidoId).single()
+      if(res.data && res.data.estado==='en_camino' && res.data.cadete_id){
+        actualizarUbicacionCadete(res.data.cadete_id)
+        return
+      }
     }
+    await renderSeguimiento(pedidoId)
   }, 5000)
 }
 
@@ -1233,7 +1236,9 @@ async function renderSeguimiento(pedidoId){
 
   // Inicializar mapa si está en camino
   if(p.estado==='en_camino' && p.cadete_id){
-    setTimeout(function(){ iniciarMapaSeguimiento(p) }, 200)
+    setTimeout(function(){
+      iniciarMapaSeguimiento(p)
+    }, 400)
   }
 }
 
@@ -1245,12 +1250,22 @@ var marcadorClienteDestino = null
 function iniciarMapaSeguimiento(pedido){
   var el = document.getElementById('mapa-seguimiento-cliente')
   if(!el) return
-  if(mapaSegCliente){ mapaSegCliente.remove(); mapaSegCliente=null }
+  if(mapaSegCliente){ mapaSegCliente.remove(); mapaSegCliente=null; marcadorCadeteCliente=null; marcadorClienteDestino=null }
+
+  // Forzar dimensiones antes de inicializar
+  el.style.height = '240px'
+  el.style.width = '100%'
 
   mapaSegCliente = L.map('mapa-seguimiento-cliente', {zoomControl:false, attributionControl:false})
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapaSegCliente)
 
-  // Marcador destino (casa del cliente)
+  // Centrar en Punta Alta de arranque hasta tener coordenadas reales
+  mapaSegCliente.setView([-38.8833, -62.4000], 14)
+
+  // Forzar re-render del mapa
+  setTimeout(function(){ if(mapaSegCliente) mapaSegCliente.invalidateSize() }, 100)
+
+  // Marcador destino
   geocodificarDir(pedido.direccion_entrega, function(lat, lng){
     if(!lat||!lng) return
     marcadorClienteDestino = L.marker([lat,lng], {
@@ -1259,7 +1274,7 @@ function iniciarMapaSeguimiento(pedido){
         iconSize:[36,36], iconAnchor:[18,18], className:''
       })
     }).addTo(mapaSegCliente)
-    mapaSegCliente.setView([lat,lng], 14)
+    mapaSegCliente.setView([lat,lng], 15)
   })
 
   // Cargar ubicación del cadete
