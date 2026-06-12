@@ -1,37 +1,32 @@
 {
   "name": "ALL Pedidos",
   "short_name": "ALL Pedidos",
-  "description": "Tu comida, cuando querés",
+  "description": "Pedí comida a domicilio en tu ciudad, rápido y fácil.",
   "start_url": "/all-pedidos/",
   "scope": "/all-pedidos/",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#FF4D00",
   "theme_color": "#FF4D00",
+  "orientation": "portrait",
+  "lang": "es-AR",
   "icons": [
     {
-      "src": "favicon-96x96.png",
-      "sizes": "96x96",
-      "type": "image/png"
-    },
-    {
-      "src": "icon-192.png.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "icon-512.png.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png"
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
-  ],
-  "categories": ["food", "shopping"],
-  "lang": "es-AR"
+  ]
 }
