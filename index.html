@@ -855,13 +855,13 @@ async function cargarRestaurantes(){
   var res=await sb.from('restaurantes').select('*').order('nombre')
   if(res.error||!res.data){ lista.innerHTML='<div class="loading-text">Error cargando</div>'; return }
   var emojis={'El Bodegón NKT':'🦞',"Colantonio's":'🍕','Kusama Sushi':'🍣'}
-  lista.innerHTML=res.data.map(function(r){
+  var visibles=res.data.filter(function(r){ return r.abierto!==false })
+  lista.innerHTML=visibles.map(function(r){
     var emoji=emojis[r.nombre]||'🍽'
-    var ab=r.abierto!==false
     var imgContent = r.logo_url ? '<img src="'+r.logo_url+'" style="width:100%;height:100%;object-fit:cover;display:block" alt="'+r.nombre+'"/>' : '<span style="font-size:52px">'+emoji+'</span>'
     return '<div class="resto-card" onclick="abrirResto(\''+r.id+'\')">'
       +'<div class="resto-card-img">'+imgContent
-      +'<span class="resto-card-badge '+(ab?'badge-abierto':'badge-cerrado')+'">'+(ab?'● Abierto':'● Cerrado')+'</span>'
+      +'<span class="resto-card-badge badge-abierto">● Abierto</span>'
       +'</div>'
       +'<div class="resto-card-body">'
       +'<div class="resto-card-nombre">'+r.nombre+'</div>'
@@ -883,6 +883,12 @@ async function abrirResto(restoId){
   actualizarFab()
   var res=await sb.from('restaurantes').select('*').eq('id',restoId).single()
   if(res.error||!res.data) return
+  if(res.data.abierto===false){
+    alert('Este local no está disponible en este momento.')
+    irA('v-home')
+    cargarRestaurantes()
+    return
+  }
   restoActual=res.data
   document.getElementById('menu-resto-nombre').textContent=restoActual.nombre
   document.getElementById('carrito-resto-nombre').textContent=restoActual.nombre
