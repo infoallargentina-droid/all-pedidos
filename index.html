@@ -48,6 +48,16 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .input:focus{border-color:#FF4D00}
 .input.error{border-color:#E24B4A;background:#FFF8F8}
 .btn-main{width:100%;padding:16px;background:#FF4D00;color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer}
+
+.btn-slide{position:relative;width:100%;height:54px;background:#FFE4D6;border-radius:27px;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none}
+.btn-slide-fill{position:absolute;top:0;left:0;height:100%;width:54px;background:linear-gradient(90deg,#FF4D00,#FF7A33);border-radius:27px;transition:width .08s linear}
+.btn-slide-fill.snap{transition:width .25s cubic-bezier(.22,1,.36,1)}
+.btn-slide-label{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#FF4D00;letter-spacing:.2px;pointer-events:none}
+.btn-slide-handle{position:absolute;top:3px;left:3px;width:48px;height:48px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.18);display:flex;align-items:center;justify-content:center;font-size:20px;color:#FF4D00;cursor:grab;transition:left .08s linear}
+.btn-slide-handle.snap{transition:left .25s cubic-bezier(.22,1,.36,1)}
+.btn-slide-handle:active{cursor:grabbing}
+.btn-slide.done .btn-slide-label{color:#fff}
+.btn-slide.disabled{opacity:.5;pointer-events:none}
 .btn-sec{width:100%;padding:14px;background:#f5f5f5;color:#1A1A1A;border:none;border-radius:14px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
 .pass-wrap{position:relative;margin-bottom:14px}
 .pass-wrap .input{margin-bottom:0;padding-right:48px}
@@ -302,7 +312,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
       <input type="email" id="l-email" placeholder="tu@email.com" class="input"/>
       <div class="field-label">Contraseña</div>
       <div class="pass-wrap"><input type="password" id="l-pass" placeholder="••••••••" class="input"/><span class="pass-ojo" onclick="togglePass('l-pass',this)">👁</span></div>
-      <button class="btn-main" onclick="login()">Ingresar →</button>
+      <div class="btn-slide" id="slide-login" data-action="login()"><div class="btn-slide-fill"></div><div class="btn-slide-label">Deslizá para ingresar</div><div class="btn-slide-handle">→</div></div>
     </div>
     <div id="auth-registro" class="hidden">
       <div id="err-registro" class="msg-err"></div>
@@ -319,7 +329,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
       <div class="pass-wrap"><input type="password" id="r-pass" placeholder="Mínimo 6 caracteres" class="input"/><span class="pass-ojo" onclick="togglePass('r-pass',this)">👁</span></div>
       <div class="field-label required">Dirección de entrega</div>
       <input type="text" id="r-dir" placeholder="Ej: San Martín 542, Bahía Blanca" class="input" autocomplete="off"/>
-      <button class="btn-main" onclick="registro()">Crear cuenta →</button>
+      <div class="btn-slide" id="slide-registro" data-action="registro()"><div class="btn-slide-fill"></div><div class="btn-slide-label">Deslizá para crear tu cuenta</div><div class="btn-slide-handle">→</div></div>
     </div>
     <div class="version">ALL Pedidos v2.1</div>
   </div>
@@ -389,7 +399,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
   <div class="carrito-footer">
     <div class="carrito-subtotal"><span>Subtotal</span><span id="carrito-subtotal-val">$0</span></div>
     <div class="carrito-total-row"><span style="font-size:14px;font-weight:600;color:#888">Total estimado</span><div class="carrito-total-val" id="carrito-total">$0</div></div>
-    <button class="btn-main" onclick="irA('v-checkout');renderCheckout()">Continuar →</button>
+    <div class="btn-slide" id="slide-continuar" data-action="irA('v-checkout');renderCheckout()"><div class="btn-slide-fill"></div><div class="btn-slide-label">Deslizá para continuar</div><div class="btn-slide-handle">→</div></div>
   </div>
 </div>
 
@@ -402,7 +412,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
   <div class="checkout-scroll" id="checkout-scroll"></div>
   <div class="checkout-footer">
     <div id="err-checkout" class="msg-err"></div>
-    <button class="btn-main" id="btn-confirmar" onclick="confirmarPedido()">Confirmar pedido ✓</button>
+    <div class="btn-slide" id="slide-confirmar" data-action="confirmarPedido()"><div class="btn-slide-fill"></div><div class="btn-slide-label">Deslizá para confirmar pedido</div><div class="btn-slide-handle">✓</div></div>
   </div>
 </div>
 
@@ -699,6 +709,66 @@ function irACompletarPerfil(){
   }, 300)
 }
 
+// ── SLIDE TO CONFIRM ─────────────────────────────────────────────────────────
+function initSlideBtn(el){
+  if(!el || el._slideInit) return
+  el._slideInit = true
+  var fill = el.querySelector('.btn-slide-fill')
+  var handle = el.querySelector('.btn-slide-handle')
+  var action = el.getAttribute('data-action')
+  var dragging = false, startX = 0, maxX = 0, current = 0
+
+  function metrics(){ maxX = el.clientWidth - handle.clientWidth - 6 }
+  function setPos(x, snap){
+    x = Math.max(0, Math.min(maxX, x))
+    current = x
+    if(snap){ fill.classList.add('snap'); handle.classList.add('snap') }
+    else { fill.classList.remove('snap'); handle.classList.remove('snap') }
+    handle.style.left = (3 + x) + 'px'
+    fill.style.width = (x + handle.clientWidth + 3) + 'px'
+  }
+  function onStart(clientX){
+    if(el.classList.contains('disabled') || el.classList.contains('done')) return
+    metrics()
+    dragging = true
+    startX = clientX - current
+  }
+  function onMove(clientX){
+    if(!dragging) return
+    setPos(clientX - startX, false)
+  }
+  function onEnd(){
+    if(!dragging) return
+    dragging = false
+    if(maxX>0 && current >= maxX * 0.82){
+      setPos(maxX, true)
+      el.classList.add('done')
+      setTimeout(function(){
+        if(action) new Function(action)()
+      }, 150)
+    } else {
+      setPos(0, true)
+    }
+  }
+  handle.addEventListener('touchstart', function(e){ onStart(e.touches[0].clientX) }, {passive:true})
+  handle.addEventListener('touchmove', function(e){ onMove(e.touches[0].clientX) }, {passive:true})
+  handle.addEventListener('touchend', onEnd)
+  handle.addEventListener('mousedown', function(e){ e.preventDefault(); onStart(e.clientX) })
+  window.addEventListener('mousemove', function(e){ onMove(e.clientX) })
+  window.addEventListener('mouseup', onEnd)
+}
+function resetSlideBtn(el){
+  if(!el) return
+  el.classList.remove('done')
+  var fill = el.querySelector('.btn-slide-fill')
+  var handle = el.querySelector('.btn-slide-handle')
+  if(fill) fill.style.width = '54px'
+  if(handle) handle.style.left = '3px'
+}
+function initAllSlideBtns(){
+  document.querySelectorAll('.btn-slide').forEach(initSlideBtn)
+}
+
 // ── NAVEGACIÓN ────────────────────────────────────────────────────────────────
 function irA(vistaId){
   document.querySelectorAll('.vista').forEach(function(v){ v.classList.remove('activa') })
@@ -752,9 +822,9 @@ async function login(){
   var email=document.getElementById('l-email').value.trim()
   var pass=document.getElementById('l-pass').value
   var err=document.getElementById('err-login'); err.style.display='none'
-  if(!email||!pass){ err.style.display='block'; err.textContent='Completá email y contraseña'; return }
+  if(!email||!pass){ err.style.display='block'; err.textContent='Completá email y contraseña'; resetSlideBtn(document.getElementById('slide-login')); return }
   var res=await sb.auth.signInWithPassword({email:email,password:pass})
-  if(res.error){ err.style.display='block'; err.textContent='Email o contraseña incorrectos'; return }
+  if(res.error){ err.style.display='block'; err.textContent='Email o contraseña incorrectos'; resetSlideBtn(document.getElementById('slide-login')); return }
   usuarioActual=res.data.user
   await cargarPerfil()
   irA('v-home'); await cargarCategoriasTipos(); cargarRestaurantes()
@@ -770,14 +840,14 @@ async function registro(){
   var err=document.getElementById('err-registro'); err.style.display='none'
 
   // Validaciones obligatorias
-  if(!nombre){ err.style.display='block'; err.textContent='El nombre es obligatorio'; document.getElementById('r-nombre').classList.add('error'); return }
-  if(!tel){ err.style.display='block'; err.textContent='El teléfono es obligatorio'; document.getElementById('r-tel').classList.add('error'); return }
-  if(!email){ err.style.display='block'; err.textContent='El email es obligatorio'; document.getElementById('r-email').classList.add('error'); return }
-  if(!pass||pass.length<6){ err.style.display='block'; err.textContent='La contraseña debe tener al menos 6 caracteres'; return }
-  if(!dir){ err.style.display='block'; err.textContent='La dirección de entrega es obligatoria'; document.getElementById('r-dir').classList.add('error'); return }
+  if(!nombre){ err.style.display='block'; err.textContent='El nombre es obligatorio'; document.getElementById('r-nombre').classList.add('error'); resetSlideBtn(document.getElementById('slide-registro')); return }
+  if(!tel){ err.style.display='block'; err.textContent='El teléfono es obligatorio'; document.getElementById('r-tel').classList.add('error'); resetSlideBtn(document.getElementById('slide-registro')); return }
+  if(!email){ err.style.display='block'; err.textContent='El email es obligatorio'; document.getElementById('r-email').classList.add('error'); resetSlideBtn(document.getElementById('slide-registro')); return }
+  if(!pass||pass.length<6){ err.style.display='block'; err.textContent='La contraseña debe tener al menos 6 caracteres'; resetSlideBtn(document.getElementById('slide-registro')); return }
+  if(!dir){ err.style.display='block'; err.textContent='La dirección de entrega es obligatoria'; document.getElementById('r-dir').classList.add('error'); resetSlideBtn(document.getElementById('slide-registro')); return }
 
   var res=await sb.auth.signUp({email:email,password:pass,options:{data:{nombre:nombre}}})
-  if(res.error){ err.style.display='block'; err.textContent='Error: '+res.error.message; return }
+  if(res.error){ err.style.display='block'; err.textContent='Error: '+res.error.message; resetSlideBtn(document.getElementById('slide-registro')); return }
   usuarioActual=res.data.user
   await sb.from('perfiles').upsert({id:usuarioActual.id,nombre:nombre,telefono:tel,direccion_base:dir})
   perfilActual={nombre:nombre,telefono:tel,direccion_base:dir}
@@ -969,6 +1039,7 @@ function actualizarFab(){
 }
 
 function renderCarrito(){
+  resetSlideBtn(document.getElementById('slide-continuar'))
   var scroll=document.getElementById('carrito-scroll')
   if(!carrito.length){ scroll.innerHTML='<div class="loading-text">Tu carrito está vacío</div>'; return }
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
@@ -1010,6 +1081,11 @@ function haversine(lat1,lng1,lat2,lng2){
 
 // ── CHECKOUT ──────────────────────────────────────────────────────────────────
 async function renderCheckout(){
+  resetSlideBtn(document.getElementById('slide-confirmar'))
+  if(document.getElementById('slide-confirmar')){
+    var lbl=document.getElementById('slide-confirmar').querySelector('.btn-slide-label')
+    if(lbl) lbl.textContent='Deslizá para confirmar pedido'
+  }
   descuentoData = await verificarDescuentoDisponible()
   var creditoDesc = descuentoData ? descuentoData.porcentaje+'% OFF en '+(restoActual?restoActual.nombre:'este local') : null
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
@@ -1107,23 +1183,25 @@ async function subirTicket(input){
 
 async function confirmarPedido(){
   var err=document.getElementById('err-checkout'); err.style.display='none'
+  var slideConfirmar=document.getElementById('slide-confirmar')
 
   // Verificar perfil completo
   if(!perfilCompleto()){
     err.style.display='block'; err.textContent='Completá tu perfil (nombre, teléfono y dirección) antes de hacer un pedido'
+    resetSlideBtn(slideConfirmar)
     setTimeout(function(){ irACompletarPerfil() }, 1500)
     return
   }
 
   // Dirección solo obligatoria en delivery
   if(tipoEntrega==='delivery'){
-    if(!dirEntrega){ err.style.display='block'; err.textContent='Ingresá una dirección de entrega'; return }
-    if(zonaNombre==='Fuera de zona de entrega'){ err.style.display='block'; err.textContent='😔 Por el momento no llegamos a tu dirección.'; return }
+    if(!dirEntrega){ err.style.display='block'; err.textContent='Ingresá una dirección de entrega'; resetSlideBtn(slideConfirmar); return }
+    if(zonaNombre==='Fuera de zona de entrega'){ err.style.display='block'; err.textContent='😔 Por el momento no llegamos a tu dirección.'; resetSlideBtn(slideConfirmar); return }
   }
 
-  if(!metodoPago){ err.style.display='block'; err.textContent='Seleccioná un método de pago'; return }
-  if(metodoPago==='transferencia'&&!ticketUrl){ err.style.display='block'; err.textContent='Subí el comprobante de transferencia'; return }
-  if(!carrito.length){ err.style.display='block'; err.textContent='Tu carrito está vacío'; return }
+  if(!metodoPago){ err.style.display='block'; err.textContent='Seleccioná un método de pago'; resetSlideBtn(slideConfirmar); return }
+  if(metodoPago==='transferencia'&&!ticketUrl){ err.style.display='block'; err.textContent='Subí el comprobante de transferencia'; resetSlideBtn(slideConfirmar); return }
+  if(!carrito.length){ err.style.display='block'; err.textContent='Tu carrito está vacío'; resetSlideBtn(slideConfirmar); return }
 
   var costoEnvioFinal = tipoEntrega==='retiro' ? 0 : costoEnvio
   var propinaFinal = tipoEntrega==='retiro' ? 0 : propinaSeleccionada
@@ -1135,7 +1213,8 @@ async function confirmarPedido(){
   var total=subtotal+costoEnvioFinal+comision+propinaFinal-descuentoCredito
   var notas=document.getElementById('checkout-notas')
 
-  var btn=document.getElementById('btn-confirmar'); btn.textContent='Procesando...'
+  var slideLabel=slideConfirmar?slideConfirmar.querySelector('.btn-slide-label'):null
+  if(slideLabel) slideLabel.textContent='Procesando...'
   var res=await sb.from('pedidos').insert([{
     cliente_id:usuarioActual.id, restaurante_id:restoActual.id, items:carrito,
     descuento_credito:descuentoCredito, total:total, subtotal:subtotal,
@@ -1144,8 +1223,11 @@ async function confirmarPedido(){
     ticket_url:ticketUrl||null, notas:notas?notas.value:'',
     tipo_entrega:tipoEntrega
   }]).select().single()
-  btn.textContent='Confirmar pedido ✓'
-  if(res.error){ err.style.display='block'; err.textContent='Error: '+res.error.message; return }
+  if(res.error){
+    if(slideLabel) slideLabel.textContent='Deslizá para confirmar pedido'
+    resetSlideBtn(slideConfirmar)
+    err.style.display='block'; err.textContent='Error: '+res.error.message; return
+  }
 
   pedidoActivoId=res.data.id
   carrito=[]; metodoPago=null; ticketUrl=null; propinaSeleccionada=0
@@ -1507,7 +1589,7 @@ function initAutocomplete(){
   })
 }
 window.initAutocomplete=initAutocomplete
-document.addEventListener('DOMContentLoaded',function(){ setTimeout(initAutocomplete,1000) })
+document.addEventListener('DOMContentLoaded',function(){ setTimeout(initAutocomplete,1000); setTimeout(initAllSlideBtns,300) })
 var _origAbrirModalDir=abrirModalDir
 abrirModalDir=function(){ _origAbrirModalDir(); setTimeout(initAutocomplete,200) }
 
