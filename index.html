@@ -24,8 +24,8 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;overflow:hidden;background:#f5f5f5}
 body{font-family:system-ui,-apple-system,sans-serif}
-.vista{display:none;width:100%;height:100%;min-height:100vh;max-height:100vh;flex-direction:column;overflow:hidden}
-html,body{height:100%;max-height:100vh;overflow:hidden}
+.vista{display:none;width:100%;height:100vh;min-height:100vh;max-height:100vh;height:100dvh;min-height:100dvh;max-height:100dvh;flex-direction:column;overflow:hidden}
+html,body{height:100%;max-height:100vh;max-height:100dvh;overflow:hidden}
 .vista.activa{display:flex}
 
 #v-splash{background:#FF4D00;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding-top:env(safe-area-inset-top)}
@@ -93,7 +93,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .menu-topbar-row{display:flex;align-items:center;gap:10px;padding-bottom:12px}
 .back-btn{font-size:28px;color:#1A1A1A;cursor:pointer;background:none;border:none;padding:0;line-height:1}
 .menu-resto-nombre{font-size:16px;font-weight:700;color:#1A1A1A;flex:1}
-.carrito-fab{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;border:none;border-radius:28px;padding:14px 24px;font-size:14px;font-weight:700;cursor:pointer;display:none;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(0,0,0,0.3);z-index:50;white-space:nowrap}
+.carrito-fab{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;border:none;border-radius:30px;padding:18px 26px;min-height:54px;font-size:14px;font-weight:700;cursor:pointer;display:none;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(0,0,0,0.3);z-index:50;white-space:nowrap;-webkit-tap-highlight-color:rgba(255,77,0,0.25);touch-action:manipulation}
 .carrito-fab.visible{display:flex}
 .carrito-fab-count{background:#FF4D00;border-radius:20px;padding:3px 10px;font-size:13px;font-weight:800}
 .cat-tabs{display:flex;gap:8px;overflow-x:auto;padding:0 0 12px;scrollbar-width:none}
@@ -124,7 +124,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .carrito-item-nombre{font-size:14px;font-weight:700;color:#1A1A1A}
 .carrito-item-precio{font-size:13px;color:#888;margin-top:2px}
 .carrito-item-sub{font-size:14px;font-weight:700;color:#FF4D00;min-width:70px;text-align:right}
-.carrito-footer{background:#fff;padding:14px 20px 20px;border-top:1px solid #eee;flex-shrink:0}
+.carrito-footer{background:#fff;padding:14px 20px calc(20px + env(safe-area-inset-bottom));border-top:1px solid #eee;flex-shrink:0}
 .carrito-subtotal{display:flex;justify-content:space-between;font-size:13px;color:#888;margin-bottom:6px}
 .carrito-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .carrito-total-val{font-size:22px;font-weight:800;color:#1A1A1A}
@@ -155,7 +155,7 @@ html,body{height:100%;max-height:100vh;overflow:hidden}
 .resumen-row.propina{color:#2D6A2D}
 .zona-badge{display:inline-block;background:#E3F2FD;color:#1565C0;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-top:6px}
 .notas-input{width:100%;padding:12px;font-size:13px;border-radius:10px;border:1.5px solid #eee;background:#fafafa;color:#1A1A1A;outline:none;resize:none;height:70px}
-.checkout-footer{background:#fff;padding:14px 20px 20px;border-top:1px solid #eee;flex-shrink:0}
+.checkout-footer{background:#fff;padding:14px 20px calc(20px + env(safe-area-inset-bottom));border-top:1px solid #eee;flex-shrink:0}
 
 #v-seguimiento{background:#f5f5f5}
 .seg-topbar{background:#fff;padding:calc(44px + env(safe-area-inset-top)) 16px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;flex-shrink:0}
