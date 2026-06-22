@@ -49,14 +49,14 @@ html,body{height:100%;max-height:100vh;max-height:100dvh;overflow:hidden}
 .input.error{border-color:#E24B4A;background:#FFF8F8}
 .btn-main{width:100%;padding:16px;background:#FF4D00;color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer}
 
-.btn-slide{position:relative;width:100%;height:54px;background:#FFE4D6;border-radius:27px;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none}
-.btn-slide-fill{position:absolute;top:0;left:0;height:100%;width:54px;background:linear-gradient(90deg,#FF4D00,#FF7A33);border-radius:27px;transition:width .08s linear}
+.btn-slide{position:relative;width:100%;height:54px;background:#FF4D00;border-radius:27px;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none;box-shadow:0 2px 8px rgba(255,77,0,0.35)}
+.btn-slide-fill{position:absolute;top:0;left:0;height:100%;width:54px;background:rgba(0,0,0,0.18);border-radius:27px;transition:width .08s linear}
 .btn-slide-fill.snap{transition:width .25s cubic-bezier(.22,1,.36,1)}
-.btn-slide-label{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#FF4D00;letter-spacing:.2px;pointer-events:none}
-.btn-slide-handle{position:absolute;top:3px;left:3px;width:48px;height:48px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.18);display:flex;align-items:center;justify-content:center;font-size:20px;color:#FF4D00;cursor:grab;transition:left .08s linear}
+.btn-slide-label{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;letter-spacing:.3px;pointer-events:none;text-shadow:0 1px 2px rgba(0,0,0,0.15)}
+.btn-slide-handle{position:absolute;top:5px;left:5px;width:44px;height:44px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.22);display:flex;align-items:center;justify-content:center;font-size:20px;color:#FF4D00;cursor:grab;transition:left .08s linear;font-weight:700}
 .btn-slide-handle.snap{transition:left .25s cubic-bezier(.22,1,.36,1)}
 .btn-slide-handle:active{cursor:grabbing}
-.btn-slide.done .btn-slide-label{color:#fff}
+.btn-slide.done .btn-slide-fill{width:100%!important}
 .btn-slide.disabled{opacity:.5;pointer-events:none}
 .btn-sec{width:100%;padding:14px;background:#f5f5f5;color:#1A1A1A;border:none;border-radius:14px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
 .pass-wrap{position:relative;margin-bottom:14px}
@@ -127,6 +127,12 @@ html,body{height:100%;max-height:100vh;max-height:100dvh;overflow:hidden}
 .carrito-footer{background:#fff;padding:14px 20px calc(20px + env(safe-area-inset-bottom));border-top:1px solid #eee;flex-shrink:0}
 .carrito-subtotal{display:flex;justify-content:space-between;font-size:13px;color:#888;margin-bottom:6px}
 .carrito-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.hora-picker{margin-bottom:14px}
+.hora-picker-label{font-size:12px;font-weight:600;color:#888;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.hora-chips{display:flex;gap:8px;flex-wrap:wrap}
+.hora-chip{padding:8px 14px;border-radius:20px;border:2px solid #eee;background:#fff;font-size:13px;font-weight:600;color:#888;cursor:pointer;transition:all .15s;touch-action:manipulation}
+.hora-chip.active{border-color:#FF4D00;background:#FF4D00;color:#fff}
+.hora-chip-programado{background:#FFF3EE;border-color:#FF4D00;color:#FF4D00;font-size:12px;margin-top:6px;width:100%;text-align:center;padding:6px;border-radius:10px;display:none}
 .carrito-total-val{font-size:22px;font-weight:800;color:#1A1A1A}
 
 #v-checkout{background:#f5f5f5}
@@ -161,6 +167,8 @@ html,body{height:100%;max-height:100vh;max-height:100dvh;overflow:hidden}
 .seg-topbar{background:#fff;padding:calc(44px + env(safe-area-inset-top)) 16px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;flex-shrink:0}
 .seg-scroll{flex:1;overflow-y:auto;padding:14px}
 .seg-estado-card{border-radius:18px;padding:20px;margin-bottom:14px;text-align:center}
+.seg-hora-card{background:#FFF3EE;border:1.5px solid #FF4D00;border-radius:12px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:#FF4D00;text-align:center}
+.seg-hora-card.alt{background:#FFF8E1;border-color:#FFA000;color:#E65100}
 .seg-estado-icon{font-size:52px;margin-bottom:8px}
 .seg-estado-label{font-size:22px;font-weight:800;color:#fff}
 .seg-estado-sub{font-size:13px;color:rgba(255,255,255,0.9);margin-top:6px;line-height:1.5;padding:0 8px}
@@ -399,6 +407,16 @@ html,body{height:100%;max-height:100vh;max-height:100dvh;overflow:hidden}
   <div class="carrito-footer">
     <div class="carrito-subtotal"><span>Subtotal</span><span id="carrito-subtotal-val">$0</span></div>
     <div class="carrito-total-row"><span style="font-size:14px;font-weight:600;color:#888">Total estimado</span><div class="carrito-total-val" id="carrito-total">$0</div></div>
+    <div class="hora-picker">
+      <div class="hora-picker-label">🕐 ¿Cuándo lo querés?</div>
+      <div class="hora-chips">
+        <div class="hora-chip active" onclick="seleccionarHora('ahora',this)">Ahora</div>
+        <div class="hora-chip" onclick="seleccionarHora('1h',this)">En 1h</div>
+        <div class="hora-chip" onclick="seleccionarHora('2h',this)">En 2h</div>
+        <div class="hora-chip" onclick="seleccionarHora('3h',this)">En 3h</div>
+      </div>
+      <div class="hora-chip-programado" id="hora-chip-info"></div>
+    </div>
     <div class="btn-slide" id="slide-continuar" data-action="irA('v-checkout');renderCheckout()"><div class="btn-slide-fill"></div><div class="btn-slide-label">Deslizá para continuar</div><div class="btn-slide-handle">→</div></div>
   </div>
 </div>
@@ -630,6 +648,8 @@ var perfilActual = null
 var restoActual = null
 var carrito = []
 var metodoPago = null
+var horaPedido = 'ahora' // 'ahora' | '1h' | '2h' | '3h'
+var horaPedidoTimestamp = null // Date ISO del momento de entrega esperado
 var ticketUrl = null
 var dirEntrega = ''
 var propinaSeleccionada = 0
@@ -1038,8 +1058,32 @@ function actualizarFab(){
   else { fab.classList.remove('visible') }
 }
 
+function seleccionarHora(opcion, el){
+  horaPedido = opcion
+  document.querySelectorAll('.hora-chip').forEach(function(c){ c.classList.remove('active') })
+  el.classList.add('active')
+  var info = document.getElementById('hora-chip-info')
+  if(opcion === 'ahora'){
+    horaPedidoTimestamp = null
+    info.style.display = 'none'
+  } else {
+    var mins = opcion === '1h' ? 60 : opcion === '2h' ? 120 : 180
+    var fecha = new Date(Date.now() + mins * 60000)
+    horaPedidoTimestamp = fecha.toISOString()
+    var h = fecha.getHours().toString().padStart(2,'0')
+    var m = fecha.getMinutes().toString().padStart(2,'0')
+    info.style.display = 'block'
+    info.textContent = '📅 Entrega estimada a las ' + h + ':' + m + ' hs'
+  }
+}
+
 function renderCarrito(){
   resetSlideBtn(document.getElementById('slide-continuar'))
+  // Resetear selector de hora
+  horaPedido = 'ahora'; horaPedidoTimestamp = null
+  document.querySelectorAll('.hora-chip').forEach(function(c,i){ c.classList.toggle('active', i===0) })
+  var info = document.getElementById('hora-chip-info')
+  if(info) info.style.display = 'none'
   var scroll=document.getElementById('carrito-scroll')
   if(!carrito.length){ scroll.innerHTML='<div class="loading-text">Tu carrito está vacío</div>'; return }
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
@@ -1221,7 +1265,9 @@ async function confirmarPedido(){
     costo_envio:costoEnvioFinal, comision:comision, propina:propinaFinal,
     estado:'nuevo', direccion_entrega:dirFinal, metodo_pago:metodoPago,
     ticket_url:ticketUrl||null, notas:notas?notas.value:'',
-    tipo_entrega:tipoEntrega
+    tipo_entrega:tipoEntrega,
+    hora_pedido:horaPedido,
+    hora_entrega_esperada:horaPedidoTimestamp
   }]).select().single()
   if(res.error){
     if(slideLabel) slideLabel.textContent='Deslizá para confirmar pedido'
@@ -1283,7 +1329,24 @@ async function renderSeguimiento(pedidoId){
     html+='<button class="btn-main" onclick="irA(\'v-home\')" style="margin-bottom:12px">🏠 Volver al inicio</button>'
   } else {
     html+='<div class="seg-estado-sub">'+estado.sub+'</div></div>'
-    html+='<div class="seg-steps">'
+  // HORA PROGRAMADA
+  if(p.hora_pedido && p.hora_pedido !== 'ahora'){
+    var horaStr = ''
+    if(p.hora_entrega_alternativa){
+      var alt = new Date(p.hora_entrega_alternativa)
+      var hh = alt.getHours().toString().padStart(2,'0')
+      var mm = alt.getMinutes().toString().padStart(2,'0')
+      horaStr = '🔄 El local propuso otra hora: <strong>'+hh+':'+mm+' hs</strong>'
+      html += '<div class="seg-hora-card alt">'+horaStr+'<div style="font-size:11px;color:#888;margin-top:4px">Podés comunicarte con el local si tenés dudas.</div></div>'
+    } else if(p.hora_entrega_esperada){
+      var esp = new Date(p.hora_entrega_esperada)
+      var hhe = esp.getHours().toString().padStart(2,'0')
+      var mme = esp.getMinutes().toString().padStart(2,'0')
+      html += '<div class="seg-hora-card">📅 Pedido programado para las <strong>'+hhe+':'+mme+' hs</strong></div>'
+    }
+  }
+
+  html+='<div class="seg-steps">'
     pasos.forEach(function(paso,i){
       var done=i<idxActual, active=i===idxActual, e=ESTADOS[paso]
       html+='<div class="seg-step"><div class="seg-step-dot '+(done?'done':active?'active':'')+'">'+e.icon+'</div>'
