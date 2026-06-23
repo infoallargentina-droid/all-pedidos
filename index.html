@@ -343,6 +343,19 @@ html,body{height:100%;max-height:100vh;max-height:100dvh;overflow:hidden}
   </div>
 </div>
 
+<!-- BANNER PWA -->
+<div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#1A1A1A;color:#fff;padding:14px 16px;padding-bottom:calc(14px + env(safe-area-inset-bottom));box-shadow:0 -4px 20px rgba(0,0,0,0.3)">
+  <div style="display:flex;align-items:center;gap:12px">
+    <img src="icons/icon-192.png" style="width:48px;height:48px;border-radius:12px;flex-shrink:0" onerror="this.style.display='none'"/>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:14px;font-weight:700">Instalá ALL en tu teléfono</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-top:2px">Pedí más rápido, sin abrir el navegador</div>
+    </div>
+    <button id="pwa-install-btn" style="background:#FF4D00;color:#fff;border:none;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer;touch-action:manipulation;flex-shrink:0">Instalar</button>
+    <button onclick="cerrarBannerPWA()" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:20px;cursor:pointer;padding:4px;flex-shrink:0">✕</button>
+  </div>
+</div>
+
 <!-- HOME -->
 <div id="v-home" class="vista">
   <div class="topbar-home">
@@ -649,6 +662,26 @@ const { createClient } = supabase
 const sb = createClient(SUPABASE_URL, ANON_KEY)
 
 var usuarioActual = null
+
+// Verifica si un timestamp (o la hora actual si no se pasa) está dentro del horario del local
+function restoEstaAbierto(horarios, timestampISO){
+  if(!horarios) return true // sin horarios → siempre abierto
+  var fecha = timestampISO ? new Date(timestampISO) : new Date()
+  var partes = new Intl.DateTimeFormat('es-AR',{
+    timeZone:'America/Argentina/Buenos_Aires',
+    weekday:'long', hour:'2-digit', minute:'2-digit', hour12:false
+  }).formatToParts(fecha)
+  var dia = partes.find(function(p){ return p.type==='weekday' }).value.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+  var hora = parseInt(partes.find(function(p){ return p.type==='hour' }).value)
+  var min = parseInt(partes.find(function(p){ return p.type==='minute' }).value)
+  var minutos = hora*60 + min
+  var horarioDia = horarios[dia]
+  if(!horarioDia || !horarioDia.activo) return false
+  var apertura = parseInt(horarioDia.apertura.split(':')[0])*60 + parseInt(horarioDia.apertura.split(':')[1])
+  var cierre = parseInt(horarioDia.cierre.split(':')[0])*60 + parseInt(horarioDia.cierre.split(':')[1])
+  return minutos >= apertura && minutos < cierre
+}
 var perfilActual = null
 var restoActual = null
 var carrito = []
@@ -934,6 +967,24 @@ async function abrirResto(restoId){
     return
   }
   restoActual=res.data
+
+  // Validar horario del local (en hora Argentina)
+  if(res.data.horarios && !res.data.abierto){
+    // ya sabemos que está cerrado (abierto=false ya lo checkeamos arriba)
+  }
+  if(res.data.horarios && res.data.abierto !== false){
+    if(!restoEstaAbierto(res.data.horarios)){
+      // Calcular próxima apertura para mostrársela al cliente
+      var diasNombres = ['domingo','lunes','martes','miercoles','jueves','viernes','sabado']
+      var diaHoy = new Intl.DateTimeFormat('es-AR',{timeZone:'America/Argentina/Buenos_Aires',weekday:'long'}).format(new Date()).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      var hDia = res.data.horarios[diaHoy]
+      var msgHorario = hDia && hDia.activo ? 'Hoy abre a las '+hDia.apertura+' hs.' : 'Hoy no hay atención.'
+      alert('😔 '+res.data.nombre+' está cerrado en este momento.\n'+msgHorario)
+      irA('v-home')
+      cargarRestaurantes()
+      return
+    }
+  }
   document.getElementById('menu-resto-nombre').textContent=restoActual.nombre
   document.getElementById('carrito-resto-nombre').textContent=restoActual.nombre
   if(dirEntrega && restoActual.lat && restoActual.lng) await calcularZonaEnvio()
@@ -1172,8 +1223,17 @@ async function renderCheckout(){
   html+='<div class="pago-opt'+(metodoPago==='transferencia'?' selected':'')+'" onclick="seleccionarPago(\'transferencia\')">'
   html+='<div class="pago-opt-icon">🏦</div><div class="pago-opt-info"><div class="pago-opt-label">Transferencia</div><div class="pago-opt-sub">Subí el comprobante</div></div><div class="pago-check">'+(metodoPago==='transferencia'?'✓':'')+'</div></div>'
   if(metodoPago==='transferencia'){
+    var aliasInfo = ''
+    if(restoActual && restoActual.alias_transferencia){
+      aliasInfo = '<div style="margin-top:8px;padding:12px;background:#FFF3EE;border-radius:10px;border:1.5px solid #FF4D00">'
+        +'<div style="font-size:11px;color:#888;font-weight:600;margin-bottom:4px">DATOS PARA TRANSFERIR</div>'
+        +(restoActual.titular_transferencia ? '<div style="font-size:13px;font-weight:600;color:#1A1A1A">'+restoActual.titular_transferencia+'</div>' : '')
+        +'<div style="font-size:15px;font-weight:700;color:#FF4D00;letter-spacing:.5px">'+restoActual.alias_transferencia+'</div>'
+        +'</div>'
+    }
     html+='<div style="margin-top:10px;padding:14px;background:#f5f5f5;border-radius:12px;border:1.5px dashed #ddd;text-align:center;cursor:pointer" onclick="document.getElementById(\'ticket-input\').click()">📎 '+(ticketUrl?'✓ Comprobante cargado':'Subir comprobante')+'</div>'
     if(ticketUrl) html+='<img src="'+ticketUrl+'" style="width:100%;border-radius:10px;margin-top:8px"/>'
+    html+=aliasInfo
   }
   html+='</div>'
 
@@ -1236,6 +1296,19 @@ async function confirmarPedido(){
   if(!metodoPago){ err.style.display='block'; err.textContent='Seleccioná un método de pago'; resetSlideBtn(slideConfirmar); return }
   if(metodoPago==='transferencia'&&!ticketUrl){ err.style.display='block'; err.textContent='Subí el comprobante de transferencia'; resetSlideBtn(slideConfirmar); return }
   if(!carrito.length){ err.style.display='block'; err.textContent='Tu carrito está vacío'; resetSlideBtn(slideConfirmar); return }
+
+  // Validar horario del local
+  if(restoActual && restoActual.horarios){
+    var tsAValidar = horaPedidoTimestamp || null // null = ahora
+    if(!restoEstaAbierto(restoActual.horarios, tsAValidar)){
+      var diaHoy = new Intl.DateTimeFormat('es-AR',{timeZone:'America/Argentina/Buenos_Aires',weekday:'long'}).format(new Date()).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      var hDia = restoActual.horarios[diaHoy]
+      var msgErr = horaPedidoTimestamp
+        ? '😔 El local no atiende a esa hora. ' + (hDia&&hDia.activo ? 'Hoy cierra a las '+hDia.cierre+' hs.' : 'Hoy no hay atención.')
+        : '😔 El local está cerrado en este momento. ' + (hDia&&hDia.activo ? 'Hoy abre a las '+hDia.apertura+' hs.' : 'Hoy no hay atención.')
+      err.style.display='block'; err.textContent=msgErr; resetSlideBtn(slideConfirmar); return
+    }
+  }
 
   var costoEnvioFinal = tipoEntrega==='retiro' ? 0 : costoEnvio
   var propinaFinal = tipoEntrega==='retiro' ? 0 : propinaSeleccionada
@@ -1781,8 +1854,29 @@ function togglePass(inputId,btn){
     }
   }
 
-  window.allNuevoPedido=allNuevoPedido;
-})();
+// ── BANNER PWA ────────────────────────────────────────────────────────────────
+var deferredInstallPrompt = null
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault()
+  deferredInstallPrompt = e
+  // Solo mostrar si no lo cerró antes y no está ya instalada
+  if(!localStorage.getItem('pwa-banner-cerrado') && !window.matchMedia('(display-mode: standalone)').matches){
+    setTimeout(function(){ document.getElementById('pwa-banner').style.display='block' }, 3000)
+  }
+})
+document.getElementById('pwa-install-btn').addEventListener('click', function(){
+  if(!deferredInstallPrompt) return
+  deferredInstallPrompt.prompt()
+  deferredInstallPrompt.userChoice.then(function(){ cerrarBannerPWA() })
+})
+function cerrarBannerPWA(){
+  document.getElementById('pwa-banner').style.display='none'
+  localStorage.setItem('pwa-banner-cerrado','1')
+}
+// Si ya está instalada como PWA, nunca mostrar el banner
+if(window.matchMedia('(display-mode: standalone)').matches){
+  localStorage.setItem('pwa-banner-cerrado','1')
+}
 </script>
 </body>
 </html>
