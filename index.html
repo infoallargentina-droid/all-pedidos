@@ -674,13 +674,18 @@ function restoEstaAbierto(horarios, timestampISO){
   }).formatToParts(fecha)
   var dia = partes.find(function(p){ return p.type==='weekday' }).value.toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-  var hora = parseInt(partes.find(function(p){ return p.type==='hour' }).value)
-  var min = parseInt(partes.find(function(p){ return p.type==='minute' }).value)
+  var horaVal = partes.find(function(p){ return p.type==='hour' }).value
+  var minVal = partes.find(function(p){ return p.type==='minute' }).value
+  var hora = parseInt(horaVal) === 24 ? 0 : parseInt(horaVal) // algunos browsers dan "24" para medianoche
+  var min = parseInt(minVal)
   var minutos = hora*60 + min
   var horarioDia = horarios[dia]
   if(!horarioDia || !horarioDia.activo) return false
   var apertura = parseInt(horarioDia.apertura.split(':')[0])*60 + parseInt(horarioDia.apertura.split(':')[1])
-  var cierre = parseInt(horarioDia.cierre.split(':')[0])*60 + parseInt(horarioDia.cierre.split(':')[1])
+  var cierreH = parseInt(horarioDia.cierre.split(':')[0])
+  var cierreM = parseInt(horarioDia.cierre.split(':')[1])
+  // 00:00 como cierre = medianoche = fin del día (1440 min)
+  var cierre = (cierreH === 0 && cierreM === 0) ? 1440 : cierreH*60 + cierreM
   return minutos >= apertura && minutos < cierre
 }
 var perfilActual = null
@@ -933,13 +938,19 @@ async function cargarRestaurantes(){
   var res=await sb.from('restaurantes').select('*').order('nombre')
   if(res.error||!res.data){ lista.innerHTML='<div class="loading-text">Error cargando</div>'; return }
   var emojis={'El Bodegón NKT':'🦞',"Colantonio's":'🍕','Kusama Sushi':'🍣'}
+  // Filtrar solo los que no están pausados manualmente
   var visibles=res.data.filter(function(r){ return r.abierto!==false })
   lista.innerHTML=visibles.map(function(r){
     var emoji=emojis[r.nombre]||'🍽'
+    // Determinar si está realmente abierto según horario
+    var abiertoReal = r.horarios ? restoEstaAbierto(r.horarios) : true
+    var badgeClass = abiertoReal ? 'badge-abierto' : 'badge-cerrado'
+    var badgeText = abiertoReal ? '● Abierto' : '● Cerrado'
     var imgContent = r.logo_url ? '<img src="'+r.logo_url+'" style="width:100%;height:100%;object-fit:cover;display:block" alt="'+r.nombre+'"/>' : '<span style="font-size:52px">'+emoji+'</span>'
-    return '<div class="resto-card" onclick="abrirResto(\''+r.id+'\')">'
+    var cardStyle = abiertoReal ? '' : 'opacity:0.75'
+    return '<div class="resto-card" onclick="abrirResto(\''+r.id+'\')" style="'+cardStyle+'">'
       +'<div class="resto-card-img">'+imgContent
-      +'<span class="resto-card-badge badge-abierto">● Abierto</span>'
+      +'<span class="resto-card-badge '+badgeClass+'">'+badgeText+'</span>'
       +'</div>'
       +'<div class="resto-card-body">'
       +'<div class="resto-card-nombre">'+r.nombre+'</div>'
