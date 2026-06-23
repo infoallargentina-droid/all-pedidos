@@ -286,6 +286,7 @@ html,body{height:100%;max-height:100vh;max-height:100dvh;overflow:hidden}
 .cupones-empty{text-align:center;padding:40px 20px;color:#888;font-size:14px}
 @keyframes popIn{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
 @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes fadeInBg{from{opacity:0}to{opacity:1}}
 </style>
 </head>
 <body>
@@ -961,9 +962,7 @@ async function abrirResto(restoId){
   var res=await sb.from('restaurantes').select('*').eq('id',restoId).single()
   if(res.error||!res.data) return
   if(res.data.abierto===false){
-    alert('Este local no está disponible en este momento.')
-    irA('v-home')
-    cargarRestaurantes()
+    mostrarAlerta('Local no disponible', 'Este local no está disponible en este momento. Podés elegir otro restaurante.', function(){ irA('v-home'); cargarRestaurantes() })
     return
   }
   restoActual=res.data
@@ -979,9 +978,7 @@ async function abrirResto(restoId){
       var diaHoy = new Intl.DateTimeFormat('es-AR',{timeZone:'America/Argentina/Buenos_Aires',weekday:'long'}).format(new Date()).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
       var hDia = res.data.horarios[diaHoy]
       var msgHorario = hDia && hDia.activo ? 'Hoy abre a las '+hDia.apertura+' hs.' : 'Hoy no hay atención.'
-      alert('😔 '+res.data.nombre+' está cerrado en este momento.\n'+msgHorario)
-      irA('v-home')
-      cargarRestaurantes()
+      mostrarAlerta('Local cerrado', res.data.nombre+' no está atendiendo en este momento.<br><br>'+msgHorario, function(){ irA('v-home'); cargarRestaurantes() })
       return
     }
   }
@@ -1732,6 +1729,26 @@ async function detectarUbicacion(){
       }
     } catch(e){}
   },function(){},{timeout:10000,maximumAge:300000})
+}
+
+function mostrarAlerta(titulo, mensaje, onClose){
+  var bg = document.createElement('div')
+  bg.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9000;display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeInBg .2s ease'
+  bg.innerHTML =
+    '<div style="background:#fff;border-radius:24px;width:100%;max-width:340px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:popIn .25s cubic-bezier(.22,1,.36,1)">'
+    +'<div style="background:#FF4D00;padding:20px 20px 16px;text-align:center">'
+    +'<div style="font-size:36px;margin-bottom:6px">🔴</div>'
+    +'<div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:1.5px;text-transform:uppercase">ALL Pedidos</div>'
+    +'</div>'
+    +'<div style="padding:20px 20px 24px;text-align:center">'
+    +'<div style="font-size:17px;font-weight:700;color:#1A1A1A;margin-bottom:8px">'+titulo+'</div>'
+    +'<div style="font-size:14px;color:#666;line-height:1.5;margin-bottom:20px">'+mensaje+'</div>'
+    +'<button id="alerta-btn-ok" style="width:100%;padding:16px;background:#FF4D00;color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;touch-action:manipulation">Entendido</button>'
+    +'</div></div>'
+  document.body.appendChild(bg)
+  function cerrar(){ bg.remove(); if(onClose) onClose() }
+  bg.querySelector('#alerta-btn-ok').addEventListener('click', cerrar)
+  bg.addEventListener('click', function(e){ if(e.target===bg) cerrar() })
 }
 
 function mostrarToast(msg){
