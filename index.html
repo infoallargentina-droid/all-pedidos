@@ -1,6 +1,5 @@
 
 
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -13,6 +12,30 @@
 <meta name="theme-color" content="#FF4D00"/>
 <meta name="apple-touch-fullscreen" content="yes"/>
 <link rel="manifest" href="manifest.json"/>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "1b144508-a68c-4823-b96d-6e1cf5a10fa0",
+      allowLocalhostAsSecureOrigin: true
+    });
+  });
+  // Vincula el usuario logueado con OneSignal para poder enviarle notis
+  async function vincularOneSignal(userId){
+    if(!userId) return
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      try {
+        await OneSignal.login(userId)
+        // Pedir permiso de notificaciones si no lo dio aún
+        if(OneSignal.Notifications.permission === false){
+          await OneSignal.Notifications.requestPermission()
+        }
+      } catch(e){ console.log('OneSignal:', e) }
+    });
+  }
+</script>
 <link rel="apple-touch-icon" href="icon-192.png"/>
 <title>ALL — Pedidos v2.1</title>
 <style>:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom);--sal:env(safe-area-inset-left);--sar:env(safe-area-inset-right)}</style>
@@ -840,6 +863,7 @@ sb.auth.getSession().then(async function(res){
   await cargarConfiguracion()
   if(res.data.session){
     usuarioActual = res.data.session.user
+    vincularOneSignal(usuarioActual.id)
     await cargarPerfil()
     irA('v-home')
     await cargarCategoriasTipos()
@@ -878,6 +902,7 @@ async function login(){
   var res=await sb.auth.signInWithPassword({email:email,password:pass})
   if(res.error){ err.style.display='block'; err.textContent='Email o contraseña incorrectos'; resetSlideBtn(document.getElementById('slide-login')); return }
   usuarioActual=res.data.user
+  vincularOneSignal(usuarioActual.id)
   await cargarPerfil()
   irA('v-home'); await cargarCategoriasTipos(); seleccionarCategoria('comida')
   actualizarBadgeCupones(); actualizarBadgePerfil()
@@ -901,6 +926,7 @@ async function registro(){
   var res=await sb.auth.signUp({email:email,password:pass,options:{data:{nombre:nombre}}})
   if(res.error){ err.style.display='block'; err.textContent='Error: '+res.error.message; resetSlideBtn(document.getElementById('slide-registro')); return }
   usuarioActual=res.data.user
+  vincularOneSignal(usuarioActual.id)
   await sb.from('perfiles').upsert({id:usuarioActual.id,nombre:nombre,telefono:tel,direccion_base:dir})
   perfilActual={nombre:nombre,telefono:tel,direccion_base:dir}
   dirEntrega=dir
@@ -1429,6 +1455,28 @@ async function confirmarPedido(){
 }
 
 // ── SEGUIMIENTO ───────────────────────────────────────────────────────────────
+async function responderHoraAlt(pedidoId, acepta){
+  if(acepta){
+    // Cliente acepta la hora alternativa → se vuelve la hora esperada oficial
+    var pedRes = await sb.from('pedidos').select('hora_entrega_alternativa').eq('id',pedidoId).single()
+    var nuevaHora = pedRes.data ? pedRes.data.hora_entrega_alternativa : null
+    await sb.from('pedidos').update({
+      hora_alt_respondida: 'aceptada',
+      hora_entrega_esperada: nuevaHora
+    }).eq('id', pedidoId)
+    mostrarToast('✅ Confirmaste la nueva hora')
+  } else {
+    // Cliente rechaza → cancela el pedido
+    if(!confirm('¿Seguro que querés cancelar el pedido?')) return
+    await sb.from('pedidos').update({
+      estado: 'cancelado',
+      motivo_cancelacion: 'El cliente no aceptó la hora propuesta por el local'
+    }).eq('id', pedidoId)
+    mostrarToast('Pedido cancelado')
+  }
+  renderSeguimiento(pedidoId)
+}
+
 async function cargarSeguimiento(pedidoId){
   if(segInterval) clearInterval(segInterval)
   await renderSeguimiento(pedidoId)
@@ -1470,8 +1518,18 @@ async function renderSeguimiento(pedidoId){
       var alt = new Date(p.hora_entrega_alternativa)
       var hh = alt.getHours().toString().padStart(2,'0')
       var mm = alt.getMinutes().toString().padStart(2,'0')
-      horaStr = '🔄 El local propuso otra hora: <strong>'+hh+':'+mm+' hs</strong>'
-      html += '<div class="seg-hora-card alt">'+horaStr+'<div style="font-size:11px;color:#888;margin-top:4px">Podés comunicarte con el local si tenés dudas.</div></div>'
+      if(p.hora_alt_respondida === 'aceptada'){
+        // Ya aceptó — mostrar confirmado
+        html += '<div class="seg-hora-card">✅ Confirmaste la entrega para las <strong>'+hh+':'+mm+' hs</strong></div>'
+      } else {
+        // Pendiente de respuesta — mostrar botones
+        horaStr = '🔄 El local te propone otra hora de entrega: <strong>'+hh+':'+mm+' hs</strong>'
+        html += '<div class="seg-hora-card alt">'+horaStr
+        html += '<div style="display:flex;gap:8px;margin-top:12px">'
+        html += '<button onclick="responderHoraAlt(\''+p.id+'\',true)" style="flex:1;padding:12px;background:#2D6A2D;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;touch-action:manipulation">✅ Acepto</button>'
+        html += '<button onclick="responderHoraAlt(\''+p.id+'\',false)" style="flex:1;padding:12px;background:#fff;color:#E24B4A;border:1.5px solid #E24B4A;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;touch-action:manipulation">❌ No me sirve</button>'
+        html += '</div></div>'
+      }
     } else if(p.hora_entrega_esperada){
       var esp = new Date(p.hora_entrega_esperada)
       var hhe = esp.getHours().toString().padStart(2,'0')
