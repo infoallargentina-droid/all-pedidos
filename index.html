@@ -244,13 +244,14 @@ html,body{height:100%;max-height:100vh;max-height:100dvh;overflow:hidden}
 #v-reclamo{background:#f5f5f5}
 .reclamo-topbar{background:#fff;padding:calc(44px + env(safe-area-inset-top)) 16px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;flex-shrink:0}
 
-.navbar{display:flex;background:#fff;border-top:1px solid #eee;flex-shrink:0;padding-bottom:max(14px,env(safe-area-inset-bottom));padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px 4px;cursor:pointer;border:none;background:none;position:relative}
-.nav-item-icon{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:.2s}
-.nav-item.active .nav-item-icon{background:#FFF0E5}
-.nav-item-icon svg{width:22px;height:22px;stroke:#aaa;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.navbar{display:flex;background:#fff;border-top:1px solid #eee;flex-shrink:0;padding:8px 8px max(14px,env(safe-area-inset-bottom));padding-left:max(8px,env(safe-area-inset-left));padding-right:max(8px,env(safe-area-inset-right));gap:6px}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 4px;cursor:pointer;border:none;background:#f7f7f7;position:relative;border-radius:14px;touch-action:manipulation;transition:background .15s,transform .1s;min-height:62px}
+.nav-item:active{transform:scale(.95)}
+.nav-item.active{background:#FFF0E5}
+.nav-item-icon{width:30px;height:30px;display:flex;align-items:center;justify-content:center;transition:.2s}
+.nav-item-icon svg{width:26px;height:26px;stroke:#999;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .nav-item.active .nav-item-icon svg{stroke:#FF4D00}
-.nav-item-label{font-size:10px;font-weight:600;color:#aaa;margin-top:3px}
+.nav-item-label{font-size:11px;font-weight:700;color:#999;margin-top:0}
 .nav-item.active .nav-item-label{color:#FF4D00}
 .nav-dot{position:absolute;top:6px;right:calc(50% - 18px);width:8px;height:8px;background:#FF4D00;border-radius:50%;border:2px solid #fff;display:none}
 .nav-dot.show{display:block}
@@ -400,7 +401,7 @@ html,body{height:100%;max-height:100vh;max-height:100dvh;overflow:hidden}
   </div>
   <div class="franja-argentina">🇦🇷 Orgullosamente argentinos</div>
   <div class="navbar">
-    <button class="nav-item active" onclick="setNavActive3(0)">
+    <button class="nav-item active" onclick="irA('v-home');setNavActive3(0);seleccionarCategoria('comida')">
       <div class="nav-item-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
       <div class="nav-item-label">Inicio</div>
     </button>
@@ -448,6 +449,7 @@ html,body{height:100%;max-height:100vh;max-height:100dvh;overflow:hidden}
   <div class="carrito-footer">
     <div class="carrito-subtotal"><span>Subtotal</span><span id="carrito-subtotal-val">$0</span></div>
     <div class="carrito-total-row"><span style="font-size:14px;font-weight:600;color:#888">Total estimado</span><div class="carrito-total-val" id="carrito-total">$0</div></div>
+    <div style="font-size:11px;color:#aaa;margin:-8px 0 12px">El costo de envío se calcula en el siguiente paso según cómo lo quieras recibir.</div>
     <div class="hora-picker">
       <div class="hora-picker-label">🕐 ¿Cuándo lo querés?</div>
       <div class="hora-chips">
@@ -744,6 +746,15 @@ const ESTADOS = {
   listo:      { label:'Listo para retirar',      icon:'✅',  color:'#2D6A2D', sub:'Tu pedido está listo' },
   entregado:  { label:'¡Entregado!',             icon:'✅',  color:'#2D6A2D', sub:'Tu pedido llegó. ¡Buen provecho!' },
   cancelado:  { label:'Pedido rechazado',        icon:'❌',  color:'#E24B4A', sub:'El local no pudo aceptar tu pedido' }
+}
+
+// Devuelve el estado adaptado según el tipo de entrega (retiro vs delivery)
+function getEstado(estadoKey, tipoEntrega){
+  var e = ESTADOS[estadoKey] || ESTADOS.nuevo
+  if(tipoEntrega==='retiro' && estadoKey==='en_camino'){
+    return { label:'Listo para retirar', icon:'🛍', color:'#2D6A2D', sub:'Tu pedido está listo. Podés pasar a retirarlo por el local.' }
+  }
+  return e
 }
 
 // ── VERIFICACIÓN DE PERFIL ────────────────────────────────────────────────────
@@ -1192,7 +1203,8 @@ function renderCarrito(){
   var subtotal=carrito.reduce(function(s,i){ return s+i.precio*i.qty },0)
   var descuentoCredito=(aplicarCredito&&descuentoData)?Math.round(subtotal*descuentoData.porcentaje/100):0
   var comision=comisionConfig.activa?Math.round(subtotal*comisionConfig.porcentaje/100):0
-  var total=Math.max(0,subtotal+costoEnvio+comision+propinaSeleccionada-descuentoCredito)
+  // En el carrito NO se incluye el envío — se calcula en el checkout según delivery/retiro
+  var total=Math.max(0,subtotal+comision-descuentoCredito)
   scroll.innerHTML=carrito.map(function(item){
     var sub=item.precio*item.qty
     return '<div class="carrito-item"><div class="carrito-item-info"><div class="carrito-item-nombre">'+item.nombre+'</div><div class="carrito-item-precio">$'+Number(item.precio).toLocaleString('es-AR')+' c/u</div></div>'
@@ -1436,7 +1448,7 @@ async function cargarSeguimiento(pedidoId){
 async function renderSeguimiento(pedidoId){
   var res=await sb.from('pedidos').select('*,restaurantes(nombre)').eq('id',pedidoId).single()
   if(res.error||!res.data) return
-  var p=res.data, estado=ESTADOS[p.estado]||ESTADOS.nuevo
+  var p=res.data, esRetiro=p.tipo_entrega==='retiro', estado=getEstado(p.estado, p.tipo_entrega)
   var pasos=['nuevo','preparando','en_camino','entregado'], idxActual=pasos.indexOf(p.estado)
   var html=''
   html+='<div class="seg-estado-card" style="background:'+estado.color+'">'
@@ -1470,7 +1482,7 @@ async function renderSeguimiento(pedidoId){
 
   html+='<div class="seg-steps">'
     pasos.forEach(function(paso,i){
-      var done=i<idxActual, active=i===idxActual, e=ESTADOS[paso]
+      var done=i<idxActual, active=i===idxActual, e=getEstado(paso, p.tipo_entrega)
       html+='<div class="seg-step"><div class="seg-step-dot '+(done?'done':active?'active':'')+'">'+e.icon+'</div>'
       html+='<div class="seg-step-info"><div class="seg-step-label '+(done?'done':active?'active':'')+'">'+e.label+'</div></div></div>'
       if(i<pasos.length-1) html+='<div class="seg-step-line '+(done?'done':'')+'"></div>'
@@ -1478,8 +1490,8 @@ async function renderSeguimiento(pedidoId){
     html+='</div>'
   }
 
-  // MAPA EN TIEMPO REAL — solo cuando está en camino
-  if(p.estado==='en_camino'){
+  // MAPA EN TIEMPO REAL — solo cuando está en camino Y es delivery (no retiro)
+  if(p.estado==='en_camino' && !esRetiro){
     html+='<div class="mapa-seguimiento-wrap">'
     html+='<div class="mapa-seguimiento-header">'
     html+='<div class="seg-estado-icon" style="font-size:24px">🏍</div>'
@@ -1608,7 +1620,7 @@ async function cargarMisPedidos(){
       +'<div class="pedido-hist-head"><span class="pedido-hist-num">'+(p.restaurantes?p.restaurantes.nombre:'Pedido')+'</span><span class="pedido-hist-fecha">'+fecha+'</span></div>'
       +'<div class="pedido-hist-items">'+items+'</div>'
       +'<div class="pedido-hist-footer"><span style="font-size:15px;font-weight:700;color:#1A1A1A">$'+Number(p.total).toLocaleString('es-AR')+'</span>'
-      +'<span class="tag '+(tagC[p.estado]||'tag-nuevo')+'">'+(tagL[p.estado]||p.estado)+'</span></div></div>'
+      +'<span class="tag '+(tagC[p.estado]||'tag-nuevo')+'">'+((p.estado==='en_camino'&&p.tipo_entrega==='retiro')?'Listo p/ retirar':(tagL[p.estado]||p.estado))+'</span></div></div>'
   }).join('')
 }
 
