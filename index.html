@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1470,7 +1471,8 @@ async function responderHoraAlt(pedidoId, acepta){
     if(!confirm('¿Seguro que querés cancelar el pedido?')) return
     await sb.from('pedidos').update({
       estado: 'cancelado',
-      motivo_cancelacion: 'El cliente no aceptó la hora propuesta por el local'
+      motivo_cancelacion: 'El cliente no aceptó la hora propuesta por el local',
+      cancelado_por: 'cliente'
     }).eq('id', pedidoId)
     mostrarToast('Pedido cancelado')
   }
