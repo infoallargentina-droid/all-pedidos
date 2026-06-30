@@ -1280,7 +1280,8 @@ async function renderCheckout(){
   var html=''
 
   if(creditoDesc){
-    html+='<div class="premio-banner" onclick="toggleAplicarCredito()" style="'+(aplicarCredito?'background:linear-gradient(135deg,#2D6A2D,#388E3C)':''')+'">'
+    var bannerStyle=aplicarCredito?'background:linear-gradient(135deg,#2D6A2D,#388E3C)':''
+    html+='<div class="premio-banner" onclick="toggleAplicarCredito()" style="'+bannerStyle+'">'
     html+='<div class="premio-banner-icon">'+(aplicarCredito?'✅':'🎁')+'</div>'
     html+='<div class="premio-banner-info"><div class="premio-banner-title">'+creditoDesc+'</div>'
     html+='<div class="premio-banner-sub">'+(aplicarCredito?'✓ Descuento aplicado automáticamente':'Tocá para aplicar el descuento')+'</div></div>'
@@ -2013,6 +2014,9 @@ function togglePass(inputId,btn){
       setTimeout(function(){ p.remove(); },dur+delay+100);
     }
   }
+
+  window.allNuevoPedido = allNuevoPedido
+})()
 
 // ── BANNER PWA ────────────────────────────────────────────────────────────────
 var deferredInstallPrompt = null
