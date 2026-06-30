@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -38,7 +39,7 @@
   }
 </script>
 <link rel="apple-touch-icon" href="icon-192.png"/>
-<title>ALL — Pedidos v2.1</title>
+<title>ALL — Pedidos v2.2</title>
 <style>:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom);--sal:env(safe-area-inset-left);--sar:env(safe-area-inset-right)}</style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -377,7 +378,7 @@ html,body{height:100%;max-height:100vh;max-height:100dvh;overflow:hidden}
       <input type="text" id="r-dir" placeholder="Ej: San Martín 542, Bahía Blanca" class="input" autocomplete="off"/>
       <button class="btn-action" id="slide-registro" onclick="registro()">Crear cuenta →</button>
     </div>
-    <div class="version">ALL Pedidos v2.1</div>
+    <div class="version">ALL Pedidos v2.2</div>
   </div>
 </div>
 
@@ -421,7 +422,7 @@ html,body{height:100%;max-height:100vh;max-height:100dvh;overflow:hidden}
     </div>
     <div class="home-section" id="home-section-title">Todos los locales</div>
     <div class="restos-grid" id="lista-restos-home"><div class="loading-text" style="grid-column:span 2">Cargando...</div></div>
-    <div class="version">ALL Pedidos v2.1</div>
+    <div class="version">ALL Pedidos v2.2</div>
   </div>
   <div class="franja-argentina">🇦🇷 Orgullosamente argentinos</div>
   <div class="navbar">
@@ -597,7 +598,7 @@ html,body{height:100%;max-height:100vh;max-height:100dvh;overflow:hidden}
       <button class="btn-main" onclick="guardarPerfil()">Guardar cambios</button>
     </div>
     <button class="btn-sec" onclick="cerrarSesion()">Cerrar sesión</button>
-    <div class="version">ALL Pedidos v2.1</div>
+    <div class="version">ALL Pedidos v2.2</div>
   </div>
   <div class="navbar">
     <button class="nav-item" onclick="irA('v-home');setNavActive3(0)">
@@ -1038,7 +1039,7 @@ async function cargarRestaurantes(){
     var badgeText = abiertoReal ? '● Abierto' : '● Cerrado'
     var imgContent = r.logo_url ? '<img src="'+r.logo_url+'" style="width:100%;height:100%;object-fit:cover;display:block" alt="'+r.nombre+'"/>' : '<span style="font-size:52px">'+emoji+'</span>'
     var cardStyle = abiertoReal ? '' : 'opacity:0.75'
-    return '<div class="resto-card" onclick="abrirResto(\''+r.id+'\')" style="'+cardStyle+'">'
+    return '<div class="resto-card" onclick="aplicarCredito=false;abrirResto(\''+r.id+'\')" style="'+cardStyle+'">'
       +'<div class="resto-card-img">'+imgContent
       +'<span class="resto-card-badge '+badgeClass+'">'+badgeText+'</span>'
       +'</div>'
@@ -1279,10 +1280,10 @@ async function renderCheckout(){
   var html=''
 
   if(creditoDesc){
-    html+='<div class="premio-banner" onclick="toggleAplicarCredito()">'
-    html+='<div class="premio-banner-icon">🎁</div>'
-    html+='<div class="premio-banner-info"><div class="premio-banner-title">Tenés '+creditoDesc+'</div>'
-    html+='<div class="premio-banner-sub">'+(aplicarCredito?'✓ Descuento aplicado':'Tocá para aplicar el descuento')+'</div></div>'
+    html+='<div class="premio-banner" onclick="toggleAplicarCredito()" style="'+(aplicarCredito?'background:linear-gradient(135deg,#2D6A2D,#388E3C)':''')+'">'
+    html+='<div class="premio-banner-icon">'+(aplicarCredito?'✅':'🎁')+'</div>'
+    html+='<div class="premio-banner-info"><div class="premio-banner-title">'+creditoDesc+'</div>'
+    html+='<div class="premio-banner-sub">'+(aplicarCredito?'✓ Descuento aplicado automáticamente':'Tocá para aplicar el descuento')+'</div></div>'
     html+='<div class="premio-banner-arrow">'+(aplicarCredito?'✓':'›')+'</div></div>'
   }
 
@@ -1712,7 +1713,11 @@ async function cargarCupones(){
   }).join('')
 }
 
-async function irARestoConCupon(restoId){ irA('v-home'); await abrirResto(restoId) }
+async function irARestoConCupon(restoId){
+  aplicarCredito = true  // activar el cupón automáticamente
+  irA('v-home')
+  await abrirResto(restoId)
+}
 
 async function actualizarBadgeCupones(){
   if(!usuarioActual) return
