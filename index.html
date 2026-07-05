@@ -1039,7 +1039,7 @@ async function cargarRestaurantes(){
     var badgeText = abiertoReal ? '● Abierto' : '● Cerrado'
     var imgContent = r.logo_url ? '<img src="'+r.logo_url+'" style="width:100%;height:100%;object-fit:cover;display:block" alt="'+r.nombre+'"/>' : '<span style="font-size:52px">'+emoji+'</span>'
     var cardStyle = abiertoReal ? '' : 'opacity:0.75'
-    return '<div class="resto-card" onclick="aplicarCredito=false;abrirResto(\''+r.id+'\')" style="'+cardStyle+'">'
+    return '<div class="resto-card" onclick="abrirResto(\''+r.id+'\')" style="'+cardStyle+'">'
       +'<div class="resto-card-img">'+imgContent
       +'<span class="resto-card-badge '+badgeClass+'">'+badgeText+'</span>'
       +'</div>'
@@ -1372,8 +1372,9 @@ function seleccionarEntrega(tipo){
 async function subirTicket(input){
   var file=input.files[0]; if(!file) return
   var ext=file.name.split('.').pop()
-  var up=await sb.storage.from('productos').upload('tickets/'+Date.now()+'.'+ext,file,{upsert:true})
-  if(!up.error){ ticketUrl=sb.storage.from('productos').getPublicUrl('tickets/'+Date.now()+'.'+ext).data.publicUrl; renderCheckout() }
+  var fileName='tickets/'+Date.now()+'.'+ext
+  var up=await sb.storage.from('productos').upload(fileName,file,{upsert:true})
+  if(!up.error){ ticketUrl=sb.storage.from('productos').getPublicUrl(fileName).data.publicUrl; renderCheckout() }
 }
 
 async function confirmarPedido(){
@@ -1715,7 +1716,7 @@ async function cargarCupones(){
 }
 
 async function irARestoConCupon(restoId){
-  aplicarCredito = true  // activar el cupón automáticamente
+  aplicarCredito = true
   irA('v-home')
   await abrirResto(restoId)
 }
@@ -1745,8 +1746,9 @@ async function enviarReclamo(){
   var fi=document.getElementById('reclamo-foto-input')
   if(fi.files[0]){
     var file=fi.files[0], ext=file.name.split('.').pop()
-    var up=await sb.storage.from('productos').upload('reclamos/'+Date.now()+'.'+ext,file,{upsert:true})
-    if(!up.error) fotoUrl=sb.storage.from('productos').getPublicUrl('reclamos/'+Date.now()+'.'+ext).data.publicUrl
+    var fileNameR='reclamos/'+Date.now()+'.'+ext
+    var up=await sb.storage.from('productos').upload(fileNameR,file,{upsert:true})
+    if(!up.error) fotoUrl=sb.storage.from('productos').getPublicUrl(fileNameR).data.publicUrl
   }
   var res=await sb.from('reclamos').insert([{pedido_id:pedidoActivoId,cliente_id:usuarioActual.id,descripcion:desc,foto_url:fotoUrl}])
   if(res.error){ err.style.display='block'; err.textContent='Error enviando reclamo'; return }
