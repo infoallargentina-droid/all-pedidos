@@ -39,7 +39,7 @@
   }
 </script>
 <link rel="apple-touch-icon" href="icon-192.png"/>
-<title>ALL — Pedidos v2.2</title>
+<title>ALL — Pedidos v2.3</title>
 <style>:root{--sat:env(safe-area-inset-top);--sab:env(safe-area-inset-bottom);--sal:env(safe-area-inset-left);--sar:env(safe-area-inset-right)}</style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -378,7 +378,7 @@ html,body{height:100%;max-height:100vh;max-height:100dvh;overflow:hidden}
       <input type="text" id="r-dir" placeholder="Ej: San Martín 542, Bahía Blanca" class="input" autocomplete="off"/>
       <button class="btn-action" id="slide-registro" onclick="registro()">Crear cuenta →</button>
     </div>
-    <div class="version">ALL Pedidos v2.2</div>
+    <div class="version">ALL Pedidos v2.3</div>
   </div>
 </div>
 
@@ -422,7 +422,7 @@ html,body{height:100%;max-height:100vh;max-height:100dvh;overflow:hidden}
     </div>
     <div class="home-section" id="home-section-title">Todos los locales</div>
     <div class="restos-grid" id="lista-restos-home"><div class="loading-text" style="grid-column:span 2">Cargando...</div></div>
-    <div class="version">ALL Pedidos v2.2</div>
+    <div class="version">ALL Pedidos v2.3</div>
   </div>
   <div class="franja-argentina">🇦🇷 Orgullosamente argentinos</div>
   <div class="navbar">
@@ -598,7 +598,7 @@ html,body{height:100%;max-height:100vh;max-height:100dvh;overflow:hidden}
       <button class="btn-main" onclick="guardarPerfil()">Guardar cambios</button>
     </div>
     <button class="btn-sec" onclick="cerrarSesion()">Cerrar sesión</button>
-    <div class="version">ALL Pedidos v2.2</div>
+    <div class="version">ALL Pedidos v2.3</div>
   </div>
   <div class="navbar">
     <button class="nav-item" onclick="irA('v-home');setNavActive3(0)">
@@ -1516,31 +1516,28 @@ async function renderSeguimiento(pedidoId){
     html+='<button class="btn-main" onclick="irA(\'v-home\')" style="margin-bottom:12px">🏠 Volver al inicio</button>'
   } else {
     html+='<div class="seg-estado-sub">'+estado.sub+'</div></div>'
-  // HORA PROGRAMADA
-  if(p.hora_pedido && p.hora_pedido !== 'ahora'){
-    var horaStr = ''
-    if(p.hora_entrega_alternativa){
-      var alt = new Date(p.hora_entrega_alternativa)
-      var hh = alt.getHours().toString().padStart(2,'0')
-      var mm = alt.getMinutes().toString().padStart(2,'0')
-      if(p.hora_alt_respondida === 'aceptada'){
-        // Ya aceptó — mostrar confirmado
-        html += '<div class="seg-hora-card">✅ Confirmaste la entrega para las <strong>'+hh+':'+mm+' hs</strong></div>'
-      } else {
-        // Pendiente de respuesta — mostrar botones
-        horaStr = '🔄 El local te propone otra hora de entrega: <strong>'+hh+':'+mm+' hs</strong>'
-        html += '<div class="seg-hora-card alt">'+horaStr
-        html += '<div style="display:flex;gap:8px;margin-top:12px">'
-        html += '<button onclick="responderHoraAlt(\''+p.id+'\',true)" style="flex:1;padding:12px;background:#2D6A2D;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;touch-action:manipulation">✅ Acepto</button>'
-        html += '<button onclick="responderHoraAlt(\''+p.id+'\',false)" style="flex:1;padding:12px;background:#fff;color:#E24B4A;border:1.5px solid #E24B4A;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;touch-action:manipulation">❌ No me sirve</button>'
-        html += '</div></div>'
-      }
-    } else if(p.hora_entrega_esperada){
-      var esp = new Date(p.hora_entrega_esperada)
-      var hhe = esp.getHours().toString().padStart(2,'0')
-      var mme = esp.getMinutes().toString().padStart(2,'0')
-      html += '<div class="seg-hora-card">📅 Pedido programado para las <strong>'+hhe+':'+mme+' hs</strong></div>'
+  // HORA ALTERNATIVA — siempre visible (pedidos ahora O programados)
+  if(p.hora_entrega_alternativa){
+    var alt = new Date(p.hora_entrega_alternativa)
+    var hh = alt.getHours().toString().padStart(2,'0')
+    var mm = alt.getMinutes().toString().padStart(2,'0')
+    if(p.hora_alt_respondida === 'aceptada'){
+      html += '<div class="seg-hora-card">✅ Confirmaste la entrega para las <strong>'+hh+':'+mm+' hs</strong></div>'
+    } else {
+      html += '<div class="seg-hora-card alt" style="animation:pulse 1.5s ease-in-out infinite alternate">'
+      html += '🔔 <strong>El local propone otra hora de entrega: '+hh+':'+mm+' hs</strong>'
+      html += '<div style="font-size:12px;color:#E65100;margin-top:4px">Respondé para confirmar tu pedido</div>'
+      html += '<div style="display:flex;gap:8px;margin-top:12px">'
+      html += '<button onclick="responderHoraAlt(\''+p.id+'\',true)" style="flex:1;padding:12px;background:#2D6A2D;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation">✅ Acepto</button>'
+      html += '<button onclick="responderHoraAlt(\''+p.id+'\',false)" style="flex:1;padding:12px;background:#fff;color:#E24B4A;border:1.5px solid #E24B4A;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation">❌ No me sirve</button>'
+      html += '</div></div>'
     }
+  } else if(p.hora_pedido && p.hora_pedido !== 'ahora' && p.hora_entrega_esperada){
+    // Solo mostrar hora programada si NO hay alternativa propuesta
+    var esp = new Date(p.hora_entrega_esperada)
+    var hhe = esp.getHours().toString().padStart(2,'0')
+    var mme = esp.getMinutes().toString().padStart(2,'0')
+    html += '<div class="seg-hora-card">📅 Pedido programado para las <strong>'+hhe+':'+mme+' hs</strong></div>'
   }
 
   html+='<div class="seg-steps">'
